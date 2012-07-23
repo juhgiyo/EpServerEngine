@@ -138,7 +138,7 @@ epl::EpTString BaseClient::GetHostName() const
 		return _T("");
 
 #if defined(_UNICODE) || defined(UNICODE)
-	EpTString retString=epl::System::MultiByteToWideChar(m_hostName.c_str());
+	epl::EpTString retString=epl::System::MultiByteToWideChar(m_hostName.c_str());
 	return retString;
 #else //defined(_UNICODE) || defined(UNICODE)
 	return m_hostName;
@@ -152,7 +152,7 @@ epl::EpTString BaseClient::GetPort() const
 		return _T("");
 
 #if defined(_UNICODE) || defined(UNICODE)
-	EpTString retString=epl::System::MultiByteToWideChar(m_port.c_str());;
+	epl::EpTString retString=epl::System::MultiByteToWideChar(m_port.c_str());;
 	return retString;
 #else //defined(_UNICODE) || defined(UNICODE)
 	return m_port;

@@ -11,7 +11,8 @@ FEATURES
 * Easy to build server/client application.
   - Just implement Packet Structure and Packet Parsing routine for your server/client, 
        and EpServerEngine will do rest for you.
-  - No more nasty initialization of WinSock and painful Winsock operation to build server/client application.
+  - No more nasty initialization of WinSock and painful Winsock operation 
+       to build server/client application.
   - No need to spend the time for handling thread synchronization.
 * Supports variadic length packets using Packet Container
 * Supports full ASCII/Unicode development environment
@@ -58,6 +59,11 @@ If the documentation file is not visible after finishing download,
 USAGE
 
 To find the usage examples, please see the wiki page at <https://github.com/juhgiyo/EpServerEngine/wiki>
+
+
+REFERENCE
+
+* EpLibrary 2.0 <https://github.com/juhgiyo/EpLibrary>
 
 
 LICENSE
