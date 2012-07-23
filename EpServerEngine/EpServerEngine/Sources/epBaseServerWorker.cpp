@@ -80,6 +80,7 @@ BaseServerWorker::~BaseServerWorker()
 
 void BaseServerWorker::setArg(void* a)
 {
+	epl::LockObj lock(m_sendLock);
 	SOCKET clientSocket=reinterpret_cast<SOCKET>(a);
 	m_clientSocket=clientSocket;
 }

@@ -94,7 +94,18 @@ namespace epse
 		{
 			if(this!=&b)
 			{
+				epl::LockObj lock(m_lock);
 				BaseServerSendObject::operator =(b);
+				m_clientSocket=b.m_clientSocket;
+				m_server=b.m_server;
+
+				if(m_packet)
+					m_packet->ReleaseObj();
+				m_packet=b.m_packet;
+				if(m_packet)
+					m_packet->RetainObj();
+				m_maxPacketSize=b.m_maxPacketSize;
+
 			}
 			return *this;
 		}

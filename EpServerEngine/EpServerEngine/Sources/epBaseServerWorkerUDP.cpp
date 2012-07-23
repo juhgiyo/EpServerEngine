@@ -87,9 +87,13 @@ void BaseServerWorkerUDP::setArg(void* a)
 	PacketPassUnit *clientSocket=reinterpret_cast<PacketPassUnit*>(a);
 	m_clientSocket=clientSocket->m_clientSocket;
 	m_server=clientSocket->m_server;
+	
+	if(m_packet)
+		m_packet->ReleaseObj();
 	m_packet=clientSocket->m_packet;
 	if(m_packet)
 		m_packet->RetainObj();
+
 	m_maxPacketSize=m_server->GetMaxPacketByteSize();
 }
 

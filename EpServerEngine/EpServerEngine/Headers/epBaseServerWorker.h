@@ -95,7 +95,9 @@ namespace epse
 		{
 			if(this!=&b)
 			{
+				epl::LockObj lock(m_sendLock);
 				BaseServerSendObject::operator =(b);
+				m_clientSocket=b.m_clientSocket;
 			}
 			return *this;
 		}	

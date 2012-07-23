@@ -109,6 +109,8 @@ void BasePacketParser::execute()
 void BasePacketParser::setArg(void* a)
 {
 	epl::LockObj lock(m_generalLock);
+	if(m_packetReceived)
+		m_packetReceived->ReleaseObj();
 	m_packetReceived=( reinterpret_cast<PacketPassUnit*>(a))->m_packet;
 	if(m_packetReceived)
 		m_packetReceived->RetainObj();
