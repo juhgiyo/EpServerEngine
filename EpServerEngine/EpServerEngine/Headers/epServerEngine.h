@@ -49,5 +49,6 @@ An Interface for EP Server Engine.
 #endif  //EP_SERVER_ENGINE_DLL_EXPORT
 
 #include "epl.h"
+using namespace epl;
 
 #endif //__EP_SERVER_ENGINE_H__
