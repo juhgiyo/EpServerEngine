@@ -46,10 +46,9 @@ namespace epse{
 		Default Constructor
 
 		Initializes the Object
-		@param[in] callbackObj the callback object to call when thread stops
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServerObject(epl::BaseCallbackObject *callbackObj=NULL,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY):epl::SmartObject(lockPolicyType),epl::Thread(callbackObj,lockPolicyType)
+		BaseServerObject(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY):epl::SmartObject(lockPolicyType),epl::Thread(lockPolicyType)
 		{
 		}
 

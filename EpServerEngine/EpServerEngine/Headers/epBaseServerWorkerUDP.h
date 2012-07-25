@@ -65,10 +65,9 @@ namespace epse
 		Default Constructor
 
 		Initializes the Worker
-		@param[in] callbackObj the callback object to call when worker thread stops
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServerWorkerUDP(epl::BaseCallbackObject *callbackObj=NULL,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseServerWorkerUDP(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor

@@ -68,10 +68,9 @@ namespace epse{
 
 		Initializes the Server
 		@param[in] port the port string
-		@param[in] callbackObj the callback object to call when server stops
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServer(const TCHAR * port=_T(DEFAULT_PORT),epl::BaseCallbackObject *callbackObj=NULL, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseServer(const TCHAR * port=_T(DEFAULT_PORT), epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor

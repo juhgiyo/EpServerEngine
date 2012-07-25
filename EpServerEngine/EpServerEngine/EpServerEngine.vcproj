@@ -737,10 +737,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\EpLibraryHeaders\epBaseCallbackObject.h"
-				>
-			</File>
-			<File
 				RelativePath=".\EpLibraryHeaders\epBaseFile.h"
 				>
 			</File>
@@ -861,7 +857,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\EpLibraryHeaders\epPatriciaTree.h"
+				RelativePath=".\EpLibraryHeaders\epPatriciaTrie.h"
 				>
 			</File>
 			<File

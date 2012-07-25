@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 using namespace epse;
-BaseServerWorker::BaseServerWorker(epl::BaseCallbackObject *callbackObj,epl::LockPolicy lockPolicyType): BaseServerSendObject(callbackObj,lockPolicyType)
+BaseServerWorker::BaseServerWorker(epl::LockPolicy lockPolicyType): BaseServerSendObject(lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)

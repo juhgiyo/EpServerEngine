@@ -35,7 +35,6 @@ A Frame Interface for Thread Class.
 #include "epCriticalSectionEx.h"
 #include "epMutex.h"
 #include "epNoLock.h"
-#include "epBaseCallbackObject.h"
 
 namespace epl
 {
@@ -91,10 +90,9 @@ namespace epl
 		Default Constructor
 
 		Initializes the thread class
-		@param[in] callBackObj The callback object to call when thread ends
 		@param[in] lockPolicyType The lock policy
 		*/
-		Thread(BaseCallbackObject *callBackObj=NULL,LockPolicy lockPolicyType=EP_LOCK_POLICY);
+		Thread(LockPolicy lockPolicyType=EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -121,14 +119,6 @@ namespace epl
 		{
 			if(this!=&b)
 			{
-				LockObj lock(m_callBackLock);
-				if(m_callBackObj)
-				{
-					m_callBackObj->ReleaseObj();
-				}
-				m_callBackObj=b.m_callBackObj;
-				if(m_callBackObj)
-					m_callBackObj->RetainObj();
 			}
 			return *this;
 		}
@@ -158,6 +148,7 @@ namespace epl
 		/*!
 		Terminate the running or suspended thread.
 		@return true, if succeeded, otherwise false.
+		@remark this function should be use with care! Memory leak might occur!
 		*/
 		bool Terminate();
 
@@ -187,6 +178,23 @@ namespace epl
 		}
 
 		/*!
+		Return the parent's Thread Handle.
+		@return the parent's Thread Handle.
+		*/
+		ThreadHandle GetParentThreadHandle() const
+		{
+			return m_parentThreadHandle;
+		}
+
+		/*!
+		Return the parent's Thread ID
+		@return the parent's Thread ID
+		*/
+		ThreadID GetParentThreadID() const
+		{
+			return m_parentThreadId;
+		}
+		/*!
 		Return the Thread Status.
 		@return the current thread status.
 		*/
@@ -196,16 +204,15 @@ namespace epl
 		}
 
 		/*!
-		Return the Callback Object.
-		@return the current callback object.
+		Return the Thread Exit Code.
+		@return the thread exit code.
+		@remark 0 means successful termination, 1 means unsafe termination.
 		*/
-		BaseCallbackObject *GetCallbackObj();
+		unsigned long GetExitCode() const
+		{
+			return m_exitCode;
+		}
 
-		/*!
-		Set current callback object as given parameter
-		@param[in] callBackObj the callback object to set
-		*/
-		void SetCallbackObj(BaseCallbackObject * callBackObj);
 
 		/*!
 		Return the thread argument list.
@@ -242,6 +249,16 @@ namespace epl
 		@remark Subclass should override this function for executing the thread function.
 		*/
 		virtual void execute();
+
+		/*!
+		Calls when the thread terminated.
+		@param[in] exitCode the exit code of the thread
+		@param[in] isInDeletion the flag whether the thread class is in deletion or not
+		@remark Subclass should override this function for clean up such as deallocation.
+		@remark exitCode = 0 means successful termination, 1 means unsafe termination.
+		@remark if isInDeletion is true, then onTerminated is called within destructor!
+		*/
+		virtual void onTerminated(unsigned long exitCode,bool isInDeletion=false);
 
 	private:
 		/*!
@@ -282,6 +299,12 @@ namespace epl
 		ThreadID m_threadId;
 		/// Thread Handle
 		ThreadHandle m_threadHandle;
+		
+		/// Parent Thread ID
+		ThreadID m_parentThreadId;
+		/// Parent Thread Handle
+		ThreadHandle m_parentThreadHandle;
+		
 		/// Thread Argument List
 		void * m_arg;
 		/// Thread Status
@@ -290,12 +313,10 @@ namespace epl
 		ThreadType m_type;
 		/// Lock
 		BaseLock *m_threadLock;
-		/// Callback Lock
-		BaseLock *m_callBackLock;
 		/// Thread Lock Policy
 		LockPolicy m_lockPolicy;
-		/// Callback Object
-		BaseCallbackObject *m_callBackObj;
+		/// exit code
+		unsigned long m_exitCode;
 
 
 	};

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-BasePacketParser::BasePacketParser(unsigned int waitTimeMilliSec,epl::BaseCallbackObject *callbackObj,epl::LockPolicy lockPolicyType):BaseServerObject(callbackObj,lockPolicyType)
+BasePacketParser::BasePacketParser(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):BaseServerObject(lockPolicyType)
 {
 	m_waitTime=waitTimeMilliSec;
 	m_owner=NULL;

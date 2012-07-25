@@ -76,10 +76,9 @@ namespace epse{
 		Initializes the Client
 		@param[in] hostName the hostname string
 		@param[in] port the port string
-		@param[in] callbackObj the callback object to call when client disconnects
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseClient(const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),epl::BaseCallbackObject *callbackObj=NULL,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseClient(const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor

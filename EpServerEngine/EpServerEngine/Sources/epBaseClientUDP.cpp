@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,epl::BaseCallbackObject *callbackObj,epl::LockPolicy lockPolicyType): BaseServerSendObject(callbackObj,lockPolicyType)
+BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,epl::LockPolicy lockPolicyType): BaseServerSendObject(lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
