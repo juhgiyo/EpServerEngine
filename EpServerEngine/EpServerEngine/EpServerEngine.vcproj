@@ -821,6 +821,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EpLibraryHeaders\epInterlockedEx.h"
+				>
+			</File>
+			<File
 				RelativePath=".\EpLibraryHeaders\epJobScheduleQueue.h"
 				>
 			</File>
