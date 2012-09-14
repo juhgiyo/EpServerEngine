@@ -30,7 +30,7 @@ An Interface for Network Stream Class.
 */
 #ifndef __EP_NETWORK_STREAM_H__
 #define __EP_NETWORK_STREAM_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epStream.h"
 
 namespace epl
@@ -39,7 +39,7 @@ namespace epl
 	@class NetworkStream epNetworkStream.h
 	@brief A class for Network Stream.
 	*/
-	class EP_FOUNDATION NetworkStream:public Stream
+	class EP_LIBRARY NetworkStream:public Stream
 	{
 	public:
 		enum NetworkStreamFlushType{

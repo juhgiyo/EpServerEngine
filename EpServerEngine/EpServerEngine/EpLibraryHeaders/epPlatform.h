@@ -31,7 +31,7 @@ An Interface for the Platform Dependencies.
 #ifndef __EP_PLATFORM_H__
 #define __EP_PLATFORM_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 

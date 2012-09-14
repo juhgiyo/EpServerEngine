@@ -31,7 +31,7 @@ An Interface for the Fast Natural Log Approximation.
 #ifndef __EP_FAST_LOG_H__
 #define __EP_FAST_LOG_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 
 namespace epl{
 #define FLOG_ERROR 0xff
@@ -40,7 +40,7 @@ namespace epl{
 	@class FastLog epFastLog.h
 	@brief A class that calculates Logarithm.
 	*/
-	class EP_FOUNDATION FastLog
+	class EP_LIBRARY FastLog
 	{
 	public:
 		/*!

@@ -30,7 +30,7 @@ An Interface for Quick Sort Algorithm Function.
 */
 #ifndef __EP_QUICK_SORT_H__
 #define __EP_QUICK_SORT_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epInsertionSort.h"
 #include <stack>
 using namespace std;

@@ -31,7 +31,7 @@ An Interface for the Random Number Generator.
 #ifndef __EP_RANDOM_H__
 #define __EP_RANDOM_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSingletonHolder.h"
 
 #define RANDOM_INSTANCE epl::SingletonHolder<Random>::Instance()
@@ -41,7 +41,7 @@ namespace epl
 	@class Random epRandom.h
 	@brief A class that generate the random number.
 	*/
-	class EP_FOUNDATION Random
+	class EP_LIBRARY Random
 	{
 	public:
 		friend class SingletonHolder<Random>;

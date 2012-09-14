@@ -38,7 +38,7 @@ An Interface for XMLite Class.
 #ifndef __EP_XMLITE_H__
 #define __EP_XMLITE_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epMemory.h"
 #include <vector>
@@ -58,14 +58,14 @@ namespace epl
 	typedef struct _tagXMLDocument XDoc, *LPXDoc;
 
 	// Entity Encode/Decode Support
-	typedef struct EP_FOUNDATION _tagXmlEntity
+	typedef struct EP_LIBRARY _tagXmlEntity
 	{
 		TCHAR m_entity;					// entity ( & " ' < > )
 		TCHAR m_ref[10];					// entity reference ( &amp; &quot; etc )
 		int m_ref_len;					// entity reference length
 	}XENTITY,*LPXENTITY;
 
-	typedef struct EP_FOUNDATION _tagXMLEntitys : public std::vector<XENTITY>
+	typedef struct EP_LIBRARY _tagXMLEntitys : public std::vector<XENTITY>
 	{
 		LPXENTITY GetEntity( int entity );
 		LPXENTITY GetEntity( LPTSTR entity );	
@@ -93,7 +93,7 @@ namespace epl
 	}PCODE;
 
 
-	typedef struct EP_FOUNDATION _tagValueParseInfo
+	typedef struct EP_LIBRARY _tagValueParseInfo
 	{
 
 		TCHAR chXMLTagOpen;
@@ -106,7 +106,7 @@ namespace epl
 	}VALUEPARSEINFO,*LPVALUEPARSEINFO;
 
 	// Parse info.
-	typedef struct EP_FOUNDATION _tagParseInfo
+	typedef struct EP_LIBRARY _tagParseInfo
 	{
 		bool		m_trim_value;			// [set] do trim when parse?
 		bool		m_entity_value;		// [set] do convert from reference to entity? ( &lt; -> < )
@@ -128,7 +128,7 @@ namespace epl
 	
 
 	// display optional environment
-	typedef struct EP_FOUNDATION _tagDispOption
+	typedef struct EP_LIBRARY _tagDispOption
 	{
 		bool m_newline;			// newline when new tag
 		bool m_reference_value;	// do convert from entity to reference ( < -> &lt; )
@@ -142,7 +142,7 @@ namespace epl
 	
 
 	// XAttr : Attribute Implementation
-	typedef struct EP_FOUNDATION _tagXMLAttr
+	typedef struct EP_LIBRARY _tagXMLAttr
 	{
 		CString m_name;
 		CString	m_value;
@@ -162,7 +162,7 @@ namespace epl
 	}NODE_TYPE;
 
 	// XMLNode structure
-	typedef struct EP_FOUNDATION _tagXMLNode
+	typedef struct EP_LIBRARY _tagXMLNode
 	{
 		// name and value
 		CString m_name;
@@ -241,7 +241,7 @@ namespace epl
 	}XNode, *LPXNode;
 
 	// XMLDocument structure
-	typedef struct EP_FOUNDATION _tagXMLDocument : public XNode
+	typedef struct EP_LIBRARY _tagXMLDocument : public XNode
 	{
 		PARSEINFO	m_parse_info;
 		VALUEPARSEINFO m_valueParse_info;

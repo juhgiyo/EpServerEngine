@@ -31,7 +31,7 @@ An Interface for InterlockedEx Class.
 #ifndef __EP_INTERLOCKED_EX_H__
 #define __EP_INTERLOCKED_EX_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epBaseLock.h"
 
@@ -46,7 +46,7 @@ namespace epl
 	@class InterlockedEx epInterlockedEx.h
 	@brief A class that handles the Interlocked functionality.
 	*/
-	class EP_FOUNDATION InterlockedEx :public BaseLock
+	class EP_LIBRARY InterlockedEx :public BaseLock
 	{
 	public:
 		/*!

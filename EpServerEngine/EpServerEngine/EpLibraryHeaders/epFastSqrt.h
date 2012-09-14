@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 An Interface for the Fast Square Root Approximation.
 
 */
-#include "epFoundationLib.h"
+#include "epLib.h"
 
 #ifndef __EP_FAST_SQRT_H__
 #define __EP_FAST_SQRT_H__
@@ -38,7 +38,7 @@ namespace epl
 	@class FastSqrt epFastSqrt.h
 	@brief A class that calculates SquareRoot.
 	*/
-	class EP_FOUNDATION FastSqrt
+	class EP_LIBRARY FastSqrt
 	{
 	public:
 		/*!

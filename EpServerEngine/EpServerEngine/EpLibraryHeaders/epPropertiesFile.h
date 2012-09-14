@@ -30,7 +30,7 @@ An Interface for the Properties File Class.
 */
 #ifndef __EP_PROPERTIES_FILE_H__
 #define __EP_PROPERTIES_FILE_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epMemory.h"
 #include "epBaseFile.h"
@@ -44,7 +44,7 @@ namespace epl{
 	@class PropertiesFile epPropertiesFile.h
 	@brief A class for Peroperties File.
 	*/
-	class EP_FOUNDATION PropertiesFile:public BaseFile{
+	class EP_LIBRARY PropertiesFile:public BaseFile{
 	public:
 
 		/*!

@@ -30,7 +30,7 @@ An Interface for the File System Folder Processing Operation.
 */
 #ifndef __EP_FOLDER_HELPER_H__
 #define __EP_FOLDER_HELPER_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 namespace epl
 {
@@ -40,7 +40,7 @@ namespace epl
 
 	Implements the Folder Processing Functions.
 	*/
-	class EP_FOUNDATION FolderHelper
+	class EP_LIBRARY FolderHelper
 	{
 
 	public:

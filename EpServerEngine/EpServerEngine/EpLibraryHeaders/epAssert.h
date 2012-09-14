@@ -31,7 +31,7 @@ An Interface for Assert.
 #ifndef __EP_ASSERT_H__
 #define __EP_ASSERT_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 
 #include <assert.h>
 #include "epMemory.h"

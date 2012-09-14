@@ -30,7 +30,7 @@ An Interface for K-ary Heap Template class.
 */
 #ifndef __EP_KARYHEAP_H__
 #define __EP_KARYHEAP_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epDynamicArray.h"
 #include "epException.h"
 #include <stack>

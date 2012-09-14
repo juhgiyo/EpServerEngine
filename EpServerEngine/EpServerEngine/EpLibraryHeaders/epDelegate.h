@@ -30,7 +30,7 @@ An Interface for C# Style Delegate Class.
 */
 #ifndef __EP_DELEGATE_H__
 #define __EP_DELEGATE_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include <vector>
 #include "epCriticalSectionEx.h"

@@ -30,7 +30,7 @@ An Interface for Thread Safe Priority Queue.
 */
 #ifndef __EP_THREAD_SAFE_PQUEUE_H__
 #define __EP_THREAD_SAFE_PQUEUE_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epThreadSafeQueue.h"
 #include "epBinarySearch.h"
 

@@ -30,7 +30,7 @@ An Interface for Thread Safe Class.
 */
 #ifndef __EP_THREAD_SAFE_CLASS_H__
 #define __EP_THREAD_SAFE_CLASS_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epCriticalSectionEx.h"
 #include "epMutex.h"
@@ -159,7 +159,7 @@ namespace epl
 		Declare the ThreadSafeObj within the class functions or regions to 
 		make the section as Critical Section.
 		*/
-		class EP_FOUNDATION ThreadSafeObj
+		class EP_LIBRARY ThreadSafeObj
 		{
 			friend ThreadSafeClass;
 		public:

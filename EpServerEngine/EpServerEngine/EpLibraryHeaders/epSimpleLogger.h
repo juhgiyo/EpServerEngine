@@ -30,7 +30,7 @@ An Interface for Managing the Logs.
 */
 #ifndef __EP_SIMPLE_LOGGER_H__
 #define __EP_SIMPLE_LOGGER_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epBaseOutputter.h"
 #include "epSingletonHolder.h"
 
@@ -75,7 +75,7 @@ namespace epl
 	@class SimpleLogManager epSimpleLogger.h
 	@brief A class that manages the logs.
 	*/
-	class EP_FOUNDATION SimpleLogManager:public BaseOutputter
+	class EP_LIBRARY SimpleLogManager:public BaseOutputter
 	{
 	public:
 		friend class SingletonHolder<SimpleLogManager>;
@@ -112,7 +112,7 @@ namespace epl
 		@class SimpleLogNode epSimpleLogger.h
 		@brief A class to hold simple log related members.
 		*/
-		class EP_FOUNDATION SimpleLogNode: public BaseOutputter::OutputNode
+		class EP_LIBRARY SimpleLogNode: public BaseOutputter::OutputNode
 		{
 		public:
 

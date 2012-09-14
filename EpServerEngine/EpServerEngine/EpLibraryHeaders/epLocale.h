@@ -31,7 +31,7 @@ An Interface for Locale Class.
 #ifndef __EP_LOCALE_H__
 #define __EP_LOCALE_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include <vector>
 #include <string.h>
 namespace epl{
@@ -52,7 +52,7 @@ namespace epl{
 
 	Implements the Locale Functions.
 	*/
-	class EP_FOUNDATION Locale
+	class EP_LIBRARY Locale
 	{
 	public:
 

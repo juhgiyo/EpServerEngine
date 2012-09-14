@@ -30,7 +30,7 @@ An Interface for Mutex Class.
 */
 #ifndef __EP_MUTEX_H__
 #define __EP_MUTEX_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epBaseLock.h"
 
@@ -45,7 +45,7 @@ namespace epl
 	@class Mutex epMutex.h
 	@brief A class that handles the mutex functionality.
 	*/
-	class EP_FOUNDATION Mutex :public BaseLock
+	class EP_LIBRARY Mutex :public BaseLock
 	{
 	public:
 		/*!

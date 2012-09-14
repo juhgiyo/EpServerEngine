@@ -30,7 +30,7 @@ An Interface for the Smart Object.
 */
 #ifndef __EP_SMART_OBJECT_H__
 #define __EP_SMART_OBJECT_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epSimpleLogger.h"
 #include "epCriticalSectionEx.h"
@@ -47,7 +47,7 @@ namespace epl
 
 	Implements the System Functions.
 	*/
-	class EP_FOUNDATION SmartObject
+	class EP_LIBRARY SmartObject
 	{
 	public:
 		/*!

@@ -30,6 +30,7 @@ A Interface for Base Worker Thread Class.
 */
 #ifndef __EP_BASE_WORKER_THREAD_H__
 #define __EP_BASE_WORKER_THREAD_H__
+#include "epLib.h"
 #include "epJobScheduleQueue.h"
 #include "epThread.h"
 #include "epBaseJob.h"
@@ -41,7 +42,7 @@ namespace epl
 	@class BaseWorkerThread epBaseWorkerThread.h
 	@brief A class that implements Base Worker Thread Class.
 	*/
-	class EP_FOUNDATION BaseWorkerThread :public Thread
+	class EP_LIBRARY BaseWorkerThread :public Thread
 	{
 	public:
 		/// Enumerator for Thread Life Policy

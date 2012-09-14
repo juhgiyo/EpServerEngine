@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Client Side">
+      <UniqueIdentifier>{9f9aca28-1a95-404e-aded-ba84ce232dc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\TCP">
+      <UniqueIdentifier>{f7a38642-b497-4d0f-8a58-a8c5a5e88502}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\UDP">
+      <UniqueIdentifier>{2b684519-df86-44df-bddb-fed6c58e684a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side">
+      <UniqueIdentifier>{48bd4d1c-f047-4e27-8dd0-33d4cce6af82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\TCP">
+      <UniqueIdentifier>{4bac62f0-1925-4c4b-8107-01eddf7e74c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\UDP">
+      <UniqueIdentifier>{8e4cd2ed-6d65-45e0-a7bb-de09acdca93c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Client Side">
+      <UniqueIdentifier>{72106fe9-4b33-4272-8085-935cd01c94ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\TCP">
+      <UniqueIdentifier>{8c9611cf-cb90-4caa-aef6-cd99a889c484}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\UDP">
+      <UniqueIdentifier>{79700d16-6f59-4161-9659-5c6d40fac5f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side">
+      <UniqueIdentifier>{561f127d-1158-48c3-b767-31f8f564b37c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\TCP">
+      <UniqueIdentifier>{98087a61-963c-4945-8ea5-a16e365556be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\UDP">
+      <UniqueIdentifier>{5b664c64-4fb5-4f23-a863-faf02ecb3a96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="EpLibraryHeaders">
+      <UniqueIdentifier>{1491596d-364e-472c-a1d7-7fb2aeb5314f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sources\epBasePacketParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epPacket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epServerObjectList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseClient.cpp">
+      <Filter>Source Files\Client Side\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseClientUDP.cpp">
+      <Filter>Source Files\Client Side\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseServer.cpp">
+      <Filter>Source Files\Server Side\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseServerWorker.cpp">
+      <Filter>Source Files\Server Side\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseServerUDP.cpp">
+      <Filter>Source Files\Server Side\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseServerWorkerUDP.cpp">
+      <Filter>Source Files\Server Side\UDP</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Headers\epBasePacketParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseServerObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseServerSendObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epPacket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epPacketContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epServerConf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epServerEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epServerObjectList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseClient.h">
+      <Filter>Header Files\Client Side\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseClientUDP.h">
+      <Filter>Header Files\Client Side\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseServer.h">
+      <Filter>Header Files\Server Side\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseServerWorker.h">
+      <Filter>Header Files\Server Side\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseServerUDP.h">
+      <Filter>Header Files\Server Side\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseServerWorkerUDP.h">
+      <Filter>Header Files\Server Side\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epAlgorithm.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epAssert.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epBaseFile.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epBaseJob.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epBaseJobProcessor.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epBaseLock.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epBaseOutputter.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epBaseWorkerThread.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epBinarySearch.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epConsoleHelper.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epCriticalSectionEx.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epCStringEx.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epDateTimeHelper.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epDelegate.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epDynamicArray.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epEndian.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epException.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epFastLog.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epFastSqrt.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epFileStream.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epFolderHelper.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epFoundationLib.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epInsertionSort.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epInterlockedEx.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epJobScheduleQueue.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epKAryHeap.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epl.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epLocale.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epMemory.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epMergeSort.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epMutex.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epNetworkStream.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epNoLock.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epPatriciaTrie.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epPlatform.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epPrimeNum.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epProfiler.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epPropertiesFile.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epQuickSort.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epRandom.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epRegistryHelper.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epSemaphore.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epSimpleLogger.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epSingletonHolder.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epSmartObject.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epStream.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epSystem.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epTaskbarNotifier.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epTextFile.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epThread.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epThreadSafeClass.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epThreadSafePQueue.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epThreadSafeQueue.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epTinyObject.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epWinProcessHelper.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epWorkerThreadDelegate.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epWorkerThreadFactory.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epWorkerThreadInfinite.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epWorkerThreadSingle.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epXMLFile.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epXMLite.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

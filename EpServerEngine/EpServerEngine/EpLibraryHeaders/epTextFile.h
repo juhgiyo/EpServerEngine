@@ -30,7 +30,7 @@ An Interface for the Text File Class.
 */
 #ifndef __EP_TEXT_FILE_H__
 #define __EP_TEXT_FILE_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epMemory.h"
 #include "epBaseFile.h"
@@ -41,7 +41,7 @@ namespace epl{
 	@class TextFile epTextFile.h
 	@brief A class for Text File.
 	*/
-	class EP_FOUNDATION TextFile:public BaseFile{
+	class EP_LIBRARY TextFile:public BaseFile{
 	public:
 
 		/*!

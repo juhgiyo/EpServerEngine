@@ -30,7 +30,7 @@ An Interface for Stream Class.
 */
 #ifndef __EP_STREAM_H__
 #define __EP_STREAM_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epCriticalSectionEx.h"
 #include "epMutex.h"
 #include "epNoLock.h"
@@ -42,7 +42,7 @@ namespace epl
 	@class Stream epStream.h
 	@brief A class for Stream.
 	*/
-	class EP_FOUNDATION Stream
+	class EP_LIBRARY Stream
 	{
 	public:
 		/// Enumeration for Stream Seek Type

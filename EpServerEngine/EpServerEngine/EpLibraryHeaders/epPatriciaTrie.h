@@ -31,7 +31,7 @@ An Interface for Patricia Trie Template class.
 #ifndef __EP_PATRICIA_TRIE_H__
 #define __EP_PATRICIA_TRIE_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epBinarySearch.h"
 #include <vector>
 using namespace std;

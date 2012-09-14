@@ -30,7 +30,7 @@ An Interface for CriticalSectionEx Class.
 */
 #ifndef __EP_CRITICAL_SECTION_EX_H__
 #define __EP_CRITICAL_SECTION_EX_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epBaseLock.h"
 
@@ -44,7 +44,7 @@ namespace epl
 	@class CriticalSectionEx epCriticalSectionEx.h
 	@brief A class that handles the CriticalSectionEx functionality.
 	*/
-	class EP_FOUNDATION CriticalSectionEx :public BaseLock
+	class EP_LIBRARY CriticalSectionEx :public BaseLock
 	{
 	public:
 		/*!

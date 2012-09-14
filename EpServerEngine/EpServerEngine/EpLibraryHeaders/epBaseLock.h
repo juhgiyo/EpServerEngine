@@ -30,7 +30,7 @@ An Interface for Virtual Lock Class.
 */
 #ifndef __EP_BASE_LOCK_H__
 #define __EP_BASE_LOCK_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 
 namespace epl
@@ -39,7 +39,7 @@ namespace epl
 	@class BaseLock epBaseLock.h
 	@brief A class that handles the virtual base lock.
 	*/
-	class EP_FOUNDATION BaseLock
+	class EP_LIBRARY BaseLock
 	{
 	public:
 		/*!
@@ -91,7 +91,7 @@ namespace epl
 		@class BaseLockObj epBaseLock.h
 		@brief A class that handles the lock.
 		*/
-		class EP_FOUNDATION BaseLockObj
+		class EP_LIBRARY BaseLockObj
 		{
 		public:
 			/*!

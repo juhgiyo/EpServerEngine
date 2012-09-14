@@ -31,7 +31,7 @@ An Interface for the Fast Prime Number Calculation.
 #ifndef __EP_PRIME_NUM_H__
 #define __EP_PRIME_NUM_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 
 namespace epl
 {
@@ -39,7 +39,7 @@ namespace epl
 	@class PrimeNum epPrimeNum.h
 	@brief A class that calculates Prime Number.
 	*/
-	class EP_FOUNDATION PrimeNum
+	class EP_LIBRARY PrimeNum
 	{
 	public:
 		/*!

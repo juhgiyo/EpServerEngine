@@ -30,7 +30,7 @@ An Interface for the DateTime Operation.
 */
 #ifndef __EP_DATE_TIME_HELPER_H__
 #define __EP_DATE_TIME_HELPER_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 
 namespace epl 
@@ -41,7 +41,7 @@ namespace epl
 
 	Implements the DateTime Helping Functions.
 	*/
-	class EP_FOUNDATION DateTimeHelper
+	class EP_LIBRARY DateTimeHelper
 	{
 	public:
 		/*!

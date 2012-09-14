@@ -3,7 +3,7 @@
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/eplibrary>
 @date April 16, 2011
-@brief Interface for EP Foundation Library
+@brief Interface for EpLibrary Pre-compiled header
 @version 2.0
 
 @section LICENSE
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for EP Foundation Library
+An Interface for EpLibrary Pre-compiled header
 
 */
 #ifndef __EP_EPL_H__

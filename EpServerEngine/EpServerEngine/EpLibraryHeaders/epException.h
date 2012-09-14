@@ -30,7 +30,7 @@ An Interface for Exception.
 */
 #ifndef __EP_EXCEPTION_H__
 #define __EP_EXCEPTION_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include <exception>
 
 /*!

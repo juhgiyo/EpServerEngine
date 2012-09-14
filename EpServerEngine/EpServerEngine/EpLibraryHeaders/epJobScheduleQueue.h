@@ -30,6 +30,7 @@ An Interface for Job Scheudle Queue.
 */
 #ifndef __EP_JOB_SCHEDULE_QUEUE_H__
 #define __EP_JOB_SCHEDULE_QUEUE_H__
+#include "epLib.h"
 #include "epThreadSafePQueue.h"
 #include "epBaseJob.h"
 
@@ -39,7 +40,7 @@ namespace epl
 	@class JobScheduleQueue epJobScheduleQueue.h
 	@brief A class for Thread Safe Priority Queue.
 	*/
-	class EP_FOUNDATION JobScheduleQueue :public ThreadSafePQueue<BaseJob*, BaseJob>
+	class EP_LIBRARY JobScheduleQueue :public ThreadSafePQueue<BaseJob*, BaseJob>
 	{
 	public:
 		/*!

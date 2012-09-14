@@ -30,7 +30,7 @@ An Interface for the Registry Processing Operation.
 */
 #ifndef __EP_REGISTRY_HELPER_H__
 #define __EP_REGISTRY_HELPER_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 
 namespace epl
@@ -41,7 +41,7 @@ namespace epl
 
 	Implements the Registry Processing Functions.
 	*/
-	class EP_FOUNDATION RegistryHelper
+	class EP_LIBRARY RegistryHelper
 	{
 	public:
 		/*!

@@ -37,7 +37,7 @@ An Interface for CStringEx Class.
 */
 #ifndef __EP_CSTRING_EX_H__
 #define __EP_CSTRING_EX_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 
 namespace epl
@@ -46,7 +46,7 @@ namespace epl
 	@class CStringEx epCStringEx.h
 	@brief A class for CStringEx.
 	*/
-	class EP_FOUNDATION CStringEx: public CString
+	class EP_LIBRARY CStringEx: public CString
 	{
 	public:
 

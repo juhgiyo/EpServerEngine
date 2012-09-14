@@ -43,7 +43,7 @@ An Interface for Tiny Object.
 */
 #ifndef __EP_TINY_OBJECT_H__
 #define __EP_TINY_OBJECT_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSingletonHolder.h"
 #include "epThreadSafeClass.h"
 
@@ -69,10 +69,10 @@ namespace epl {
 #define UCHAR_MAX     0xff      // maximum unsigned char value 
 #endif 
 
-	class EP_FOUNDATION StaticAllocator
+	class EP_LIBRARY StaticAllocator
 	{
 	public:
-		class EP_FOUNDATION Fragment
+		class EP_LIBRARY Fragment
 		{
 			friend StaticAllocator;
 
@@ -127,7 +127,7 @@ namespace epl {
 	};
 
 
-	class EP_FOUNDATION TinyObjAllocator
+	class EP_LIBRARY TinyObjAllocator
 	{
 	public:
 		TinyObjAllocator(
@@ -158,10 +158,10 @@ namespace epl {
 		unsigned int fragmentSize = DEFAULT_FRAGMENT_SIZE,
 		unsigned int maxTinyObjectSize = MAX_TINY_OBJECT_SIZE
 		>
-	class EP_FOUNDATION TinyObject
+	class EP_LIBRARY TinyObject
 	{
 
-		struct EP_FOUNDATION MyTinyObjAllocator : public TinyObjAllocator
+		struct EP_LIBRARY MyTinyObjAllocator : public TinyObjAllocator
 		{
 			MyTinyObjAllocator() : TinyObjAllocator(fragmentSize, maxTinyObjectSize)
 			{}

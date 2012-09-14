@@ -30,7 +30,7 @@ An Interface for Factory Class for Worker Thread.
 */
 #ifndef __EP_WORKER_THREAD_FACTORY_H__
 #define __EP_WORKER_THREAD_FACTORY_H__
-
+#include "epLib.h"
 #include "epBaseWorkerThread.h"
 
 namespace epl
@@ -40,7 +40,7 @@ namespace epl
 	@class WorkerThreadFactory epWorkerThreadFactory.h
 	@brief A factory class that returns the Worker Thread objects.
 	*/
-	class EP_FOUNDATION WorkerThreadFactory
+	class EP_LIBRARY WorkerThreadFactory
 	{
 	public:
 		/*!

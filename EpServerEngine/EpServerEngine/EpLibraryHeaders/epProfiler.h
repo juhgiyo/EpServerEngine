@@ -30,7 +30,7 @@ An Interface for the Debugging Profiler.
 */
 #ifndef __EP_PROFILER_H__
 #define __EP_PROFILER_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epBaseOutputter.h"
 #include "epSingletonHolder.h"
 
@@ -76,7 +76,7 @@ namespace epl
 	@class Profiler epProfiler.h
 	@brief This is a class for handling the profiling
 	*/
-	class EP_FOUNDATION Profiler
+	class EP_LIBRARY Profiler
 	{
 	public:
 
@@ -163,7 +163,7 @@ namespace epl
 	@class ProfileManager epProfiler.h
 	@brief A class that manages the profile data.
 	*/
-	class EP_FOUNDATION ProfileManager:public BaseOutputter
+	class EP_LIBRARY ProfileManager:public BaseOutputter
 	{
 	public:
 		friend class SingletonHolder<ProfileManager>;
@@ -192,7 +192,7 @@ namespace epl
 		@class ProfileObj epProfiler.h
 		@brief This is a class for handling the profiling
 		*/
-		class EP_FOUNDATION ProfileObj
+		class EP_LIBRARY ProfileObj
 		{
 		public:
 			/*!
@@ -262,7 +262,7 @@ namespace epl
 		@class ProfileNode epProfiler.h
 		@brief A class to hold profiling related members.
 		*/
-		class EP_FOUNDATION ProfileNode:public BaseOutputter::OutputNode
+		class EP_LIBRARY ProfileNode:public BaseOutputter::OutputNode
 		{
 		public:
 			friend class ProfileManager;

@@ -30,7 +30,7 @@ An Interface for Merge Sort Algorithm Function.
 */
 #ifndef __EP_MERGE_SORT_H__
 #define __EP_MERGE_SORT_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include <stack>
 using namespace std;
 

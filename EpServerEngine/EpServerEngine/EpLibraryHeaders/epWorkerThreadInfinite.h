@@ -30,7 +30,7 @@ A Interface for Infinite-looping Worker Thread Class.
 */
 #ifndef __EP_WORKER_THREAD_INFINITE_H__
 #define __EP_WORKER_THREAD_INFINITE_H__
-
+#include "epLib.h"
 #include "epWorkerThreadFactory.h"
 #include "epCriticalSectionEx.h"
 #include "epBaseJobProcessor.h"
@@ -41,7 +41,7 @@ namespace epl
 	@class WorkerThreadInfinite epWorkerThreadInfinite.h
 	@brief A class that implements infinite-looping Worker Thread Class.
 	*/
-	class EP_FOUNDATION WorkerThreadInfinite:public BaseWorkerThread
+	class EP_LIBRARY WorkerThreadInfinite:public BaseWorkerThread
 	{
 	public:
 		/*!

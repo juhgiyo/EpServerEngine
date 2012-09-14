@@ -31,7 +31,7 @@ An Interface for System Class.
 #ifndef __EP_SYSTEM_H__
 #define __EP_SYSTEM_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epAlgorithm.h"
 
 #include <vector>
@@ -91,7 +91,7 @@ namespace epl
 
 	Implements the System Functions.
 	*/
-	class EP_FOUNDATION System
+	class EP_LIBRARY System
 	{
 
 	public:

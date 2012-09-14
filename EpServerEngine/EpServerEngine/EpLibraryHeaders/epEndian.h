@@ -31,7 +31,7 @@ An Interface for Endian Class.
 #ifndef __EP_ENDIAN_H__
 #define __EP_ENDIAN_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 
 
 namespace epl
@@ -40,7 +40,7 @@ namespace epl
 	@class Endian epEndian.h
 	@brief A class for Endian.
 	*/
-	class EP_FOUNDATION Endian
+	class EP_LIBRARY Endian
 	{
 		/*!
 		Swap Short Endianness and return the swapped value.

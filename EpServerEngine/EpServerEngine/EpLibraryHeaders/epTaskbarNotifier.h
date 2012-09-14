@@ -38,7 +38,7 @@ An Interface for TaskbarNotifier Class.
 #ifndef __EP_TASKBAR_NOTIFIER_H__
 #define __EP_TASKBAR_NOTIFIER_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epMemory.h"
 
@@ -54,7 +54,7 @@ namespace epl
 	@class CTaskbarNotifier epTaskbarNotifier.h
 	@brief A class for TaskbarNotifier.
 	*/
-	class EP_FOUNDATION CTaskbarNotifier : public CWnd
+	class EP_LIBRARY CTaskbarNotifier : public CWnd
 	{
 		DECLARE_DYNAMIC(CTaskbarNotifier)
 

@@ -30,7 +30,7 @@ An Interface for Worker Thread Delegate.
 */
 #ifndef __EP_WORKER_THREAD_DELEGATE_H__
 #define __EP_WORKER_THREAD_DELEGATE_H__
-
+#include "epLib.h"
 namespace epl
 {
 
@@ -38,7 +38,7 @@ namespace epl
 	@class WorkerThreadDelegate epWorkerThreadDelegate.h
 	@brief A pure virtual class for Worker Thread Delegate.
 	*/
-	class EP_FOUNDATION WorkerThreadDelegate
+	class EP_LIBRARY WorkerThreadDelegate
 	{
 	public:
 		/*!

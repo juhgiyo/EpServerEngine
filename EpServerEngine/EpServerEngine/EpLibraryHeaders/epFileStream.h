@@ -30,7 +30,7 @@ An Interface for File Stream Class.
 */
 #ifndef __EP_FILE_STREAM_H__
 #define __EP_FILE_STREAM_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epStream.h"
 
 namespace epl
@@ -39,7 +39,7 @@ namespace epl
 	@class FileStream epFileStream.h
 	@brief A class for File Stream.
 	*/
-	class EP_FOUNDATION FileStream:public Stream
+	class EP_LIBRARY FileStream:public Stream
 	{
 	public:
 		/*!

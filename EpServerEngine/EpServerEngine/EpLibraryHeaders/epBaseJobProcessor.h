@@ -30,7 +30,7 @@ An Interface for Base Job Processor.
 */
 #ifndef __EP_JOB_PROCESSOR_H__
 #define __EP_JOB_PROCESSOR_H__
-
+#include "epLib.h"
 #include "epBaseWorkerThread.h"
 #include "epBaseJob.h"
 
@@ -41,7 +41,7 @@ namespace epl
 	@class BaseJobProcessor epBaseJobProcessor.h
 	@brief A base class for Job Processing Objects.
 	*/
-	class EP_FOUNDATION BaseJobProcessor: public SmartObject
+	class EP_LIBRARY BaseJobProcessor: public SmartObject
 	{
 	public:
 		friend class JobProcessorScheduleQueue;

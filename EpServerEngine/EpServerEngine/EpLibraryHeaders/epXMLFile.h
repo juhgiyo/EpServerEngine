@@ -30,7 +30,7 @@ An Interface for the XML File Class.
 */
 #ifndef __EP_XML_FILE_H__
 #define __EP_XML_FILE_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epXMLite.h"
 #include "epBaseFile.h"
@@ -47,7 +47,7 @@ namespace epl
 	@struct XMLInfo epXMLFile.h
 	@brief A structure for XML parsing information.
 	*/
-	typedef struct EP_FOUNDATION _xmlInfo
+	typedef struct EP_LIBRARY _xmlInfo
 	{
 		/// string for xml version
 		EpTString m_xmlVersion;
@@ -73,7 +73,7 @@ namespace epl
 	@class XMLFile epXMLFile.h
 	@brief A class for XML File.
 	*/
-	class EP_FOUNDATION XMLFile:public XNode, public BaseFile{
+	class EP_LIBRARY XMLFile:public XNode, public BaseFile{
 	public:
 		/*!
 		Default Constructor

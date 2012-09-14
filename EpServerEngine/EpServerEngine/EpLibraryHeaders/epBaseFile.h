@@ -30,7 +30,7 @@ An Interface for the Base File Class.
 */
 #ifndef __EP_BASE_FILE_H__
 #define __EP_BASE_FILE_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epMemory.h"
 #include <list>
@@ -45,7 +45,7 @@ namespace epl{
 	@class BaseFile epBaseFile.h
 	@brief A class for Base File.
 	*/
-	class EP_FOUNDATION BaseFile{
+	class EP_LIBRARY BaseFile{
 	public:
 
 		/*!

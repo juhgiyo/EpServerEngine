@@ -30,7 +30,7 @@ An Interface for the Console Processing Operation.
 */
 #ifndef __EP_CONSOLE_HELPER_H__
 #define __EP_CONSOLE_HELPER_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 
 namespace epl
@@ -41,7 +41,7 @@ namespace epl
 
 	Implements the Console Processing Functions.
 	*/
-	class EP_FOUNDATION ConsoleHelper
+	class EP_LIBRARY ConsoleHelper
 	{
 	public:
 		/*!

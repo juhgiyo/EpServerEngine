@@ -31,7 +31,7 @@ An Interface for Semaphore Class.
 #ifndef __EP_SEMAPHORE_H__
 #define __EP_SEMAPHORE_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epBaseLock.h"
 
@@ -46,7 +46,7 @@ namespace epl
 	@class Semaphore epSemaphore.h
 	@brief A class that handles the semaphore functionality.
 	*/
-	class EP_FOUNDATION Semaphore :public BaseLock
+	class EP_LIBRARY Semaphore :public BaseLock
 	{
 	public:
 		/*!

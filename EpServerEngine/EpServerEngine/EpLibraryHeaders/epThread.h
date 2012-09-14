@@ -30,7 +30,7 @@ A Frame Interface for Thread Class.
 */
 #ifndef __EP_THREAD_H__
 #define __EP_THREAD_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include <process.h>
 #include "epCriticalSectionEx.h"
 #include "epMutex.h"
@@ -43,7 +43,7 @@ namespace epl
 	@class Thread epThread.h
 	@brief A class that implements base thread class operation.
 	*/
-	class EP_FOUNDATION Thread
+	class EP_LIBRARY Thread
 	{
 	public:
 

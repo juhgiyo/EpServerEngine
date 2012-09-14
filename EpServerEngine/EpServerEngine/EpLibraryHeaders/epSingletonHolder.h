@@ -31,7 +31,7 @@ An Interface for the Template Singleton Holder.
 #ifndef __EP_SINGLETON_HOLDER_H__
 #define __EP_SINGLETON_HOLDER_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 
 namespace epl
 {

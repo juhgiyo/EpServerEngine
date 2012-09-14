@@ -30,7 +30,7 @@ An Interface for NoLock Class.
 */
 #ifndef __EP_NO_LOCK_H__
 #define __EP_NO_LOCK_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epBaseLock.h"
 
@@ -44,7 +44,7 @@ namespace epl
 	@class NoLock epNoLock.h
 	@brief A class that handles the NoLock functionality.
 	*/
-	class EP_FOUNDATION NoLock :public BaseLock
+	class EP_LIBRARY NoLock :public BaseLock
 	{
 	public:
 		/*!

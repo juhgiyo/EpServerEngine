@@ -30,6 +30,7 @@ An Interface for Base Job.
 */
 #ifndef __EP_BASE_JOB_H__
 #define __EP_BASE_JOB_H__
+#include "epLib.h"
 #include "epThreadSafePQueue.h"
 #include "epSmartObject.h"
 
@@ -45,7 +46,7 @@ namespace epl
 	@class BaseJob epBaseJob.h
 	@brief A base class for Job Objects.
 	*/
-	class EP_FOUNDATION BaseJob: public SmartObject
+	class EP_LIBRARY BaseJob: public SmartObject
 	{
 	public:
 		friend class BaseWorkerThread;

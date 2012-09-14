@@ -30,7 +30,7 @@ A Interface for Single Job Worker Thread Class.
 */
 #ifndef __EP_WORKER_THREAD_SINGLE_H__
 #define __EP_WORKER_THREAD_SINGLE_H__
-
+#include "epLib.h"
 #include "epWorkerThreadFactory.h"
 #include "epBaseJobProcessor.h"
 
@@ -41,7 +41,7 @@ namespace epl
 	@class WorkerThreadSingle epWorkerThreadSingle.h
 	@brief A class that implements single-job Worker Thread Class.
 	*/
-	class EP_FOUNDATION WorkerThreadSingle:public BaseWorkerThread
+	class EP_LIBRARY WorkerThreadSingle:public BaseWorkerThread
 	{
 	public:
 		/*!

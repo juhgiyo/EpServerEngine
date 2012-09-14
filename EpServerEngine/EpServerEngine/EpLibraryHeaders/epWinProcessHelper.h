@@ -30,7 +30,7 @@ An Interface for the Window Processing Operation.
 */
 #ifndef __EP_WIN_PROCESS_HELPER_H__
 #define __EP_WIN_PROCESS_HELPER_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include <vector>
 
@@ -43,7 +43,7 @@ namespace epl
 
 	Implements the Window Processing Functions.
 	*/
-	class EP_FOUNDATION WinProcessHelper
+	class EP_LIBRARY WinProcessHelper
 	{
 
 	public:

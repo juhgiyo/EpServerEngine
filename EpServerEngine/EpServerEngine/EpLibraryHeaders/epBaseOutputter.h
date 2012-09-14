@@ -30,7 +30,7 @@ An Interface for Outputting data Template class.
 */
 #ifndef __EP_OUTPUTTER_H__
 #define __EP_OUTPUTTER_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epSystem.h"
 #include "epThreadSafeClass.h"
 #include "epCriticalSectionEx.h"
@@ -43,7 +43,7 @@ namespace epl
 	@class BaseOutputter epBaseOutputter.h
 	@brief A Base Class for output the data.
 	*/
-	class EP_FOUNDATION BaseOutputter
+	class EP_LIBRARY BaseOutputter
 	{
 	public:
 
@@ -90,7 +90,7 @@ namespace epl
 		@class OutputNode epBaseOutputter.h
 		@brief A virtual class for OutputNode.
 		*/
-		class  EP_FOUNDATION OutputNode
+		class  EP_LIBRARY OutputNode
 		{
 		public:
 			/*!

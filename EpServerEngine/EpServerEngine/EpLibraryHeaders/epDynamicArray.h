@@ -31,7 +31,7 @@ An Interface for Dynamic Array Data Structure.
 #ifndef __EP_DYNAMIC_ARRAY_H__
 #define __EP_DYNAMIC_ARRAY_H__
 
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epCriticalSectionEx.h"
 #include "epMutex.h"
 #include "epNoLock.h"

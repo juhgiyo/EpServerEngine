@@ -30,7 +30,7 @@ An Interface for Insertion Sort Algorithm Function.
 */
 #ifndef __EP_INSERTION_SORT_H__
 #define __EP_INSERTION_SORT_H__
-#include "epFoundationLib.h"
+#include "epLib.h"
 #include "epAlgorithm.h"
 
 namespace epl
