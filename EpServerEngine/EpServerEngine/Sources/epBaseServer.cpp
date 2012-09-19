@@ -124,7 +124,7 @@ void BaseServer::execute()
 	while(1)
 	{
 		clientSocket=accept(m_listenSocket, NULL, NULL);
-		if(clientSocket == INVALID_SOCKET)
+		if(clientSocket == INVALID_SOCKET || m_listenSocket== INVALID_SOCKET)
 		{
 			break;			
 		}
