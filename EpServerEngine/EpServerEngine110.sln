@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EpServerEngine", "EpServerEngine\EpServerEngine110.vcxproj", "{DD2AE526-0AED-421D-9CB8-C73FB348CADB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug DLL Unicode|Win32 = Debug DLL Unicode|Win32
+		Debug DLL|Win32 = Debug DLL|Win32
+		Debug Unicode|Win32 = Debug Unicode|Win32
+		Debug|Win32 = Debug|Win32
+		Release DLL Unicode|Win32 = Release DLL Unicode|Win32
+		Release DLL|Win32 = Release DLL|Win32
+		Release Unicode|Win32 = Release Unicode|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Debug DLL Unicode|Win32.ActiveCfg = Debug DLL Unicode|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Debug DLL Unicode|Win32.Build.0 = Debug DLL Unicode|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Debug DLL|Win32.ActiveCfg = Debug DLL|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Debug DLL|Win32.Build.0 = Debug DLL|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Debug Unicode|Win32.ActiveCfg = Debug Unicode|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Debug Unicode|Win32.Build.0 = Debug Unicode|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Debug|Win32.Build.0 = Debug|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Release DLL Unicode|Win32.ActiveCfg = Release DLL Unicode|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Release DLL Unicode|Win32.Build.0 = Release DLL Unicode|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Release DLL|Win32.ActiveCfg = Release DLL|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Release DLL|Win32.Build.0 = Release DLL|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Release Unicode|Win32.ActiveCfg = Release Unicode|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Release Unicode|Win32.Build.0 = Release Unicode|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Release|Win32.ActiveCfg = Release|Win32
+		{DD2AE526-0AED-421D-9CB8-C73FB348CADB}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
