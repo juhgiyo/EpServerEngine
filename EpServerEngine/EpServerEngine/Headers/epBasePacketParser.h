@@ -111,6 +111,15 @@ namespace epse
 		unsigned int GetWaitTimeForParserTerminate();
 
 		/*!
+		Get the owner object of this parser object.
+		@return the pointer to the owner object.
+		*/
+		BaseServerSendObject *GetOwnerObject() const
+		{
+			return m_owner;
+		}
+
+		/*!
 		Parse the given packet and do relevant operation
 		@remark  Subclasses must implement this
 		@param[in] packet the packet to parse
@@ -129,8 +138,6 @@ namespace epse
 		};
 
 		
-
-
 	private:	
 		/*!
 		Set the argument for the base server worker thread.

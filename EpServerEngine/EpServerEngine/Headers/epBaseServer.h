@@ -176,6 +176,7 @@ namespace epse{
 		*/
 		void stopServer(bool fromInternal);
 
+	private:
 		/// port number
 		epl::EpString m_port;
 		/// listening socket

@@ -193,7 +193,8 @@ namespace epse{
 		@param[in] fromInternal flag to check if the call is from internal or not
 		*/
 		void stopServer(bool fromInternal);
-
+	
+	private:
 		/// port number
 		epl::EpString m_port;
 		/// listening socket
