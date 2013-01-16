@@ -73,7 +73,7 @@ namespace epse
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseServer
+		Initializes the BaseServerWorker
 		@param[in] b the second object
 		*/
 		BaseServerWorker(const BaseServerWorker& b);

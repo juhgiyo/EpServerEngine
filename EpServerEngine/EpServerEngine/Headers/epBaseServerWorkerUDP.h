@@ -72,7 +72,7 @@ namespace epse
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseServer
+		Initializes the BaseServerWorkerUDP
 		@param[in] b the second object
 		*/
 		BaseServerWorkerUDP(const BaseServerWorkerUDP& b);
