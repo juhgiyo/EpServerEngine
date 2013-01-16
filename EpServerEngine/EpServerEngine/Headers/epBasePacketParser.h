@@ -48,7 +48,7 @@ namespace epse
 		/*!
 		Default Constructor
 
-		Initializes the Worker
+		Initializes the Parser
 		@param[in] waitTimeMilliSec the wait time in millisecond for terminating
 		@param[in] lockPolicyType The lock policy
 		*/
