@@ -34,12 +34,18 @@ An Interface for EP Server Engine.
 #ifdef EP_SERVER_ENGINE_DLL_EXPORT
 
 #define EP_SERVER_ENGINE __declspec(dllexport)
+#ifndef EP_LIBRARY_DLL_IMPORT
+#define EP_LIBRARY_DLL_IMPORT
+#endif //EP_LIBRARY_DLL_IMPORT
 
 #else   //EP_SERVER_ENGINE_DLL_EXPORT
 
 #ifdef EP_SERVER_ENGINE_DLL_IMPORT
 
 #define EP_SERVER_ENGINE __declspec(dllimport)
+#ifndef EP_LIBRARY_DLL_IMPORT
+#define EP_LIBRARY_DLL_IMPORT
+#endif //EP_LIBRARY_DLL_IMPORT
 
 #else   //EP_SERVER_ENGINE_DLL_IMPORT
 
