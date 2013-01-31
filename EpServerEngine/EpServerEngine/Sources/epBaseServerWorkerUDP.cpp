@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "epBaseServerWorkerUDP.h"
 #include "epBaseServerUDP.h"
 using namespace epse;
-BaseServerWorkerUDP::BaseServerWorkerUDP(epl::LockPolicy lockPolicyType): BaseServerSendObject(lockPolicyType)
+BaseServerWorkerUDP::BaseServerWorkerUDP(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -40,6 +40,7 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(epl::LockPolicy lockPolicyType): BaseSe
 	m_server=NULL;
 	m_maxPacketSize=0;
 	m_parser=NULL;
+	m_parserList=NULL;
 }
 BaseServerWorkerUDP::BaseServerWorkerUDP(const BaseServerWorkerUDP& b) : BaseServerSendObject(b)
 {
@@ -63,13 +64,18 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(const BaseServerWorkerUDP& b) : BaseSer
 		m_lock=NULL;
 		break;
 	}
+	m_parserList=NULL;
 }
 
 BaseServerWorkerUDP::~BaseServerWorkerUDP()
 {
 	if(m_parser)
 		m_parser->ReleaseObj();
-	WaitFor(WAITTIME_INIFINITE);
+	if(m_parserList)
+	{
+		m_parserList->ReleaseObj();
+	}
+	WaitFor(m_waitTime);
 	m_lock->Lock();
 	if(m_packet)
 	{
@@ -77,6 +83,7 @@ BaseServerWorkerUDP::~BaseServerWorkerUDP()
 		m_packet=NULL;
 	}
 	m_lock->Unlock();
+
 	if(m_lock)
 		EP_DELETE m_lock;
 }
@@ -112,13 +119,33 @@ void BaseServerWorkerUDP::setServer(BaseServerUDP *server)
 	m_server=server;
 }
 
+void BaseServerWorkerUDP::setParserList(ParserList *parserList)
+{
+	EP_ASSERT(parserList);
+	if(m_parserList)
+		m_parserList->ReleaseObj();
+	m_parserList=parserList;
+	parserList->RetainObj();
+
+}
+
 void BaseServerWorkerUDP::execute()
 {
 	BasePacketParser::PacketPassUnit passUnit;
 	passUnit.m_packet=m_packet;
 	passUnit.m_this=this;
 	m_parser =createNewPacketParser();
-	m_parser->Start(reinterpret_cast<void*>(&passUnit));
-	m_parser->WaitFor(WAITTIME_INIFINITE);
+	m_parser->setSyncPolicy(m_syncPolicy);
+	if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS||m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
+	{
+		m_parser->Start(reinterpret_cast<void*>(&passUnit));
+		m_parser->WaitFor(m_waitTime);
+	}
+	else
+	{
+		m_parser->setPacketPassUnit(&passUnit);
+		m_parserList->Push(m_parser);
+	}
+
 }
 

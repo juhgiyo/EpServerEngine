@@ -211,6 +211,9 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -279,6 +282,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -416,6 +422,9 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -485,6 +494,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -573,6 +585,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Sources\epParserList.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Sources\epServerObjectList.cpp"
 				>
 			</File>
@@ -648,6 +664,10 @@
 			</File>
 			<File
 				RelativePath=".\Headers\epPacketContainer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Headers\epParserList.h"
 				>
 			</File>
 			<File

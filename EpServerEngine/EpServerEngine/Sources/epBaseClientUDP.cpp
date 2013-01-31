@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,epl::LockPolicy lockPolicyType): BaseServerSendObject(lockPolicyType)
+BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -52,6 +52,8 @@ BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,epl::Loc
 	m_result=0;
 	m_ptr=0;
 	m_maxPacketSize=0;
+	setSyncPolicy(syncPolicy);
+	m_parserList=ParserList(syncPolicy,waitTimeMilliSec,lockPolicyType);
 }
 
 BaseClientUDP::BaseClientUDP(const BaseClientUDP& b):BaseServerSendObject(b)
@@ -86,6 +88,7 @@ BaseClientUDP::BaseClientUDP(const BaseClientUDP& b):BaseServerSendObject(b)
 		m_disconnectLock=NULL;
 		break;
 	}
+	m_parserList=ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
 
 }
 BaseClientUDP::~BaseClientUDP()
@@ -212,6 +215,11 @@ bool BaseClientUDP::Connect()
 	epl::LockObj lock(m_generalLock);
 	if(IsConnected())
 		return true;
+	if(m_syncPolicy!=SYNC_POLICY_ASYNCHRONOUS)
+	{
+		m_parserList.Clear();
+		m_parserList.StartParse();
+	}
 	if(!m_port.length())
 	{
 		m_port=DEFAULT_PORT;
@@ -322,11 +330,15 @@ void BaseClientUDP::disconnect(bool fromInternal)
 		}
 		
 		if(!fromInternal)
-			TerminateAfter(WAITTIME_INIFINITE);
+			TerminateAfter(m_waitTime);
 	
 		m_parserList.Clear();
 	}
 	cleanUpClient();
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		m_parserList.StopParser();
+	}
 
 	m_disconnectLock->Unlock();
 }
@@ -356,7 +368,11 @@ void BaseClientUDP::execute()
 			passUnit.m_packet=passPacket;
 			passUnit.m_this=this;
 			BasePacketParser *parser=createNewPacketParser();
-			parser->Start(reinterpret_cast<void*>(&passUnit));
+			parser->setSyncPolicy(m_syncPolicy);
+			if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS)
+				parser->Start(reinterpret_cast<void*>(&passUnit));
+			else
+				parser->setPacketPassUnit(&passUnit);
 			m_parserList.Push(parser);
 			parser->ReleaseObj();
 			passPacket->ReleaseObj();

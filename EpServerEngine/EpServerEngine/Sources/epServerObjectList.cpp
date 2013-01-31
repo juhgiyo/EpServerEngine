@@ -41,7 +41,6 @@ ServerObjectList::ServerObjectList(epl::LockPolicy lockPolicyType)
 
 ServerObjectList::ServerObjectList(const ServerObjectList& b)
 {
-	m_objectList=b.m_objectList;
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
 	{
@@ -57,6 +56,12 @@ ServerObjectList::ServerObjectList(const ServerObjectList& b)
 	default:
 		m_listLock=NULL;
 		break;
+	}
+	vector<BaseServerObject*>::const_iterator iter;
+	for(iter=b.m_objectList.begin();iter!=b.m_objectList.end();iter++)
+	{
+		(*iter)->RetainObj();
+		m_objectList.push_back(*iter);
 	}
 }
 

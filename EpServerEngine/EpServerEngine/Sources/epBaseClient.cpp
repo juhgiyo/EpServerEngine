@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-BaseClient::BaseClient(const TCHAR * hostName, const TCHAR * port,epl::LockPolicy lockPolicyType) :BaseServerSendObject(lockPolicyType)
+BaseClient::BaseClient(const TCHAR * hostName, const TCHAR * port,SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType) :BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -51,6 +51,8 @@ BaseClient::BaseClient(const TCHAR * hostName, const TCHAR * port,epl::LockPolic
 	m_connectSocket=INVALID_SOCKET;
 	m_result=0;
 	m_ptr=0;
+	setSyncPolicy(syncPolicy);
+	m_parserList=ParserList(syncPolicy,waitTimeMilliSec,lockPolicyType);
 }
 
 BaseClient::BaseClient(const BaseClient& b) :BaseServerSendObject(b)
@@ -85,6 +87,7 @@ BaseClient::BaseClient(const BaseClient& b) :BaseServerSendObject(b)
 		m_disconnectLock=NULL;
 		break;
 	}
+	m_parserList=ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
 }
 BaseClient::~BaseClient()
 {
@@ -211,7 +214,11 @@ void BaseClient::execute()
 				passUnit.m_packet=recvPacket;
 				passUnit.m_this=this;
 				BasePacketParser *parser =createNewPacketParser();
-				parser->Start(reinterpret_cast<void*>(&passUnit));
+				parser->setSyncPolicy(m_syncPolicy);
+				if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS)
+					parser->Start(reinterpret_cast<void*>(&passUnit));
+				else
+					parser->setPacketPassUnit(&passUnit);
 				m_parserList.Push(parser);
 				parser->ReleaseObj();
 				recvPacket->ReleaseObj();
@@ -263,6 +270,11 @@ bool BaseClient::Connect()
 	epl::LockObj lock(m_generalLock);
 	if(IsConnected())
 		return true;
+	if(m_syncPolicy!=SYNC_POLICY_ASYNCHRONOUS)
+	{
+		m_parserList.Clear();
+		m_parserList.StartParse();
+	}
 	if(!m_port.length())
 	{
 		m_port=DEFAULT_PORT;
@@ -377,12 +389,16 @@ void BaseClient::disconnect(bool fromInternal)
 
 		}
 		if(!fromInternal)
-			TerminateAfter(WAITTIME_INIFINITE);
+			TerminateAfter(m_waitTime);
 		m_parserList.Clear();
 	}
 
 	cleanUpClient();
-	
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		m_parserList.StopParser();
+	}
+
 	m_disconnectLock->Unlock();
 }
 

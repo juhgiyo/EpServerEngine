@@ -36,7 +36,7 @@ An Interface for Base Client.
 #include "epBaseServerSendObject.h"
 #include "epBasePacketParser.h"
 #include "epServerConf.h"
-#include "epServerObjectList.h"
+#include "epParserList.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -68,7 +68,6 @@ namespace epse{
 	@brief A class for Base Client.
 	*/
 	class EP_SERVER_ENGINE BaseClient:public BaseServerSendObject{
-
 	public:
 		/*!
 		Default Constructor
@@ -76,9 +75,11 @@ namespace epse{
 		Initializes the Client
 		@param[in] hostName the hostname string
 		@param[in] port the port string
+		@param[in] syncPolicy Synchronous Policy
+		@param[in] waitTimeMilliSec wait time for Client Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseClient(const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseClient(const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),SyncPolicy syncPolicy=SYNC_POLICY_ASYNCHRONOUS,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -239,7 +240,7 @@ namespace epse{
 		Packet m_recvSizePacket;
 
 		/// Parser list
-		ServerObjectList m_parserList;
+		ParserList m_parserList;
 
 	};
 }

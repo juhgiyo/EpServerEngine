@@ -378,6 +378,7 @@
   <ItemGroup>
     <ClCompile Include="Sources\epBasePacketParser.cpp" />
     <ClCompile Include="Sources\epPacket.cpp" />
+    <ClCompile Include="Sources\epParserList.cpp" />
     <ClCompile Include="Sources\epServerObjectList.cpp" />
     <ClCompile Include="Sources\epBaseClient.cpp" />
     <ClCompile Include="Sources\epBaseClientUDP.cpp" />
@@ -392,6 +393,7 @@
     <ClInclude Include="Headers\epBaseServerSendObject.h" />
     <ClInclude Include="Headers\epPacket.h" />
     <ClInclude Include="Headers\epPacketContainer.h" />
+    <ClInclude Include="Headers\epParserList.h" />
     <ClInclude Include="Headers\epse.h" />
     <ClInclude Include="Headers\epServerConf.h" />
     <ClInclude Include="Headers\epServerEngine.h" />

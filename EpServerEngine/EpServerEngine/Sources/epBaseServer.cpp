@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-BaseServer::BaseServer(const TCHAR *  port, epl::LockPolicy lockPolicyType):BaseServerObject(lockPolicyType)
+BaseServer::BaseServer(const TCHAR *  port,SyncPolicy syncPolicy,unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType):BaseServerObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -45,6 +45,12 @@ BaseServer::BaseServer(const TCHAR *  port, epl::LockPolicy lockPolicyType):Base
 	SetPort(port);
 	m_listenSocket=INVALID_SOCKET;
 	m_result=0;
+	setSyncPolicy(syncPolicy);
+	m_parserList=NULL;
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		m_parserList=EP_NEW ParserList(syncPolicy,waitTimeMilliSec,lockPolicyType);
+	}
 }
 
 BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
@@ -52,6 +58,7 @@ BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 	m_listenSocket=INVALID_SOCKET;
 	m_result=0;
 	m_port=b.m_port;
+
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
 	{
@@ -72,6 +79,12 @@ BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 		m_disconnectLock=NULL;
 		break;
 	}
+
+	m_parserList=NULL;
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
+	}
 }
 BaseServer::~BaseServer()
 {
@@ -81,6 +94,10 @@ BaseServer::~BaseServer()
 		EP_DELETE m_lock;
 	if(m_disconnectLock)
 		EP_DELETE m_disconnectLock;
+	if(m_parserList)
+	{
+		m_parserList->ReleaseObj();
+	}
 }
 
 void  BaseServer::SetPort(const TCHAR *  port)
@@ -131,6 +148,9 @@ void BaseServer::execute()
 		else
 		{
 			BaseServerWorker *accWorker=createNewWorker();
+			accWorker->setSyncPolicy(m_syncPolicy);
+			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+				accWorker->setParserList(m_parserList);
 			accWorker->Start(reinterpret_cast<void*>(clientSocket));
 			m_workerList.Push(accWorker);
 			accWorker->ReleaseObj();
@@ -146,6 +166,14 @@ bool BaseServer::StartServer()
 	epl::LockObj lock(m_lock);
 	if(IsServerStarted())
 		return true;
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		if(m_parserList)
+		{
+			m_parserList->Clear();
+			m_parserList->StartParse();
+		}
+	}
 	if(!m_port.length())
 	{
 		m_port=DEFAULT_PORT;
@@ -283,12 +311,19 @@ void BaseServer::stopServer(bool fromInternal)
 			m_listenSocket=INVALID_SOCKET;
 		}
 		if(!fromInternal)
-			TerminateAfter(WAITTIME_INIFINITE);
+			TerminateAfter(m_waitTime);
 		
 		ShutdownAllClient();
 	}
 	
 	cleanUpServer();
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		if(m_parserList)
+		{
+			m_parserList->StopParser();
+		}
+	}
 
 	m_disconnectLock->Unlock();
 }

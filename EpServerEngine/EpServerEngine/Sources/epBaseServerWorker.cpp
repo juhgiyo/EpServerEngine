@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 using namespace epse;
-BaseServerWorker::BaseServerWorker(epl::LockPolicy lockPolicyType): BaseServerSendObject(lockPolicyType)
+BaseServerWorker::BaseServerWorker(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -38,6 +38,7 @@ BaseServerWorker::BaseServerWorker(epl::LockPolicy lockPolicyType): BaseServerSe
 		break;
 	}
 	m_recvSizePacket=Packet(NULL,4);
+	m_parserList=NULL;
 }
 BaseServerWorker::BaseServerWorker(const BaseServerWorker& b) : BaseServerSendObject(b)
 {
@@ -58,6 +59,7 @@ BaseServerWorker::BaseServerWorker(const BaseServerWorker& b) : BaseServerSendOb
 		break;
 	}
 	m_recvSizePacket=Packet(NULL,4);
+	m_parserList=NULL;
 }
 
 BaseServerWorker::~BaseServerWorker()
@@ -70,9 +72,13 @@ BaseServerWorker::~BaseServerWorker()
 	}
 	closesocket(m_clientSocket);
 	m_sendLock->Unlock();
-	WaitFor(WAITTIME_INIFINITE);
+	WaitFor(m_waitTime);
 
-	m_parserList.Clear();
+	if(m_parserList)
+	{
+		m_parserList->ReleaseObj();
+	}
+	
 
 	if(m_sendLock)
 		EP_DELETE m_sendLock;
@@ -111,7 +117,7 @@ int BaseServerWorker::Send(const Packet &packet)
 }
 vector<BaseServerObject*> BaseServerWorker::GetPacketParserList() const
 {
-	return m_parserList.GetList();
+	return m_parserList->GetList();
 }
 
 
@@ -132,10 +138,28 @@ int BaseServerWorker::receive(Packet &packet)
 	return readLength;
 }
 
+void BaseServerWorker::setParserList(ParserList *parserList)
+{
+	if(!parserList)
+		return;
+	if(m_parserList)
+		m_parserList->ReleaseObj();
+	m_parserList=parserList;
+	parserList->RetainObj();
 
+}
 void BaseServerWorker::execute()
 {
 	int iResult=0;
+
+	if(!m_parserList)
+		m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
+
+	if(m_parserList&&m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
+	{
+		m_parserList->StartParse();
+	}
+
 
 	// Receive until the peer shuts down the connection
 	do {
@@ -151,8 +175,12 @@ void BaseServerWorker::execute()
 				passUnit.m_packet=recvPacket;
 				passUnit.m_this=this;
 				BasePacketParser *parser =createNewPacketParser();
-				parser->Start(reinterpret_cast<void*>(&passUnit));
-				m_parserList.Push(parser);
+				parser->setSyncPolicy(m_syncPolicy);
+				if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS)
+					parser->Start(reinterpret_cast<void*>(&passUnit));
+				else
+					parser->setPacketPassUnit(&passUnit);
+				m_parserList->Push(parser);
 				parser->ReleaseObj();
 				recvPacket->ReleaseObj();
 			}
@@ -167,7 +195,7 @@ void BaseServerWorker::execute()
 				recvPacket->ReleaseObj();
 				break;
 			}
-			m_parserList.RemoveTerminated();
+			m_parserList->RemoveTerminated();
 		}
 		else
 		{

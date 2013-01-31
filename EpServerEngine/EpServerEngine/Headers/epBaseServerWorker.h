@@ -36,7 +36,7 @@ An Interface for Base Server Worker.
 #include "epBaseServerSendObject.h"
 #include "epBasePacketParser.h"
 #include "epServerConf.h"
-#include "epServerObjectList.h"
+#include "epParserList.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -66,9 +66,10 @@ namespace epse
 		Default Constructor
 
 		Initializes the Worker
+		@param[in] waitTimeMilliSec wait time for Worker Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServerWorker(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseServerWorker(unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -96,7 +97,13 @@ namespace epse
 			{
 				epl::LockObj lock(m_sendLock);
 				BaseServerSendObject::operator =(b);
-				m_clientSocket=b.m_clientSocket;
+// 				m_clientSocket=b.m_clientSocket;
+// 
+// 				if(m_parserList)
+// 					m_parserList->ReleaseObj();
+// 				m_parserList=m_parserList;
+// 				if(m_parserList)
+// 					m_parserList->RetainObj();
 			}
 			return *this;
 		}	
@@ -126,6 +133,14 @@ namespace epse
 
 
 	private:	
+		friend class BaseServer;
+		/*!
+		Set Parser List for current worker
+		@param[in] parserList the parser list to set
+		*/
+		void setParserList(ParserList *parserList);
+	
+	private:
 		/*!
 		thread loop function
 		*/
@@ -159,7 +174,7 @@ namespace epse
 		Packet m_recvSizePacket;
 
 		/// parser thread list
-		ServerObjectList m_parserList;
+		ParserList *m_parserList;
 	};
 
 }

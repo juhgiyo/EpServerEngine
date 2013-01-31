@@ -52,7 +52,7 @@ namespace epse
 		@param[in] waitTimeMilliSec the wait time in millisecond for terminating
 		@param[in] lockPolicyType The lock policy
 		*/
-		BasePacketParser(unsigned int waitTimeMilliSec=DEFAULT_WAITTIME,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BasePacketParser(unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -80,12 +80,11 @@ namespace epse
 			{
 				epl::LockObj lock(m_generalLock);
 				BaseServerObject::operator =(b);
-				m_waitTime=b.m_waitTime;
-				m_owner=b.m_owner;
-				if(m_packetReceived)
-					m_packetReceived->ReleaseObj();
-				m_packetReceived=b.m_packetReceived;
-				m_packetReceived->RetainObj();
+// 				m_owner=b.m_owner;
+// 				if(m_packetReceived)
+// 					m_packetReceived->ReleaseObj();
+// 				m_packetReceived=b.m_packetReceived;
+// 				m_packetReceived->RetainObj();
 				
 			}
 			return *this;
@@ -97,18 +96,6 @@ namespace epse
 		@return sent byte size
 		*/
 		int Send(const Packet &packet);
-
-		/*!
-		Set the wait time for the parser thread termination
-		@param[in] milliSec the time for waiting in millisecond
-		*/
-		void SetWaitTimeForParserTerminate(unsigned int milliSec);
-
-		/*!
-		Get the wait time for the parser thread termination
-		@return the current time for waiting in millisecond
-		*/
-		unsigned int GetWaitTimeForParserTerminate();
 
 		/*!
 		Get the owner object of this parser object.
@@ -137,8 +124,26 @@ namespace epse
 			Packet *m_packet;
 		};
 
+		/*!
+		Return the packet received.
+		@return the packet received.
+		*/
+		const Packet* GetPacketReceived();
 		
+		
+
+
 	private:	
+		friend class BaseClient;
+		friend class BaseServerWorker;
+		friend class BaseClientUDP;
+		friend class BaseServerWorkerUDP;
+		/*!
+		Set PacketPassUnit
+		@param[in] packetPassUnit PacketPassUnit to set
+		*/
+		void setPacketPassUnit(PacketPassUnit* packetPassUnit);	
+
 		/*!
 		Set the argument for the base server worker thread.
 		@param[in] a The client socket from server.
@@ -157,9 +162,6 @@ namespace epse
 
 		/// Packet received
 		Packet * m_packetReceived;
-
-		/// wait time in millisecond for terminating thread
-		unsigned int m_waitTime;
 
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;

@@ -32,6 +32,7 @@ An Interface for Base Server Object.
 #define __EP_BASE_SERVER_OBJECT_H__
 
 #include "epServerEngine.h"
+#include "epServerConf.h"
 
 namespace epse{
 
@@ -46,10 +47,13 @@ namespace epse{
 		Default Constructor
 
 		Initializes the Object
+		@param[in] waitTimeMilliSec wait time for Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServerObject(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY):epl::SmartObject(lockPolicyType),epl::Thread(lockPolicyType)
+		BaseServerObject(unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY):epl::SmartObject(lockPolicyType),epl::Thread(lockPolicyType)
 		{
+			m_waitTime=waitTimeMilliSec;
+			m_syncPolicy=SYNC_POLICY_ASYNCHRONOUS;
 		}
 
 		/*!
@@ -60,6 +64,8 @@ namespace epse{
 		*/
 		BaseServerObject(const BaseServerObject& b):SmartObject(b),Thread(b)
 		{
+			m_waitTime=b.m_waitTime;
+			m_syncPolicy=b.m_syncPolicy;
 		}
 		/*!
 		Default Destructor
@@ -79,9 +85,50 @@ namespace epse{
 			{
 				Thread::operator=(b);
 				SmartObject::operator =(b);
+				m_waitTime=b.m_waitTime;
+				m_syncPolicy=b.m_syncPolicy;
 			}
 			return *this;
 		}
+
+		/*!
+		Set the wait time for the thread termination
+		@param[in] milliSec the time for waiting in millisecond
+		*/
+		void SetWaitTime(unsigned int milliSec)
+		{
+			m_waitTime=milliSec;
+		}
+
+		/*!
+		Get the wait time for the parser thread termination
+		@return the current time for waiting in millisecond
+		*/
+		unsigned int GetWaitTime()
+		{
+			return m_waitTime;
+		}
+	private:
+		friend class BaseClient;
+		friend class BaseServer;
+		friend class BaseServerWorker;
+		friend class BaseClientUDP;
+		friend class BaseServerUDP;
+		friend class BaseServerWorkerUDP;
+
+		/*!
+		Set Synchronous Policy
+		@param[in] syncPolicy the synchronous policy to set
+		*/
+		void setSyncPolicy(SyncPolicy syncPolicy)
+		{
+			m_syncPolicy=syncPolicy;
+		}
+	protected:
+		/// Synchronous Policy
+		SyncPolicy m_syncPolicy;
+		/// Wait Time in Milliseconds
+		unsigned int m_waitTime;
 	};
 }
 

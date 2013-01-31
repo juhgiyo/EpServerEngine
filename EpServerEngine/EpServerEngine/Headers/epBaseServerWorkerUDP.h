@@ -36,6 +36,7 @@ An Interface for Base UDP Server Worker.
 #include "epBaseServerSendObject.h"
 #include "epBasePacketParser.h"
 #include "epServerConf.h"
+#include "epParserList.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -65,9 +66,10 @@ namespace epse
 		Default Constructor
 
 		Initializes the Worker
+		@param[in] waitTimeMilliSec wait time for Worker Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServerWorkerUDP(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseServerWorkerUDP(unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -95,14 +97,27 @@ namespace epse
 			{
 				epl::LockObj lock(m_lock);
 				BaseServerSendObject::operator =(b);
-				m_clientSocket=b.m_clientSocket;
-				m_server=b.m_server;
+// 				m_clientSocket=b.m_clientSocket;
+// 				m_server=b.m_server;
+// 
+// 				if(m_packet)
+// 					m_packet->ReleaseObj();
+// 				m_packet=b.m_packet;
+// 				if(m_packet)
+// 					m_packet->RetainObj();
+// 
+// 				if(m_parser)
+// 					m_parser->ReleaseObj();
+// 				m_parser=b.m_parser;
+// 				if(m_parser)
+// 					m_parser->RetainObj();
+// 
+// 				if(m_parserList)
+// 					m_parserList->ReleaseObj();
+// 				m_parserList=m_parserList;
+// 				if(m_parserList)
+// 					m_parserList->RetainObj();
 
-				if(m_packet)
-					m_packet->ReleaseObj();
-				m_packet=b.m_packet;
-				if(m_packet)
-					m_packet->RetainObj();
 				m_maxPacketSize=b.m_maxPacketSize;
 
 			}
@@ -131,6 +146,14 @@ namespace epse
 		*/
 		virtual BasePacketParser* createNewPacketParser()=0;
 
+	private:	
+		friend class BaseServerUDP;
+		/*!
+		Set Parser List for current worker
+		@param[in] parserList the parser list to set
+		*/
+		void setParserList(ParserList *parserList);
+	
 	private:	
 
 
@@ -184,6 +207,9 @@ namespace epse
 		
 		/// Parser pointer
 		BasePacketParser *m_parser;
+
+		/// parser thread list
+		ParserList *m_parserList;
 	};
 
 }

@@ -66,5 +66,15 @@ namespace epse{
 	*/
 	#define DEFAULT_WAITTIME WAITTIME_INIFINITE
 
+	/// Synchronous Policy
+	typedef enum _syncPolicy{
+		/// Asynchronoous
+		SYNC_POLICY_ASYNCHRONOUS=0,
+		/// Synchronous by each client
+		SYNC_POLICY_SYNCHRONOUS_BY_CLIENT,
+		/// Synchronous as a whole
+		SYNC_POLICY_SYNCHRONOUS
+	}SyncPolicy;
+	
 }
 #endif //__EP_SERVER_CONF_H__

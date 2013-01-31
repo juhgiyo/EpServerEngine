@@ -19,9 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-BasePacketParser::BasePacketParser(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):BaseServerObject(lockPolicyType)
+BasePacketParser::BasePacketParser(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):BaseServerObject(waitTimeMilliSec,lockPolicyType)
 {
-	m_waitTime=waitTimeMilliSec;
 	m_owner=NULL;
 	m_packetReceived=NULL;
 	m_lockPolicy=lockPolicyType;
@@ -44,7 +43,6 @@ BasePacketParser::BasePacketParser(unsigned int waitTimeMilliSec,epl::LockPolicy
 
 BasePacketParser::BasePacketParser(const BasePacketParser& b):BaseServerObject(b)
 {
-	m_waitTime=b.m_waitTime;
 	m_owner=b.m_owner;
 	m_packetReceived=b.m_packetReceived;
 	if(m_packetReceived)
@@ -89,17 +87,6 @@ int BasePacketParser::Send(const Packet &packet)
 	return 0;
 }
 
-void BasePacketParser::SetWaitTimeForParserTerminate(unsigned int milliSec)
-{
-	epl::LockObj lock(m_generalLock);
-	m_waitTime=milliSec;
-}
-
-unsigned int BasePacketParser::GetWaitTimeForParserTerminate()
-{
-	epl::LockObj lock(m_generalLock);
-	return m_waitTime;
-}
 void BasePacketParser::execute()
 {
 	if(m_packetReceived)
@@ -116,4 +103,18 @@ void BasePacketParser::setArg(void* a)
 		m_packetReceived->RetainObj();
 	m_owner=( reinterpret_cast<PacketPassUnit*>(a))->m_this;
 	
+}
+const Packet* BasePacketParser::GetPacketReceived()
+{
+	return m_packetReceived;
+}
+void BasePacketParser::setPacketPassUnit(PacketPassUnit* packetPassUnit)
+{
+	epl::LockObj lock(m_generalLock);
+	if(m_packetReceived)
+		m_packetReceived->ReleaseObj();
+	m_packetReceived=packetPassUnit->m_packet;
+	if(m_packetReceived)
+		m_packetReceived->RetainObj();
+	m_owner=packetPassUnit->m_this;
 }

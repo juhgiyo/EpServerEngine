@@ -50,6 +50,7 @@ An Interface for EP Server Engine
 #include "epPacketContainer.h"
 #include "epServerConf.h"
 #include "epServerObjectList.h"
+#include "epParserList.h"
 
 
 #endif //__EP_EPSE_H__

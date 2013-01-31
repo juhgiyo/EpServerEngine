@@ -45,9 +45,10 @@ namespace epse{
 		Default Constructor
 
 		Initializes the Object
+		@param[in] waitTimeMilliSec wait time for Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServerSendObject(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY):BaseServerObject(lockPolicyType)
+		BaseServerSendObject(unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY):BaseServerObject(waitTimeMilliSec,lockPolicyType)
 		{
 		}
 
@@ -81,6 +82,11 @@ namespace epse{
 			return *this;
 		}
 
+		/*!
+		Send the given packet to relevance
+		@remark  Subclasses must implement this
+		@param[in] packet the packet to send
+		*/
 		virtual int Send(const Packet &packet)=0;
 	};
 }

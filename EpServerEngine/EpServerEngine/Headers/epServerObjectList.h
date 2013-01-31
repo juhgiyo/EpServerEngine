@@ -47,7 +47,13 @@ namespace epse{
 	*/
 	class EP_SERVER_ENGINE ServerObjectList{
 
-	public:
+	protected:
+		friend class BaseClient;
+		friend class BaseClientUDP;
+		friend class BaseServer;
+		friend class BaseServerWorker;
+		friend class BaseServerUDP;
+		friend class BaseServerWorkerUDP;
 		/*!
 		Default Constructor
 
@@ -66,7 +72,7 @@ namespace epse{
 		/*!
 		Default Destructor
 
-		Destroy the Client
+		Destroy the List
 		*/
 		virtual ~ServerObjectList();
 
@@ -80,7 +86,12 @@ namespace epse{
 			if(this!=&b)
 			{
 				epl::LockObj lock(m_listLock);
-				m_objectList=b.m_objectList;
+// 				vector<BaseServerObject*>::const_iterator iter;
+// 				for(iter=b.m_objectList.begin();iter!=b.m_objectList.end();iter++)
+// 				{
+// 					(*iter)->RetainObj();
+// 					m_objectList.push_back(*iter);
+// 				}
 			}
 			return *this;
 		}
@@ -89,7 +100,7 @@ namespace epse{
 		Remove all object which its thread is terminated
 		@remark it also releases the object
 		*/
-		void RemoveTerminated();
+		virtual void RemoveTerminated();
 
 	
 		/*!
@@ -110,7 +121,7 @@ namespace epse{
 		*/
 		vector<BaseServerObject*> GetList() const;
 
-	private:
+	protected:
 	
 		/// list lock
 		epl::BaseLock *m_listLock;

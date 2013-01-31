@@ -40,6 +40,7 @@ An Interface for Base Server.
 #include "epServerConf.h"
 #include "epBaseServerObject.h"
 #include "epServerObjectList.h"
+#include "epParserList.h"
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -68,9 +69,11 @@ namespace epse{
 
 		Initializes the Server
 		@param[in] port the port string
+		@param[in] syncPolicy Synchronous Policy
+		@param[in] waitTimeMilliSec wait time for Server Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServer(const TCHAR * port=_T(DEFAULT_PORT), epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseServer(const TCHAR * port=_T(DEFAULT_PORT),SyncPolicy syncPolicy=SYNC_POLICY_ASYNCHRONOUS,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -196,6 +199,10 @@ namespace epse{
 
 		/// worker list
 		ServerObjectList m_workerList;
+
+		/// Server Parser List
+		ParserList *m_parserList;
+	
 	};
 }
 #endif //__EP_BASE_SERVER_H__

@@ -81,6 +81,9 @@
     <ClCompile Include="Sources\epBaseServerWorkerUDP.cpp">
       <Filter>Source Files\Server Side\UDP</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\epParserList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\epBasePacketParser.h">
@@ -310,6 +313,9 @@
     </ClInclude>
     <ClInclude Include="EpLibraryHeaders\epXMLite.h">
       <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epParserList.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

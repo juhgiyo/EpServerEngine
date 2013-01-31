@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-BaseServerUDP::BaseServerUDP(const TCHAR *  port, epl::LockPolicy lockPolicyType): BaseServerObject(lockPolicyType)
+BaseServerUDP::BaseServerUDP(const TCHAR *  port,SyncPolicy syncPolicy,unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType): BaseServerObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -50,6 +50,12 @@ BaseServerUDP::BaseServerUDP(const TCHAR *  port, epl::LockPolicy lockPolicyType
 	m_listenSocket=INVALID_SOCKET;
 	m_result=0;
 	m_maxPacketSize=0;
+	setSyncPolicy(syncPolicy);
+	m_parserList=NULL;
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		m_parserList=EP_NEW ParserList(syncPolicy,waitTimeMilliSec,lockPolicyType);
+	}
 }
 
 BaseServerUDP::BaseServerUDP(const BaseServerUDP& b):BaseServerObject(b)
@@ -82,6 +88,12 @@ BaseServerUDP::BaseServerUDP(const BaseServerUDP& b):BaseServerObject(b)
 		m_disconnectLock=NULL;
 		break;
 	}
+
+	m_parserList=NULL;
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
+	}
 }
 BaseServerUDP::~BaseServerUDP()
 {
@@ -92,6 +104,10 @@ BaseServerUDP::~BaseServerUDP()
 		EP_DELETE m_sendLock;
 	if(m_disconnectLock)
 		EP_DELETE m_disconnectLock;
+	if(m_parserList)
+	{
+		m_parserList->ReleaseObj();
+	}
 }
 
 void  BaseServerUDP::SetPort(const TCHAR *  port)
@@ -167,6 +183,9 @@ void BaseServerUDP::execute()
 		/// Create Worker Thread
 		Packet *passPacket=EP_NEW Packet(packetData,recvLength);
 		BaseServerWorkerUDP *accWorker=createNewWorker();
+		accWorker->setSyncPolicy(m_syncPolicy);
+		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+			accWorker->setParserList(m_parserList);
 		BaseServerWorkerUDP::PacketPassUnit unit;
 		unit.m_clientSocket=clientSockAddr;
 		unit.m_packet=passPacket;
@@ -188,6 +207,14 @@ bool BaseServerUDP::StartServer()
 	epl::LockObj lock(m_lock);
 	if(IsServerStarted())
 		return true;
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		if(m_parserList)
+		{
+			m_parserList->Clear();
+			m_parserList->StartParse();
+		}
+	}
 	if(!m_port.length())
 	{
 		m_port=DEFAULT_PORT;
@@ -331,12 +358,19 @@ void BaseServerUDP::stopServer(bool fromInternal)
 			m_listenSocket=INVALID_SOCKET;
 		}
 		if(!fromInternal)
-			TerminateAfter(WAITTIME_INIFINITE);
+			TerminateAfter(m_waitTime);
 
 		ShutdownAllClient();
 	}
 	
 	cleanUpServer();
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		if(m_parserList)
+		{
+			m_parserList->StopParser();
+		}
+	}
 	
 	m_disconnectLock->Unlock();
 }

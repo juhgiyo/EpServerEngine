@@ -574,6 +574,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Sources\epParserList.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Sources\epServerObjectList.cpp"
 				>
 			</File>
@@ -649,6 +653,10 @@
 			</File>
 			<File
 				RelativePath=".\Headers\epPacketContainer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Headers\epParserList.h"
 				>
 			</File>
 			<File
