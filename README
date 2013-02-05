@@ -1,7 +1,7 @@
 DESCRIPTION
 
-EpServerEngine makes it easier for Visual C++ developers to develop a server/client application. 
-You will no longer have to spend hard time to figure out how to initialize/use WinSock library. 
+EpServerEngine is a Visual C++ software framework that supports the development of server/client application un a GPL3.0 license. 
+It handles all the initialize/usage WinSock library, which is time consuming task. 
 EpServerEngine supports Visual C++ 2005/2008/2010/2012.
 Source can be downloaded at <http://github.com/juhgiyo/epserverengine>
 
