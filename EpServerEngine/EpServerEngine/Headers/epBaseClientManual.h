@@ -1,9 +1,9 @@
 /*! 
-@file epBaseClient.h
+@file epBaseClientManual.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/epserverengine>
 @date February 13, 2012
-@brief Base Client Interface
+@brief Base Client Manual Interface
 @version 1.0
 
 @section LICENSE
@@ -25,18 +25,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for Base Client.
+An Interface for Base Client Manual.
 
 */
-#ifndef __EP_BASE_CLIENT_H__
-#define __EP_BASE_CLIENT_H__
+#ifndef __EP_BASE_CLIENT_MANUAL_H__
+#define __EP_BASE_CLIENT_MANUAL_H__
 
 #include "epServerEngine.h"
 #include "epPacket.h"
 #include "epBaseServerSendObject.h"
-#include "epBasePacketParser.h"
 #include "epServerConf.h"
-#include "epParserList.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -64,10 +62,10 @@ using namespace std;
 namespace epse{
 
 	/*! 
-	@class BaseClient epBaseClient.h
-	@brief A class for Base Client.
+	@class BaseClientManual epBaseClientManual.h
+	@brief A class for Base Client Manual.
 	*/
-	class EP_SERVER_ENGINE BaseClient:public BaseServerSendObject{
+	class EP_SERVER_ENGINE BaseClientManual:public BaseServerSendObject{
 	public:
 		/*!
 		Default Constructor
@@ -75,32 +73,30 @@ namespace epse{
 		Initializes the Client
 		@param[in] hostName the hostname string
 		@param[in] port the port string
-		@param[in] clientSyncPolicy Client Synchronous Policy
-		@param[in] waitTimeMilliSec wait time for Client Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseClient(const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),ClientSyncPolicy clientSyncPolicy=CLIENT_SYNC_POLICY_ASYNCHRONOUS,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseClientManual(const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseClient
+		Initializes the BaseClientManual
 		@param[in] b the second object
 		*/
-		BaseClient(const BaseClient& b);
+		BaseClientManual(const BaseClientManual& b);
 		/*!
 		Default Destructor
 
 		Destroy the Client
 		*/
-		virtual ~BaseClient();
+		virtual ~BaseClientManual();
 
 		/*!
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		BaseClient & operator=(const BaseClient&b)
+		BaseClientManual & operator=(const BaseClientManual&b)
 		{
 			if(this!=&b)
 			{
@@ -108,8 +104,6 @@ namespace epse{
 				BaseServerSendObject::operator =(b);
 				m_port=b.m_port;
 				m_hostName=b.m_hostName;
-				if(!IsConnected())
-					m_clientSyncPolicy=b.m_clientSyncPolicy;
 				
 			}
 			return *this;
@@ -142,26 +136,6 @@ namespace epse{
 		epl::EpTString GetPort() const;
 
 		/*!
-		Set Client Synchronous Policy
-		@param[in] clientSyncPolicy Client Synchronous Policy to set
-		@return true if successfully set otherwise false
-		@remark ClientSyncPolicy cannot be set when Client is connected to the server.
-		*/
-		bool SetSyncPolicy(ClientSyncPolicy clientSyncPolicy);
-
-		/*!
-		Get current Client Synchronous Policy
-		@return Client Synchronous Policy
-		*/
-		ClientSyncPolicy GetSyncPolicy() const;
-
-		/*!
-		Set the wait time for the thread termination
-		@param[in] milliSec the time for waiting in millisecond
-		*/
-		virtual void SetWaitTime(unsigned int milliSec);
-
-		/*!
 		Connect to the server
 		*/
 		bool Connect();
@@ -192,20 +166,6 @@ namespace epse{
 		*/
 		Packet *Receive();
 
-		/*!
-		Get Packet Parser List
-		@return the list of the packet parser
-		*/
-		vector<BaseServerObject*> GetPacketParserList() const;
-
-	protected:
-		/*!
-		Return the new packet parser
-		@remark Sub-class should implement this to create new parser if ClientSynchronousPolicy!=CLIENT_SYNC_POLICY_MANUAL.
-		@remark Client will automatically release this parser.
-		@return the new packet parser
-		*/
-		virtual BasePacketParser* createNewPacketParser();
 
 	private:
 
@@ -217,19 +177,6 @@ namespace epse{
 		*/
 		int receive(Packet &packet);
 
-		/*!
-		Actually processing the client thread
-		*/
-		virtual void execute();
-
-
-	
-		/*!
-		Receiving Loop Function
-		@param[in] lpParam self class object
-		@return the thread terminating status
-		*/
-		static unsigned long ClientThread( LPVOID lpParam ) ;
 
 		/*!
 		Clean up the client initialization.
@@ -242,8 +189,6 @@ namespace epse{
 		*/
 		void disconnect(bool fromInternal);
 
-		/// Flag for connection
-		bool m_isConnected;
 		/// port
 		epl::EpString m_port;
 		/// hostname
@@ -270,14 +215,12 @@ namespace epse{
 		/// Temp Packet;
 		Packet m_recvSizePacket;
 
-		/// Parser list
-		ParserList m_parserList;
+		/// Status for connection
+		bool m_isConnected;
 
-		/// Client Synchronous Policy
-		ClientSyncPolicy m_clientSyncPolicy;
 
 	};
 }
 
 
-#endif //__EP_BASE_CLIENT_H__
+#endif //__EP_BASE_CLIENT_MANUAL_H__

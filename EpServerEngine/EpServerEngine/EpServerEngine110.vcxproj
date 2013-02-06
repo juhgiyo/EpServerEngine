@@ -376,6 +376,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\epBaseClientManual.cpp" />
+    <ClCompile Include="Sources\epBaseClientUDPManual.cpp" />
     <ClCompile Include="Sources\epBasePacketParser.cpp" />
     <ClCompile Include="Sources\epPacket.cpp" />
     <ClCompile Include="Sources\epParserList.cpp" />
@@ -390,6 +392,8 @@
   <ItemGroup>
     <ClInclude Include="EpLibraryHeaders\epBaseTextFile.h" />
     <ClInclude Include="EpLibraryHeaders\epLib.h" />
+    <ClInclude Include="Headers\epBaseClientManual.h" />
+    <ClInclude Include="Headers\epBaseClientUDPManual.h" />
     <ClInclude Include="Headers\epBasePacketParser.h" />
     <ClInclude Include="Headers\epBaseServerObject.h" />
     <ClInclude Include="Headers\epBaseServerSendObject.h" />

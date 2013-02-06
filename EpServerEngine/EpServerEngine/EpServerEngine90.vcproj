@@ -591,12 +591,20 @@
 						RelativePath=".\Sources\epBaseClient.cpp"
 						>
 					</File>
+					<File
+						RelativePath=".\Sources\epBaseClientManual.cpp"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="UDP"
 					>
 					<File
 						RelativePath=".\Sources\epBaseClientUDP.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Sources\epBaseClientUDPManual.cpp"
 						>
 					</File>
 				</Filter>
@@ -685,12 +693,20 @@
 						RelativePath=".\Headers\epBaseClient.h"
 						>
 					</File>
+					<File
+						RelativePath=".\Headers\epBaseClientManual.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="UDP"
 					>
 					<File
 						RelativePath=".\Headers\epBaseClientUDP.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Headers\epBaseClientUDPManual.h"
 						>
 					</File>
 				</Filter>

@@ -215,13 +215,6 @@ namespace epse{
 
 	
 		/*!
-		Receiving Loop Function
-		@param[in] lpParam self class object
-		@return the thread terminating status
-		*/
-		static unsigned long ClientThread( LPVOID lpParam ) ;
-
-		/*!
 		Clean up the client initialization.
 		*/
 		void cleanUpClient();

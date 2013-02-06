@@ -1,5 +1,5 @@
 /*! 
-BaseClientUDP for the EpServerEngine
+BaseClientUDPManual for the EpServerEngine
 Copyright (C) 2012  Woong Gyu La <juhgiyo@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,12 +15,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "epBaseClientUDP.h"
+#include "epBaseClientUDPManual.h"
 
 
 using namespace epse;
 
-BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,ClientSyncPolicy clientSyncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
+BaseClientUDPManual::BaseClientUDPManual(const TCHAR * hostName, const TCHAR * port,epl::LockPolicy lockPolicyType): BaseServerSendObject(WAITTIME_INIFINITE,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -54,11 +54,9 @@ BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,ClientSy
 	m_isConnected=false;
 	m_maxPacketSize=0;
 	
-	m_clientSyncPolicy=clientSyncPolicy;
-	m_parserList=ParserList((m_clientSyncPolicy==CLIENT_SYNC_POLICY_ASYNCHRONOUS),waitTimeMilliSec,lockPolicyType);
 }
 
-BaseClientUDP::BaseClientUDP(const BaseClientUDP& b):BaseServerSendObject(b)
+BaseClientUDPManual::BaseClientUDPManual(const BaseClientUDPManual& b):BaseServerSendObject(b)
 {
 	m_connectSocket=INVALID_SOCKET;
 	m_result=0;
@@ -67,8 +65,6 @@ BaseClientUDP::BaseClientUDP(const BaseClientUDP& b):BaseServerSendObject(b)
 	m_port=b.m_port;
 	m_isConnected=false;
 	m_maxPacketSize=b.m_maxPacketSize;
-
-	m_clientSyncPolicy=b.m_clientSyncPolicy;
 	
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
@@ -94,10 +90,9 @@ BaseClientUDP::BaseClientUDP(const BaseClientUDP& b):BaseServerSendObject(b)
 		m_disconnectLock=NULL;
 		break;
 	}
-	m_parserList=ParserList((m_clientSyncPolicy==CLIENT_SYNC_POLICY_ASYNCHRONOUS),m_waitTime,m_lockPolicy);
 
 }
-BaseClientUDP::~BaseClientUDP()
+BaseClientUDPManual::~BaseClientUDPManual()
 {
 	Disconnect();
 
@@ -109,7 +104,7 @@ BaseClientUDP::~BaseClientUDP()
 		EP_DELETE m_disconnectLock;
 }
 
-void BaseClientUDP::SetHostName(const TCHAR * hostName)
+void BaseClientUDPManual::SetHostName(const TCHAR * hostName)
 {
 	epl::LockObj lock(m_generalLock);
 
@@ -126,7 +121,7 @@ void BaseClientUDP::SetHostName(const TCHAR * hostName)
 	}
 }
 
-void BaseClientUDP::SetPort(const TCHAR *port)
+void BaseClientUDPManual::SetPort(const TCHAR *port)
 {
 	epl::LockObj lock(m_generalLock);
 
@@ -143,7 +138,7 @@ void BaseClientUDP::SetPort(const TCHAR *port)
 	}
 
 }
-epl::EpTString BaseClientUDP::GetHostName() const
+epl::EpTString BaseClientUDPManual::GetHostName() const
 {
 	epl::LockObj lock(m_generalLock);
 	if(!m_hostName.length())
@@ -157,7 +152,7 @@ epl::EpTString BaseClientUDP::GetHostName() const
 #endif //defined(_UNICODE) || defined(UNICODE)
 
 }
-epl::EpTString BaseClientUDP::GetPort() const
+epl::EpTString BaseClientUDPManual::GetPort() const
 {
 	epl::LockObj lock(m_generalLock);
 	if(!m_port.length())
@@ -172,34 +167,13 @@ epl::EpTString BaseClientUDP::GetPort() const
 
 }
 
-bool BaseClientUDP::SetSyncPolicy(ClientSyncPolicy clientSyncPolicy)
-{
-	if(IsConnected())
-		return false;
-	epl::LockObj lock(m_generalLock);
-	m_clientSyncPolicy=clientSyncPolicy;
-	m_parserList=ParserList((m_clientSyncPolicy==CLIENT_SYNC_POLICY_ASYNCHRONOUS),m_waitTime,m_lockPolicy);
-	return true;
-}
 
-ClientSyncPolicy BaseClientUDP::GetSyncPolicy() const
-{
-	epl::LockObj lock(m_generalLock);
-	return m_clientSyncPolicy;
-}
-
-void BaseClientUDP::SetWaitTime(unsigned int milliSec)
-{
-	m_waitTime=milliSec;
-	m_parserList.SetWaitTime(milliSec);
-}
-
-unsigned int BaseClientUDP::GetMaxPacketByteSize() const
+unsigned int BaseClientUDPManual::GetMaxPacketByteSize() const
 {
 	return m_maxPacketSize;
 }
 
-int BaseClientUDP::Send(const Packet &packet)
+int BaseClientUDPManual::Send(const Packet &packet)
 {
 	epl::LockObj lock(m_sendLock);
 	if(!IsConnected())
@@ -221,9 +195,8 @@ int BaseClientUDP::Send(const Packet &packet)
 }
 
 
-Packet *BaseClientUDP::Receive()
+Packet *BaseClientUDPManual::Receive()
 {
-	EP_ASSERT(m_clientSyncPolicy==CLIENT_SYNC_POLICY_MANUAL);
 	if(!IsConnected())
 		return NULL;
 
@@ -251,55 +224,7 @@ Packet *BaseClientUDP::Receive()
 }
 
 
-vector<BaseServerObject*> BaseClientUDP::GetPacketParserList() const
-{
-	return m_parserList.GetList();
-}
-
-BasePacketParser* BaseClientUDP::createNewPacketParser()
-{
-	return NULL;
-}
-
-void BaseClientUDP::execute() 
-{
-	int iResult=0;
-	// Receive until the peer shuts down the connection
-	Packet recvPacket(NULL,m_maxPacketSize);
-	do {
-		iResult = receive(recvPacket);
-
-		if (iResult > 0) {
-			BasePacketParser::PacketPassUnit passUnit;
-			Packet *passPacket=EP_NEW Packet(recvPacket.GetPacket(),iResult);
-			passUnit.m_packet=passPacket;
-			passUnit.m_owner=this;
-			BasePacketParser *parser=createNewPacketParser();
-			EP_ASSERT(parser);
-			parser->setPacketPassUnit(passUnit);
-			if(m_clientSyncPolicy==CLIENT_SYNC_POLICY_ASYNCHRONOUS)
-				parser->Start();
-			m_parserList.Push(parser);
-			parser->ReleaseObj();
-			passPacket->ReleaseObj();
-		}
-		else if (iResult == 0)
-		{
-			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Connection closing...\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-			break;
-		}
-		else  {
-			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) recv failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-			break;
-		}
-		m_parserList.RemoveTerminated();
-
-	} while (iResult > 0);
-	disconnect(true);
-	m_isConnected=false;
-}
-
-int BaseClientUDP::receive(Packet &packet)
+int BaseClientUDPManual::receive(Packet &packet)
 {
 
 	int length=packet.GetPacketByteSize();
@@ -311,7 +236,7 @@ int BaseClientUDP::receive(Packet &packet)
 }
 
 
-bool BaseClientUDP::Connect()
+bool BaseClientUDPManual::Connect()
 {
 	epl::LockObj lock(m_generalLock);
 	if(IsConnected())
@@ -376,45 +301,21 @@ bool BaseClientUDP::Connect()
 	int nTmp = sizeof(int);
 	getsockopt(m_connectSocket, SOL_SOCKET,SO_MAX_MSG_SIZE, (char *)&m_maxPacketSize,&nTmp);
 
-	if(m_clientSyncPolicy!=CLIENT_SYNC_POLICY_MANUAL && Start())
-	{
-		if(m_clientSyncPolicy==CLIENT_SYNC_POLICY_SYNCHRONOUS)
-		{
-			if(!m_parserList.StartParse())
-			{
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-				disconnect(false);
-				return false;
-			}
-		}
-		m_isConnected=true;
-		return true;
-	}
-	else if(m_clientSyncPolicy==CLIENT_SYNC_POLICY_MANUAL)
-	{
-		m_isConnected=true;
-		return true;
-	}
-	cleanUpClient();
-	return false;
+	m_isConnected=true;
+	return true;
 }
 
 
-bool BaseClientUDP::IsConnected() const
+bool BaseClientUDPManual::IsConnected() const
 {
-	//return (GetStatus()==Thread::THREAD_STATUS_STARTED);
 	return m_isConnected;
 }
 
-void BaseClientUDP::cleanUpClient()
+void BaseClientUDPManual::cleanUpClient()
 {
 	if(m_connectSocket!=INVALID_SOCKET)
 	{
 		// shutdown the connection since no more data will be sent
-		int iResult = shutdown(m_connectSocket, SD_SEND);
-		if (iResult == SOCKET_ERROR) {
-			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
-		}
 		closesocket(m_connectSocket);
 		m_connectSocket = INVALID_SOCKET;
 	}
@@ -428,7 +329,7 @@ void BaseClientUDP::cleanUpClient()
 
 }
 
-void BaseClientUDP::disconnect(bool fromInternal)
+void BaseClientUDPManual::disconnect(bool fromInternal)
 {
 	if(!m_disconnectLock->TryLock())
 	{
@@ -436,31 +337,21 @@ void BaseClientUDP::disconnect(bool fromInternal)
 	}
 
 
-	if(GetStatus()==Thread::THREAD_STATUS_STARTED)
+	if(m_connectSocket!=INVALID_SOCKET)
 	{
-		if(m_connectSocket!=INVALID_SOCKET)
-		{
-			int iResult = shutdown(m_connectSocket, SD_SEND);
-			if (iResult == SOCKET_ERROR)
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
-			closesocket(m_connectSocket);
-			m_connectSocket = INVALID_SOCKET;
-		}
-		
-		if(!fromInternal)
-			TerminateAfter(m_waitTime);
+		int iResult = shutdown(m_connectSocket, SD_SEND);
+		if (iResult == SOCKET_ERROR)
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
+		closesocket(m_connectSocket);
+		m_connectSocket = INVALID_SOCKET;
 	}
+
 	cleanUpClient();
-	m_parserList.Clear();
-	if(m_clientSyncPolicy==CLIENT_SYNC_POLICY_SYNCHRONOUS)
-	{
-		m_parserList.StopParse();
-	}
 	m_isConnected=false;
 	m_disconnectLock->Unlock();
 }
 
-void BaseClientUDP::Disconnect()
+void BaseClientUDPManual::Disconnect()
 {
 	epl::LockObj lock(m_generalLock);
 	if(!IsConnected())

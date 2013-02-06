@@ -85,7 +85,7 @@ namespace epse{
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseClient
+		Initializes the BaseClientUDP
 		@param[in] b the second object
 		*/
 		BaseClientUDP(const BaseClientUDP& b);
@@ -221,13 +221,6 @@ namespace epse{
 		@remark  Subclasses must implement this
 		*/
 		virtual void execute();
-
-		/*!
-		Receiving Loop Function
-		@param[in] lpParam self class object
-		@return the thread terminating status
-		*/
-		static unsigned long ClientThread( LPVOID lpParam ) ;
 
 		/*!
 		Clean up the client initialization.

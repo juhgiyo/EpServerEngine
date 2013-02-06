@@ -84,6 +84,12 @@
     <ClCompile Include="Sources\epParserList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\epBaseClientManual.cpp">
+      <Filter>Source Files\Client Side\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseClientUDPManual.cpp">
+      <Filter>Source Files\Client Side\UDP</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\epBasePacketParser.h">
@@ -319,6 +325,12 @@
     </ClInclude>
     <ClInclude Include="EpLibraryHeaders\epLib.h">
       <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseClientManual.h">
+      <Filter>Header Files\Client Side\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseClientUDPManual.h">
+      <Filter>Header Files\Client Side\UDP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

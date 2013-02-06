@@ -70,10 +70,11 @@ namespace epse{
 	typedef enum _syncPolicy{
 		/// Asynchronoous
 		SYNC_POLICY_ASYNCHRONOUS=0,
-		/// Synchronous by each client
-		SYNC_POLICY_SYNCHRONOUS_BY_CLIENT,
 		/// Synchronous as a whole
-		SYNC_POLICY_SYNCHRONOUS
+		SYNC_POLICY_SYNCHRONOUS,
+		/// Synchronous by each client (Same as Synchronous if used in BaseClient)
+		SYNC_POLICY_SYNCHRONOUS_BY_CLIENT,
+		
 	}SyncPolicy;
 	
 }
