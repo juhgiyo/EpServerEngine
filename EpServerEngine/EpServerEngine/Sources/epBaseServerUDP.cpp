@@ -190,7 +190,8 @@ void BaseServerUDP::execute()
 		unit.m_clientSocket=clientSockAddr;
 		unit.m_packet=passPacket;
 		unit.m_server=this;
-		accWorker->Start(reinterpret_cast<void*>(&unit));
+		accWorker->setPacketPassUnit(unit);
+		accWorker->Start();
 		m_workerList.Push(accWorker);
 		accWorker->ReleaseObj();
 		passPacket->ReleaseObj();

@@ -369,10 +369,9 @@ void BaseClientUDP::execute()
 			passUnit.m_this=this;
 			BasePacketParser *parser=createNewPacketParser();
 			parser->setSyncPolicy(m_syncPolicy);
+			parser->setPacketPassUnit(passUnit);
 			if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS)
-				parser->Start(reinterpret_cast<void*>(&passUnit));
-			else
-				parser->setPacketPassUnit(&passUnit);
+				parser->Start();
 			m_parserList.Push(parser);
 			parser->ReleaseObj();
 			passPacket->ReleaseObj();

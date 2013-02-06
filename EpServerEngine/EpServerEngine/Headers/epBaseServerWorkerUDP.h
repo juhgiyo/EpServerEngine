@@ -182,10 +182,10 @@ namespace epse
 		void setServer(BaseServerUDP *server);
 
 		/*!
-		Set the argument for the base server worker thread.
-		@param[in] a The client socket from server.
+		Set PacketPassUnit
+		@param[in] packetPassUnit PacketPassUnit to set
 		*/
-		virtual void setArg(void* a);
+		void setPacketPassUnit(const PacketPassUnit& packetPassUnit);	
 	
 		/// client socket
 		sockaddr m_clientSocket;

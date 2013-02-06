@@ -142,13 +142,8 @@ namespace epse
 		Set PacketPassUnit
 		@param[in] packetPassUnit PacketPassUnit to set
 		*/
-		void setPacketPassUnit(PacketPassUnit* packetPassUnit);	
+		void setPacketPassUnit(const PacketPassUnit& packetPassUnit);	
 
-		/*!
-		Set the argument for the base server worker thread.
-		@param[in] a The client socket from server.
-		*/
-		virtual void setArg(void* a);
 
 		/*!
 		thread loop function

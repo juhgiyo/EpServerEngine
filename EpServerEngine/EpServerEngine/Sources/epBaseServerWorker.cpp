@@ -84,10 +84,10 @@ BaseServerWorker::~BaseServerWorker()
 		EP_DELETE m_sendLock;
 }
 
-void BaseServerWorker::setArg(void* a)
+
+void BaseServerWorker::setClientSocket(const SOCKET& clientSocket )
 {
 	epl::LockObj lock(m_sendLock);
-	SOCKET clientSocket=reinterpret_cast<SOCKET>(a);
 	m_clientSocket=clientSocket;
 }
 
@@ -176,10 +176,9 @@ void BaseServerWorker::execute()
 				passUnit.m_this=this;
 				BasePacketParser *parser =createNewPacketParser();
 				parser->setSyncPolicy(m_syncPolicy);
+				parser->setPacketPassUnit(passUnit);
 				if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS)
-					parser->Start(reinterpret_cast<void*>(&passUnit));
-				else
-					parser->setPacketPassUnit(&passUnit);
+					parser->Start();
 				m_parserList->Push(parser);
 				parser->ReleaseObj();
 				recvPacket->ReleaseObj();

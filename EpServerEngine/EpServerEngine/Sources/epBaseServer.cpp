@@ -151,7 +151,8 @@ void BaseServer::execute()
 			accWorker->setSyncPolicy(m_syncPolicy);
 			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 				accWorker->setParserList(m_parserList);
-			accWorker->Start(reinterpret_cast<void*>(clientSocket));
+			accWorker->setClientSocket(clientSocket);
+			accWorker->Start();
 			m_workerList.Push(accWorker);
 			accWorker->ReleaseObj();
 		}

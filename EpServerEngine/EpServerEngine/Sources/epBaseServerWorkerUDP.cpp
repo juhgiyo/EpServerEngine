@@ -88,16 +88,15 @@ BaseServerWorkerUDP::~BaseServerWorkerUDP()
 		EP_DELETE m_lock;
 }
 
-void BaseServerWorkerUDP::setArg(void* a)
+void BaseServerWorkerUDP::setPacketPassUnit(const PacketPassUnit &packetPassUnit)
 {
 	epl::LockObj lock(m_lock);
-	PacketPassUnit *clientSocket=reinterpret_cast<PacketPassUnit*>(a);
-	m_clientSocket=clientSocket->m_clientSocket;
-	m_server=clientSocket->m_server;
-	
+	m_clientSocket=packetPassUnit.m_clientSocket;
+	m_server=packetPassUnit.m_server;
+
 	if(m_packet)
 		m_packet->ReleaseObj();
-	m_packet=clientSocket->m_packet;
+	m_packet=packetPassUnit.m_packet;
 	if(m_packet)
 		m_packet->RetainObj();
 
@@ -136,14 +135,14 @@ void BaseServerWorkerUDP::execute()
 	passUnit.m_this=this;
 	m_parser =createNewPacketParser();
 	m_parser->setSyncPolicy(m_syncPolicy);
+	m_parser->setPacketPassUnit(passUnit);
 	if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS||m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
 	{
-		m_parser->Start(reinterpret_cast<void*>(&passUnit));
+		m_parser->Start();
 		m_parser->WaitFor(m_waitTime);
 	}
 	else
 	{
-		m_parser->setPacketPassUnit(&passUnit);
 		m_parserList->Push(m_parser);
 	}
 

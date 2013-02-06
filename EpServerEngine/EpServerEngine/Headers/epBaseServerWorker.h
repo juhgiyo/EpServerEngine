@@ -156,9 +156,9 @@ namespace epse
 	
 		/*!
 		Set the argument for the base server worker thread.
-		@param[in] a The client socket from server.
+		@param[in] clientSocket The client socket from server.
 		*/
-		virtual void setArg(void* a);
+		void setClientSocket(const SOCKET& clientSocket );
 
 
 		/// client socket

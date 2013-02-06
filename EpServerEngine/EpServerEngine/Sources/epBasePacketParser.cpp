@@ -93,28 +93,17 @@ void BasePacketParser::execute()
 		ParsePacket(*m_packetReceived);
 }
 
-void BasePacketParser::setArg(void* a)
-{
-	epl::LockObj lock(m_generalLock);
-	if(m_packetReceived)
-		m_packetReceived->ReleaseObj();
-	m_packetReceived=( reinterpret_cast<PacketPassUnit*>(a))->m_packet;
-	if(m_packetReceived)
-		m_packetReceived->RetainObj();
-	m_owner=( reinterpret_cast<PacketPassUnit*>(a))->m_this;
-	
-}
 const Packet* BasePacketParser::GetPacketReceived()
 {
 	return m_packetReceived;
 }
-void BasePacketParser::setPacketPassUnit(PacketPassUnit* packetPassUnit)
+void BasePacketParser::setPacketPassUnit(const PacketPassUnit& packetPassUnit)
 {
 	epl::LockObj lock(m_generalLock);
 	if(m_packetReceived)
 		m_packetReceived->ReleaseObj();
-	m_packetReceived=packetPassUnit->m_packet;
+	m_packetReceived=packetPassUnit.m_packet;
 	if(m_packetReceived)
 		m_packetReceived->RetainObj();
-	m_owner=packetPassUnit->m_this;
+	m_owner=packetPassUnit.m_this;
 }
