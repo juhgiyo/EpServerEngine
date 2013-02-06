@@ -124,7 +124,8 @@ void BaseServerWorkerUDP::setParserList(ParserList *parserList)
 	if(m_parserList)
 		m_parserList->ReleaseObj();
 	m_parserList=parserList;
-	parserList->RetainObj();
+	if(m_parserList)
+		m_parserList->RetainObj();
 
 }
 
@@ -132,7 +133,7 @@ void BaseServerWorkerUDP::execute()
 {
 	BasePacketParser::PacketPassUnit passUnit;
 	passUnit.m_packet=m_packet;
-	passUnit.m_this=this;
+	passUnit.m_owner=this;
 	m_parser =createNewPacketParser();
 	m_parser->setSyncPolicy(m_syncPolicy);
 	m_parser->setPacketPassUnit(passUnit);

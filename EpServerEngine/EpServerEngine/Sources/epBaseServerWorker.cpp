@@ -145,9 +145,11 @@ void BaseServerWorker::setParserList(ParserList *parserList)
 	if(m_parserList)
 		m_parserList->ReleaseObj();
 	m_parserList=parserList;
-	parserList->RetainObj();
+	if(m_parserList)
+		m_parserList->RetainObj();
 
 }
+
 void BaseServerWorker::execute()
 {
 	int iResult=0;
@@ -173,7 +175,7 @@ void BaseServerWorker::execute()
 			if (iResult == shouldReceive) {
 				BasePacketParser::PacketPassUnit passUnit;
 				passUnit.m_packet=recvPacket;
-				passUnit.m_this=this;
+				passUnit.m_owner=this;
 				BasePacketParser *parser =createNewPacketParser();
 				parser->setSyncPolicy(m_syncPolicy);
 				parser->setPacketPassUnit(passUnit);

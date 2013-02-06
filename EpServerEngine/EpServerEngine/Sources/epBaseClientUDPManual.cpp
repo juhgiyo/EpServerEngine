@@ -1,5 +1,5 @@
 /*! 
-BaseClient for the EpServerEngine
+BaseClientUDP for the EpServerEngine
 Copyright (C) 2012  Woong Gyu La <juhgiyo@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,11 +15,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "epBaseClient.h"
+#include "epBaseClientUDP.h"
+
 
 using namespace epse;
 
-BaseClient::BaseClient(const TCHAR * hostName, const TCHAR * port,SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType) :BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
+BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,ClientSyncPolicy clientSyncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -45,24 +46,30 @@ BaseClient::BaseClient(const TCHAR * hostName, const TCHAR * port,SyncPolicy syn
 		m_disconnectLock=NULL;
 		break;
 	}
-	m_recvSizePacket=Packet(NULL,4);
 	SetHostName(hostName);
 	SetPort(port);
 	m_connectSocket=INVALID_SOCKET;
 	m_result=0;
 	m_ptr=0;
-	setSyncPolicy(syncPolicy);
-	m_parserList=ParserList(syncPolicy,waitTimeMilliSec,lockPolicyType);
+	m_isConnected=false;
+	m_maxPacketSize=0;
+	
+	m_clientSyncPolicy=clientSyncPolicy;
+	m_parserList=ParserList((m_clientSyncPolicy==CLIENT_SYNC_POLICY_ASYNCHRONOUS),waitTimeMilliSec,lockPolicyType);
 }
 
-BaseClient::BaseClient(const BaseClient& b) :BaseServerSendObject(b)
+BaseClientUDP::BaseClientUDP(const BaseClientUDP& b):BaseServerSendObject(b)
 {
 	m_connectSocket=INVALID_SOCKET;
 	m_result=0;
 	m_ptr=0;
 	m_hostName=b.m_hostName;
 	m_port=b.m_port;
-	m_recvSizePacket=Packet(NULL,4);
+	m_isConnected=false;
+	m_maxPacketSize=b.m_maxPacketSize;
+
+	m_clientSyncPolicy=b.m_clientSyncPolicy;
+	
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
 	{
@@ -87,9 +94,10 @@ BaseClient::BaseClient(const BaseClient& b) :BaseServerSendObject(b)
 		m_disconnectLock=NULL;
 		break;
 	}
-	m_parserList=ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
+	m_parserList=ParserList((m_clientSyncPolicy==CLIENT_SYNC_POLICY_ASYNCHRONOUS),m_waitTime,m_lockPolicy);
+
 }
-BaseClient::~BaseClient()
+BaseClientUDP::~BaseClientUDP()
 {
 	Disconnect();
 
@@ -101,7 +109,7 @@ BaseClient::~BaseClient()
 		EP_DELETE m_disconnectLock;
 }
 
-void  BaseClient::SetHostName(const TCHAR * hostName)
+void BaseClientUDP::SetHostName(const TCHAR * hostName)
 {
 	epl::LockObj lock(m_generalLock);
 
@@ -118,7 +126,7 @@ void  BaseClient::SetHostName(const TCHAR * hostName)
 	}
 }
 
-void  BaseClient::SetPort(const TCHAR *port)
+void BaseClientUDP::SetPort(const TCHAR *port)
 {
 	epl::LockObj lock(m_generalLock);
 
@@ -133,8 +141,9 @@ void  BaseClient::SetPort(const TCHAR *port)
 		m_port=port;
 #endif// defined(_UNICODE) || defined(UNICODE)
 	}
+
 }
-epl::EpTString BaseClient::GetHostName() const
+epl::EpTString BaseClientUDP::GetHostName() const
 {
 	epl::LockObj lock(m_generalLock);
 	if(!m_hostName.length())
@@ -146,9 +155,9 @@ epl::EpTString BaseClient::GetHostName() const
 #else //defined(_UNICODE) || defined(UNICODE)
 	return m_hostName;
 #endif //defined(_UNICODE) || defined(UNICODE)
-	
+
 }
-epl::EpTString BaseClient::GetPort() const
+epl::EpTString BaseClientUDP::GetPort() const
 {
 	epl::LockObj lock(m_generalLock);
 	if(!m_port.length())
@@ -163,130 +172,146 @@ epl::EpTString BaseClient::GetPort() const
 
 }
 
-bool BaseClient::SetSyncPolicy(SyncPolicy syncPolicy)
+bool BaseClientUDP::SetSyncPolicy(ClientSyncPolicy clientSyncPolicy)
 {
 	if(IsConnected())
 		return false;
 	epl::LockObj lock(m_generalLock);
-	setSyncPolicy(syncPolicy);
-	m_parserList=ParserList(syncPolicy,m_waitTime,m_lockPolicy);
+	m_clientSyncPolicy=clientSyncPolicy;
+	m_parserList=ParserList((m_clientSyncPolicy==CLIENT_SYNC_POLICY_ASYNCHRONOUS),m_waitTime,m_lockPolicy);
 	return true;
 }
 
-SyncPolicy BaseClient::GetSyncPolicy() const
+ClientSyncPolicy BaseClientUDP::GetSyncPolicy() const
 {
 	epl::LockObj lock(m_generalLock);
-	return m_syncPolicy;
+	return m_clientSyncPolicy;
 }
 
-void BaseClient::SetWaitTime(unsigned int milliSec)
+void BaseClientUDP::SetWaitTime(unsigned int milliSec)
 {
 	m_waitTime=milliSec;
 	m_parserList.SetWaitTime(milliSec);
 }
 
-int BaseClient::Send(const Packet &packet)
+unsigned int BaseClientUDP::GetMaxPacketByteSize() const
+{
+	return m_maxPacketSize;
+}
+
+int BaseClientUDP::Send(const Packet &packet)
 {
 	epl::LockObj lock(m_sendLock);
 	if(!IsConnected())
 		return 0;
-	int writeLength=0;
+	int sentLength=0;
 	const char *packetData=packet.GetPacket();
 	int length=packet.GetPacketByteSize();
+	EP_ASSERT(length<=m_maxPacketSize);
 	if(length>0)
 	{
-		int sentLength=send(m_connectSocket,reinterpret_cast<char*>(&length),4,0);
-		if(sentLength<=0)
-			return sentLength;
-	}
-	while(length>0)
-	{
-		int sentLength=send(m_connectSocket,packetData,length,0);
-		writeLength+=sentLength;
+		//int sentLength=send(m_connectSocket,packetData,length,0);
+		sentLength=sendto(m_connectSocket,packetData,length,0,m_ptr->ai_addr,sizeof(sockaddr));
 		if(sentLength<=0)
 		{
-			return writeLength;
+			return sentLength;
 		}
-		length-=sentLength;
-		packetData+=sentLength;
 	}
-	return writeLength;
+	return sentLength;
 }
 
-vector<BaseServerObject*> BaseClient::GetPacketParserList() const
+
+Packet *BaseClientUDP::Receive()
+{
+	EP_ASSERT(m_clientSyncPolicy==CLIENT_SYNC_POLICY_MANUAL);
+	if(!IsConnected())
+		return NULL;
+
+	int iResult=0;
+	Packet recvPacket(NULL,m_maxPacketSize);
+	iResult = receive(recvPacket);
+
+	if (iResult > 0) {
+		Packet *passPacket=EP_NEW Packet(recvPacket.GetPacket(),iResult);
+		return passPacket;
+	}
+	else if (iResult == 0)
+	{
+		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Connection closing...\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+		disconnect(true);
+		m_isConnected=false;
+		return NULL;
+	}
+	else  {
+		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) recv failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+		disconnect(true);
+		m_isConnected=false;
+		return NULL;
+	}
+}
+
+
+vector<BaseServerObject*> BaseClientUDP::GetPacketParserList() const
 {
 	return m_parserList.GetList();
 }
 
-void BaseClient::execute() 
+BasePacketParser* BaseClientUDP::createNewPacketParser()
 {
-	int iResult;
+	return NULL;
+}
+
+void BaseClientUDP::execute() 
+{
+	int iResult=0;
 	// Receive until the peer shuts down the connection
+	Packet recvPacket(NULL,m_maxPacketSize);
 	do {
-		int size =receive(m_recvSizePacket);
-		if(size>0)
-		{
-			unsigned int shouldReceive=(reinterpret_cast<unsigned int*>(const_cast<char*>(m_recvSizePacket.GetPacket())))[0];
-			Packet *recvPacket=EP_NEW Packet(NULL,shouldReceive);
-			iResult = receive(*recvPacket);
+		iResult = receive(recvPacket);
 
-			if (iResult == shouldReceive) {
-				BasePacketParser::PacketPassUnit passUnit;
-				passUnit.m_packet=recvPacket;
-				passUnit.m_owner=this;
-				BasePacketParser *parser =createNewPacketParser();
-				EP_ASSERT(parser);
-                                parser->setSyncPolicy(m_syncPolicy);
-				parser->setPacketPassUnit(passUnit);
-				if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS)
-					parser->Start();
-				m_parserList.Push(parser);
-				parser->ReleaseObj();
-				recvPacket->ReleaseObj();
-			}
-			else if (iResult == 0)
-			{
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Connection closing...\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-				recvPacket->ReleaseObj();
-				break;
-			}
-			else  {
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) recv failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-				recvPacket->ReleaseObj();
-				break;
-			}
-
-			m_parserList.RemoveTerminated();
+		if (iResult > 0) {
+			BasePacketParser::PacketPassUnit passUnit;
+			Packet *passPacket=EP_NEW Packet(recvPacket.GetPacket(),iResult);
+			passUnit.m_packet=passPacket;
+			passUnit.m_owner=this;
+			BasePacketParser *parser=createNewPacketParser();
+			EP_ASSERT(parser);
+			parser->setPacketPassUnit(passUnit);
+			if(m_clientSyncPolicy==CLIENT_SYNC_POLICY_ASYNCHRONOUS)
+				parser->Start();
+			m_parserList.Push(parser);
+			parser->ReleaseObj();
+			passPacket->ReleaseObj();
 		}
-		else
+		else if (iResult == 0)
 		{
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Connection closing...\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			break;
 		}
+		else  {
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) recv failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+			break;
+		}
+		m_parserList.RemoveTerminated();
 
 	} while (iResult > 0);
 	disconnect(true);
+	m_isConnected=false;
 }
 
-
-int BaseClient::receive(Packet &packet)
+int BaseClientUDP::receive(Packet &packet)
 {
-	
-	int readLength=0;
+
 	int length=packet.GetPacketByteSize();
 	char *packetData=const_cast<char*>(packet.GetPacket());
-	while(length>0)
-	{
-		int recvLength=recv(m_connectSocket,packetData, length, 0);
-		readLength+=recvLength;
-		if(recvLength<=0)
-			break;
-		length-=recvLength;
-		packetData+=recvLength;
-	}
-	return readLength;
+	sockaddr tmpInfo;
+	int tmpInfoSize=sizeof(sockaddr);
+	int recvLength = recvfrom(m_connectSocket,packetData,length,0,&tmpInfo,&tmpInfoSize);
+	return recvLength;
 }
 
-bool BaseClient::Connect()
+
+bool BaseClientUDP::Connect()
 {
 	epl::LockObj lock(m_generalLock);
 	if(IsConnected())
@@ -305,6 +330,7 @@ bool BaseClient::Connect()
 
 	WSADATA wsaData;
 	m_connectSocket = INVALID_SOCKET;
+	m_maxPacketSize=0;
 	struct addrinfo hints;
 	int iResult;
 
@@ -317,8 +343,8 @@ bool BaseClient::Connect()
 
 	ZeroMemory( &hints, sizeof(hints) );
 	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_protocol = IPPROTO_UDP;
 
 	// Resolve the server address and port
 	iResult = getaddrinfo(m_hostName.c_str(), m_port.c_str(), &hints, &m_result);
@@ -339,14 +365,6 @@ bool BaseClient::Connect()
 			cleanUpClient();
 			return false;
 		}
-
-		// Connect to server.
-		iResult = connect( m_connectSocket, m_ptr->ai_addr, static_cast<int>(m_ptr->ai_addrlen));
-		if (iResult == SOCKET_ERROR) {
-			closesocket(m_connectSocket);
-			m_connectSocket = INVALID_SOCKET;
-			continue;
-		}
 		break;
 	}
 	if (m_connectSocket == INVALID_SOCKET) {
@@ -354,9 +372,13 @@ bool BaseClient::Connect()
 		cleanUpClient();
 		return false;
 	}
-	if(Start())
+
+	int nTmp = sizeof(int);
+	getsockopt(m_connectSocket, SOL_SOCKET,SO_MAX_MSG_SIZE, (char *)&m_maxPacketSize,&nTmp);
+
+	if(m_clientSyncPolicy!=CLIENT_SYNC_POLICY_MANUAL && Start())
 	{
-		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+		if(m_clientSyncPolicy==CLIENT_SYNC_POLICY_SYNCHRONOUS)
 		{
 			if(!m_parserList.StartParse())
 			{
@@ -365,6 +387,12 @@ bool BaseClient::Connect()
 				return false;
 			}
 		}
+		m_isConnected=true;
+		return true;
+	}
+	else if(m_clientSyncPolicy==CLIENT_SYNC_POLICY_MANUAL)
+	{
+		m_isConnected=true;
 		return true;
 	}
 	cleanUpClient();
@@ -372,16 +400,21 @@ bool BaseClient::Connect()
 }
 
 
-bool BaseClient::IsConnected() const
+bool BaseClientUDP::IsConnected() const
 {
-	return (GetStatus()==Thread::THREAD_STATUS_STARTED);
+	//return (GetStatus()==Thread::THREAD_STATUS_STARTED);
+	return m_isConnected;
 }
 
-void BaseClient::cleanUpClient()
+void BaseClientUDP::cleanUpClient()
 {
-
 	if(m_connectSocket!=INVALID_SOCKET)
 	{
+		// shutdown the connection since no more data will be sent
+		int iResult = shutdown(m_connectSocket, SD_SEND);
+		if (iResult == SOCKET_ERROR) {
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
+		}
 		closesocket(m_connectSocket);
 		m_connectSocket = INVALID_SOCKET;
 	}
@@ -390,45 +423,44 @@ void BaseClient::cleanUpClient()
 		freeaddrinfo(m_result);
 		m_result=NULL;
 	}
+	m_maxPacketSize=0;
 	WSACleanup();
 
 }
 
-void BaseClient::disconnect(bool fromInternal)
+void BaseClientUDP::disconnect(bool fromInternal)
 {
 	if(!m_disconnectLock->TryLock())
 	{
 		return;
 	}
 
-	if(IsConnected())
+
+	if(GetStatus()==Thread::THREAD_STATUS_STARTED)
 	{
 		if(m_connectSocket!=INVALID_SOCKET)
 		{
-			// shutdown the connection since no more data will be sent
 			int iResult = shutdown(m_connectSocket, SD_SEND);
-			if (iResult == SOCKET_ERROR) {
+			if (iResult == SOCKET_ERROR)
 				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
-			}
 			closesocket(m_connectSocket);
 			m_connectSocket = INVALID_SOCKET;
-
 		}
+		
 		if(!fromInternal)
 			TerminateAfter(m_waitTime);
 	}
-
 	cleanUpClient();
 	m_parserList.Clear();
-	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	if(m_clientSyncPolicy==CLIENT_SYNC_POLICY_SYNCHRONOUS)
 	{
 		m_parserList.StopParse();
 	}
-
+	m_isConnected=false;
 	m_disconnectLock->Unlock();
 }
 
-void BaseClient::Disconnect()
+void BaseClientUDP::Disconnect()
 {
 	epl::LockObj lock(m_generalLock);
 	if(!IsConnected())
@@ -437,6 +469,5 @@ void BaseClient::Disconnect()
 	}
 	disconnect(false);
 }
-
 
 

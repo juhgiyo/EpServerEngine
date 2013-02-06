@@ -71,6 +71,8 @@ BasePacketParser::~BasePacketParser()
 	m_generalLock->Lock();
 	if(m_packetReceived)
 		m_packetReceived->ReleaseObj();
+	if(m_owner)
+		m_owner->RetainObj();
 	m_generalLock->Unlock();
 
 	if(m_generalLock)
@@ -105,5 +107,10 @@ void BasePacketParser::setPacketPassUnit(const PacketPassUnit& packetPassUnit)
 	m_packetReceived=packetPassUnit.m_packet;
 	if(m_packetReceived)
 		m_packetReceived->RetainObj();
-	m_owner=packetPassUnit.m_this;
+
+	if(m_owner)
+		m_owner->ReleaseObj();
+	m_owner=packetPassUnit.m_owner;
+	if(m_owner)
+		m_owner->RetainObj();
 }

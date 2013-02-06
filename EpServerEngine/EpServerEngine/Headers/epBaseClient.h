@@ -140,6 +140,26 @@ namespace epse{
 		epl::EpTString GetPort() const;
 
 		/*!
+		Set Synchronous Policy
+		@param[in] syncPolicy Synchronous Policy to set
+		@return true if successfully set otherwise false
+		@remark SyncPolicy cannot be set when Client is connected to the server.
+		*/
+		bool SetSyncPolicy(SyncPolicy syncPolicy);
+
+		/*!
+		Get current Synchronous Policy
+		@return Synchronous Policy
+		*/
+		SyncPolicy GetSyncPolicy() const;
+
+		/*!
+		Set the wait time for the thread termination
+		@param[in] milliSec the time for waiting in millisecond
+		*/
+		virtual void SetWaitTime(unsigned int milliSec);
+
+		/*!
 		Connect to the server
 		*/
 		bool Connect();

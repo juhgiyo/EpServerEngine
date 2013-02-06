@@ -76,11 +76,11 @@ namespace epse{
 		Initializes the Client
 		@param[in] hostName the hostname string
 		@param[in] port the port string
-		@param[in] syncPolicy Synchronous Policy
+		@param[in] clientSyncPolicy Client Synchronous Policy
 		@param[in] waitTimeMilliSec wait time for Client Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseClientUDP(const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),SyncPolicy syncPolicy=SYNC_POLICY_ASYNCHRONOUS,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseClientUDP(const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),ClientSyncPolicy clientSyncPolicy=CLIENT_SYNC_POLICY_ASYNCHRONOUS,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -109,7 +109,8 @@ namespace epse{
 				BaseServerSendObject::operator =(b);
 				m_port=b.m_port;
 				m_hostName=b.m_hostName;
-				
+				if(!IsConnected())
+					m_clientSyncPolicy=b.m_clientSyncPolicy;
 			}
 			return *this;
 		}
@@ -142,18 +143,18 @@ namespace epse{
 
 
 		/*!
-		Set Synchronous Policy
-		@param[in] syncPolicy Synchronous Policy to set
+		Set Client Synchronous Policy
+		@param[in] clientSyncPolicy Client Synchronous Policy to set
 		@return true if successfully set otherwise false
-		@remark SyncPolicy cannot be set when Client is connected to the server.
+		@remark ClientSyncPolicy cannot be set when Client is connected to the server.
 		*/
-		bool SetSyncPolicy(SyncPolicy syncPolicy);
+		bool SetSyncPolicy(ClientSyncPolicy clientSyncPolicy);
 
 		/*!
-		Get current Synchronous Policy
-		@return Synchronous Policy
+		Get current Client Synchronous Policy
+		@return Client Synchronous Policy
 		*/
-		SyncPolicy GetSyncPolicy() const;
+		ClientSyncPolicy GetSyncPolicy() const;
 
 		/*!
 		Set the wait time for the thread termination
@@ -191,6 +192,14 @@ namespace epse{
 		virtual int Send(const Packet &packet);
 
 		/*!
+		Receive the packet from the server
+		@return received packet
+		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
+		@remark if ClientSynchronousPolicy!=CLIENT_SYNC_POLICY_MANUAL then assertion.
+		*/
+		Packet *Receive();
+
+		/*!
 		Get Packet Parser List
 		@return the list of the packet parser
 		*/
@@ -199,11 +208,11 @@ namespace epse{
 	protected:
 		/*!
 		Return the new packet parser
-		@remark Sub-class should implement this to create new parser.
+		@remark Sub-class should implement this to create new parser if ClientSynchronousPolicy!=CLIENT_SYNC_POLICY_MANUAL.
 		@remark Client will automatically release this parser.
 		@return the new packet parser
 		*/
-		virtual BasePacketParser* createNewPacketParser()=0;
+		virtual BasePacketParser* createNewPacketParser();
 
 
 	private:
@@ -240,7 +249,8 @@ namespace epse{
 		*/
 		void disconnect(bool fromInternal);
 
-
+		/// Flag for connection
+		bool m_isConnected;
 		/// port
 		epl::EpString m_port;
 		/// hostname
@@ -267,6 +277,9 @@ namespace epse{
 
 		/// Parser list
 		ParserList m_parserList;
+
+		/// Client Synchronous Policy
+		ClientSyncPolicy m_clientSyncPolicy;
 
 		/// Maximum UDP Datagram byte size
 		unsigned int m_maxPacketSize;

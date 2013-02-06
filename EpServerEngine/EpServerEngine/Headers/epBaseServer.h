@@ -124,6 +124,20 @@ namespace epse{
 		*/
 		epl::EpTString GetPort() const;
 
+		/*!
+		Set Synchronous Policy
+		@param[in] syncPolicy Synchronous Policy to set
+		@return true if successfully set otherwise false
+		@remark SyncPolicy cannot be set when Server is running.
+		*/
+		bool SetSyncPolicy(SyncPolicy syncPolicy);
+
+		/*!
+		Get current Server Synchronous Policy
+		@return Server Synchronous Policy
+		*/
+		SyncPolicy GetSyncPolicy() const;
+
 
 		/*!
 		Start the server

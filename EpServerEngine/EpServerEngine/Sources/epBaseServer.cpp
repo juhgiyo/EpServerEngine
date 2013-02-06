@@ -47,10 +47,6 @@ BaseServer::BaseServer(const TCHAR *  port,SyncPolicy syncPolicy,unsigned int wa
 	m_result=0;
 	setSyncPolicy(syncPolicy);
 	m_parserList=NULL;
-	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
-	{
-		m_parserList=EP_NEW ParserList(syncPolicy,waitTimeMilliSec,lockPolicyType);
-	}
 }
 
 BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
@@ -81,10 +77,6 @@ BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 	}
 
 	m_parserList=NULL;
-	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
-	{
-		m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
-	}
 }
 BaseServer::~BaseServer()
 {
@@ -130,6 +122,20 @@ epl::EpTString BaseServer::GetPort() const
 #endif //defined(_UNICODE) || defined(UNICODE)
 }
 
+bool BaseServer::SetSyncPolicy(SyncPolicy syncPolicy)
+{
+	if(IsServerStarted())
+		return false;
+	epl::LockObj lock(m_lock);
+	setSyncPolicy(syncPolicy);
+	return true;
+}
+
+SyncPolicy BaseServer::GetSyncPolicy() const
+{
+	epl::LockObj lock(m_lock);
+	return m_syncPolicy;
+}
 
 vector<BaseServerObject*> BaseServer::GetWorkerList() const
 {
@@ -167,14 +173,7 @@ bool BaseServer::StartServer()
 	epl::LockObj lock(m_lock);
 	if(IsServerStarted())
 		return true;
-	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
-	{
-		if(m_parserList)
-		{
-			m_parserList->Clear();
-			m_parserList->StartParse();
-		}
-	}
+
 	if(!m_port.length())
 	{
 		m_port=DEFAULT_PORT;
@@ -241,6 +240,19 @@ bool BaseServer::StartServer()
 	// Create thread 1.
 	if(Start())
 	{
+		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+		{
+			m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
+			if(!m_parserList || !m_parserList->StartParse())
+			{
+				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+				stopServer(false);
+				if(m_parserList)
+					m_parserList->ReleaseObj();
+				m_parserList=NULL;
+				return false;
+			}
+		}
 		return true;
 	}
 	cleanUpServer();
@@ -322,7 +334,9 @@ void BaseServer::stopServer(bool fromInternal)
 	{
 		if(m_parserList)
 		{
-			m_parserList->StopParser();
+			m_parserList->StopParse();
+			m_parserList->ReleaseObj();
+			m_parserList=NULL;
 		}
 	}
 

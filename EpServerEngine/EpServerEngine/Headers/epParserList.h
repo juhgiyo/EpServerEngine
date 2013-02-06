@@ -116,11 +116,22 @@ namespace epse{
 		*/
 		virtual void RemoveTerminated();
 
-		void StartParse();
+		/*!
+		Start Parse
+		@return true if successfully started otherwise false
+		*/
+		bool StartParse();
 
-		void StopParser();
+		/*!
+		Stop Parse
+		*/
+		void StopParse();
 	private:
-		void setSyncPolicy(SyncPolicy syncPolicy);
+		/*!
+		Set if the Parser List is for ASynchrnous
+		@param[in] isASynchrnous value to set
+		*/
+                void setSyncPolicy(SyncPolicy syncPolicy);
 
 		/*!
 		Listening Loop Function

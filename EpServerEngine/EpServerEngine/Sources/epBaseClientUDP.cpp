@@ -166,6 +166,28 @@ epl::EpTString BaseClientUDP::GetPort() const
 
 }
 
+bool BaseClientUDP::SetSyncPolicy(SyncPolicy syncPolicy)
+{
+	if(IsConnected())
+		return false;
+	epl::LockObj lock(m_generalLock);
+	setSyncPolicy(syncPolicy);
+	m_parserList=ParserList(syncPolicy,m_waitTime,m_lockPolicy);
+	return true;
+}
+
+SyncPolicy BaseClientUDP::GetSyncPolicy() const
+{
+	epl::LockObj lock(m_generalLock);
+	return m_syncPolicy;
+}
+
+void BaseClientUDP::SetWaitTime(unsigned int milliSec)
+{
+	m_waitTime=milliSec;
+	m_parserList.SetWaitTime(milliSec);
+}
+
 unsigned int BaseClientUDP::GetMaxPacketByteSize() const
 {
 	return m_maxPacketSize;
@@ -215,11 +237,7 @@ bool BaseClientUDP::Connect()
 	epl::LockObj lock(m_generalLock);
 	if(IsConnected())
 		return true;
-	if(m_syncPolicy!=SYNC_POLICY_ASYNCHRONOUS)
-	{
-		m_parserList.Clear();
-		m_parserList.StartParse();
-	}
+
 	if(!m_port.length())
 	{
 		m_port=DEFAULT_PORT;
@@ -281,6 +299,15 @@ bool BaseClientUDP::Connect()
 
 	if(Start())
 	{
+		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+		{
+			if(!m_parserList.StartParse())
+			{
+				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+				disconnect(false);
+				return false;
+			}
+		}
 		return true;
 	}
 	cleanUpClient();
@@ -331,13 +358,12 @@ void BaseClientUDP::disconnect(bool fromInternal)
 		
 		if(!fromInternal)
 			TerminateAfter(m_waitTime);
-	
-		m_parserList.Clear();
 	}
 	cleanUpClient();
+	m_parserList.Clear();
 	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 	{
-		m_parserList.StopParser();
+		m_parserList.StopParse();
 	}
 
 	m_disconnectLock->Unlock();
@@ -366,7 +392,7 @@ void BaseClientUDP::execute()
 			BasePacketParser::PacketPassUnit passUnit;
 			Packet *passPacket=EP_NEW Packet(recvPacket.GetPacket(),iResult);
 			passUnit.m_packet=passPacket;
-			passUnit.m_this=this;
+			passUnit.m_owner=this;
 			BasePacketParser *parser=createNewPacketParser();
 			parser->setSyncPolicy(m_syncPolicy);
 			parser->setPacketPassUnit(passUnit);

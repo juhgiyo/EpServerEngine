@@ -119,7 +119,7 @@ namespace epse
 		*/
 		struct PacketPassUnit{
 			/// BaseServerWorkerEx Object
-			BaseServerSendObject *m_this;
+			BaseServerSendObject *m_owner;
 			/// Packet to parse
 			Packet *m_packet;
 		};

@@ -95,7 +95,7 @@ namespace epse{
 		Set the wait time for the thread termination
 		@param[in] milliSec the time for waiting in millisecond
 		*/
-		void SetWaitTime(unsigned int milliSec)
+		virtual void SetWaitTime(unsigned int milliSec)
 		{
 			m_waitTime=milliSec;
 		}

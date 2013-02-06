@@ -52,10 +52,7 @@ BaseServerUDP::BaseServerUDP(const TCHAR *  port,SyncPolicy syncPolicy,unsigned 
 	m_maxPacketSize=0;
 	setSyncPolicy(syncPolicy);
 	m_parserList=NULL;
-	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
-	{
-		m_parserList=EP_NEW ParserList(syncPolicy,waitTimeMilliSec,lockPolicyType);
-	}
+
 }
 
 BaseServerUDP::BaseServerUDP(const BaseServerUDP& b):BaseServerObject(b)
@@ -90,10 +87,6 @@ BaseServerUDP::BaseServerUDP(const BaseServerUDP& b):BaseServerObject(b)
 	}
 
 	m_parserList=NULL;
-	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
-	{
-		m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
-	}
 }
 BaseServerUDP::~BaseServerUDP()
 {
@@ -163,6 +156,21 @@ int BaseServerUDP::send(const Packet &packet,const sockaddr &clientSockAddr)
 	return sentLength;
 }
 
+bool BaseServerUDP::SetSyncPolicy(SyncPolicy syncPolicy)
+{
+	if(IsServerStarted())
+		return false;
+	epl::LockObj lock(m_lock);
+	setSyncPolicy(syncPolicy);
+	return true;
+}
+
+SyncPolicy BaseServerUDP::GetSyncPolicy() const
+{
+	epl::LockObj lock(m_lock);
+	return m_syncPolicy;
+}
+
 vector<BaseServerObject*> BaseServerUDP::GetWorkerList() const
 {
 	return m_workerList.GetList();
@@ -208,14 +216,7 @@ bool BaseServerUDP::StartServer()
 	epl::LockObj lock(m_lock);
 	if(IsServerStarted())
 		return true;
-	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
-	{
-		if(m_parserList)
-		{
-			m_parserList->Clear();
-			m_parserList->StartParse();
-		}
-	}
+	
 	if(!m_port.length())
 	{
 		m_port=DEFAULT_PORT;
@@ -280,6 +281,19 @@ bool BaseServerUDP::StartServer()
 	// Create thread 1.
 	if(Start())
 	{
+		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+		{
+			m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
+			if(!m_parserList || !m_parserList->StartParse())
+			{
+				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+				stopServer(false);
+				if(m_parserList)
+					m_parserList->ReleaseObj();
+				m_parserList=NULL;
+				return false;
+			}
+		}
 		return true;
 	}
 	cleanUpServer();
@@ -369,7 +383,9 @@ void BaseServerUDP::stopServer(bool fromInternal)
 	{
 		if(m_parserList)
 		{
-			m_parserList->StopParser();
+			m_parserList->StopParse();
+			m_parserList->ReleaseObj();
+			m_parserList=NULL;
 		}
 	}
 	

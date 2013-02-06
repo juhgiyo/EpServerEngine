@@ -33,7 +33,7 @@ ParserList::ParserList(const ParserList& b):ServerObjectList(b),Thread(b),SmartO
 }
 ParserList::~ParserList()
 {
-	StopParser();
+	StopParse();
 }
 
 void ParserList::SetWaitTime(unsigned int milliSec)
@@ -79,13 +79,20 @@ void ParserList::RemoveTerminated()
 		ServerObjectList::RemoveTerminated();
 	return;
 }
-void ParserList::StartParse()
+bool ParserList::StartParse()
 {
+	if(GetStatus()!=Thread::THREAD_STATUS_TERMINATED)
+		return false;
 	Clear();
-	Start();
+	m_listLock->Lock();
+	m_shouldTerminate=false;
+	m_listLock->Unlock();
+	return Start();
 }
-void ParserList::StopParser()
+void ParserList::StopParse()
 {
+	if(GetStatus()==Thread::THREAD_STATUS_TERMINATED)
+		return;
 	m_listLock->Lock();
 	m_shouldTerminate=true;
 	m_listLock->Unlock();

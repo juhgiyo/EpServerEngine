@@ -140,6 +140,7 @@ namespace epse
 		*/
 		void setParserList(ParserList *parserList);
 	
+	
 	private:
 		/*!
 		thread loop function

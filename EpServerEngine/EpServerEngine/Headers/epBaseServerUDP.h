@@ -127,6 +127,19 @@ namespace epse{
 		*/
 		epl::EpTString GetPort() const;
 	
+		/*!
+		Set Synchronous Policy
+		@param[in] syncPolicy Synchronous Policy to set
+		@return true if successfully set otherwise false
+		@remark SyncPolicy cannot be set when Server is running.
+		*/
+		bool SetSyncPolicy(SyncPolicy syncPolicy);
+
+		/*!
+		Get current Synchronous Policy
+		@return Synchronous Policy
+		*/
+		SyncPolicy GetSyncPolicy() const;
 
 		/*!
 		Get the maximum packet byte size
