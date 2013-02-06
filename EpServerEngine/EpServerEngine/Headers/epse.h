@@ -32,7 +32,9 @@ An Interface for EP Server Engine
 
 // Client Side
 #include "epBaseClient.h"
+#include "epBaseClientManual.h"
 #include "epBaseClientUDP.h"
+#include "epBaseClientUDPManual.h"
 
 // Server Side
 #include "epBaseServer.h"
