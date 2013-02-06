@@ -352,6 +352,8 @@
     <ClCompile Include="Sources\epBaseServerWorkerUDP.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EpLibraryHeaders\epBaseTextFile.h" />
+    <ClInclude Include="EpLibraryHeaders\epLib.h" />
     <ClInclude Include="Headers\epBasePacketParser.h" />
     <ClInclude Include="Headers\epBaseServerObject.h" />
     <ClInclude Include="Headers\epBaseServerSendObject.h" />
@@ -370,7 +372,6 @@
     <ClInclude Include="Headers\epBaseServerWorkerUDP.h" />
     <ClInclude Include="EpLibraryHeaders\epAlgorithm.h" />
     <ClInclude Include="EpLibraryHeaders\epAssert.h" />
-    <ClInclude Include="EpLibraryHeaders\epBaseFile.h" />
     <ClInclude Include="EpLibraryHeaders\epBaseJob.h" />
     <ClInclude Include="EpLibraryHeaders\epBaseJobProcessor.h" />
     <ClInclude Include="EpLibraryHeaders\epBaseLock.h" />
