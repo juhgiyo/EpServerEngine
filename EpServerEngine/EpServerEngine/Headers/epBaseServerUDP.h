@@ -60,7 +60,7 @@ using namespace std;
 namespace epse{
 
 	/*! 
-	@class BaseServer epBaseServerUDP.h
+	@class BaseServerUDP epBaseServerUDP.h
 	@brief A class for Base UDP Server.
 	*/
 	class EP_SERVER_ENGINE BaseServerUDP:public BaseServerObject{

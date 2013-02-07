@@ -55,7 +55,7 @@ namespace epse
 {
 	class BaseServerUDP;
 	/*! 
-	@class BaseServerWorker epBaseServerWorkerUDP.h
+	@class BaseServerWorkerUDP epBaseServerWorkerUDP.h
 	@brief A class for Base UDP Server Worker.
 	*/
 	class EP_SERVER_ENGINE BaseServerWorkerUDP:public BaseServerSendObject

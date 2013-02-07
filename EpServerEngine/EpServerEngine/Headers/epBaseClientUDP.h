@@ -64,8 +64,8 @@ using namespace std;
 namespace epse{
 
 	/*! 
-	@class BaseClient epBaseClient.h
-	@brief A class for Base Client.
+	@class BaseClientUDP epBaseClientUDP.h
+	@brief A class for Base UDP Client .
 	*/
 	class EP_SERVER_ENGINE BaseClientUDP:public BaseServerSendObject{
 

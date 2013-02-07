@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for Base UDP Client.
+An Interface for Base UDP Client Manual.
 
 */
 #ifndef __EP_BASE_CLIENT_UDP_H__
@@ -63,7 +63,7 @@ namespace epse{
 
 	/*! 
 	@class BaseClientUDPManual epBaseClientUDPManual.h
-	@brief A class for Base Client Manual.
+	@brief A class for Base UDP Client Manual.
 	*/
 	class EP_SERVER_ENGINE BaseClientUDPManual:public BaseServerSendObject{
 
