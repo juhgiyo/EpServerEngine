@@ -374,20 +374,21 @@ void BaseServerUDP::stopServer(bool fromInternal)
 		}
 		if(!fromInternal)
 			TerminateAfter(m_waitTime);
-
+		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+		{
+			if(m_parserList)
+			{
+				m_parserList->StopParse();
+				m_parserList->Clear();
+				m_parserList->ReleaseObj();
+				m_parserList=NULL;
+			}
+		}
 		ShutdownAllClient();
 	}
 	
 	cleanUpServer();
-	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
-	{
-		if(m_parserList)
-		{
-			m_parserList->StopParse();
-			m_parserList->ReleaseObj();
-			m_parserList=NULL;
-		}
-	}
+
 	
 	m_disconnectLock->Unlock();
 }

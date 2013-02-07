@@ -358,14 +358,14 @@ void BaseClientUDP::disconnect(bool fromInternal)
 		
 		if(!fromInternal)
 			TerminateAfter(m_waitTime);
+		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+		{
+			m_parserList.StopParse();
+		}
+		m_parserList.Clear();
 	}
 	cleanUpClient();
-	m_parserList.Clear();
-	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
-	{
-		m_parserList.StopParse();
-	}
-
+	
 	m_disconnectLock->Unlock();
 }
 
