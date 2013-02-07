@@ -128,10 +128,10 @@ namespace epse{
 		void StopParse();
 	private:
 		/*!
-		Set if the Parser List is for ASynchrnous
-		@param[in] isASynchrnous value to set
+		Set the Parser List's SyncPolicy
+		@param[in] syncPolicy synchronous policy
 		*/
-                void setSyncPolicy(SyncPolicy syncPolicy);
+        void setSyncPolicy(SyncPolicy syncPolicy);
 
 		/*!
 		Listening Loop Function
