@@ -104,10 +104,21 @@ BaseClientUDPManual::~BaseClientUDPManual()
 		EP_DELETE m_disconnectLock;
 }
 
-void BaseClientUDPManual::SetHostName(const TCHAR * hostName)
+void  BaseClientUDPManual::SetHostName(const TCHAR * hostName)
 {
 	epl::LockObj lock(m_generalLock);
+	setHostName(hostName);
 
+}
+
+void  BaseClientUDPManual::SetPort(const TCHAR *port)
+{
+	epl::LockObj lock(m_generalLock);
+	setPort(port);
+}
+
+void BaseClientUDPManual::setHostName(const TCHAR * hostName)
+{
 	unsigned int strLength=epl::System::TcsLen(hostName);
 	if(strLength==0)
 		m_hostName=DEFAULT_HOSTNAME;
@@ -121,10 +132,8 @@ void BaseClientUDPManual::SetHostName(const TCHAR * hostName)
 	}
 }
 
-void BaseClientUDPManual::SetPort(const TCHAR *port)
+void BaseClientUDPManual::setPort(const TCHAR *port)
 {
-	epl::LockObj lock(m_generalLock);
-
 	unsigned int strLength=epl::System::TcsLen(port);
 	if(strLength==0)
 		m_port=DEFAULT_PORT;
@@ -136,7 +145,6 @@ void BaseClientUDPManual::SetPort(const TCHAR *port)
 		m_port=port;
 #endif// defined(_UNICODE) || defined(UNICODE)
 	}
-
 }
 epl::EpTString BaseClientUDPManual::GetHostName() const
 {
@@ -236,11 +244,20 @@ int BaseClientUDPManual::receive(Packet &packet)
 }
 
 
-bool BaseClientUDPManual::Connect()
+bool BaseClientUDPManual::Connect(const TCHAR * hostName, const TCHAR * port)
 {
 	epl::LockObj lock(m_generalLock);
 	if(IsConnected())
 		return true;
+
+	if(hostName)
+	{
+		setHostName(hostName);
+	}
+	if(port)
+	{
+		setPort(port);
+	}
 
 	if(!m_port.length())
 	{

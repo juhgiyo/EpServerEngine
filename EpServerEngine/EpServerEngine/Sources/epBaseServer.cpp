@@ -95,7 +95,11 @@ BaseServer::~BaseServer()
 void  BaseServer::SetPort(const TCHAR *  port)
 {
 	epl::LockObj lock(m_lock);
+	setPort(port);
+}
 
+void  BaseServer::setPort(const TCHAR *  port)
+{
 	unsigned int strLength=epl::System::TcsLen(port);
 	if(strLength==0)
 		m_port=DEFAULT_PORT;
@@ -168,11 +172,16 @@ void BaseServer::execute()
 } 
 
 
-bool BaseServer::StartServer()
+bool BaseServer::StartServer(const TCHAR * port)
 {
 	epl::LockObj lock(m_lock);
 	if(IsServerStarted())
 		return true;
+
+	if(port)
+	{
+		setPort(port);
+	}
 
 	if(!m_port.length())
 	{

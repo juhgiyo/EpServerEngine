@@ -149,8 +149,10 @@ namespace epse{
 
 		/*!
 		Start the server
+		@param[in] port the port string
+		@remark if argument is NULL then previously setting value is used
 		*/
-		bool StartServer();
+		bool StartServer(const TCHAR * port=NULL);
 		/*!
 		Stop the server
 		*/
@@ -184,7 +186,12 @@ namespace epse{
 		virtual BaseServerWorkerUDP* createNewWorker()=0;
 
 	private:
-		
+		/*!
+		Actually set the port for the server.
+		@remark Cannot be changed while connected to server
+		@param[in] port The port to set.
+		*/
+		void setPort(const TCHAR *port);
 
 		/*!
 		Listening Loop Function

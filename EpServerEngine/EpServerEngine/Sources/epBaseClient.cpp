@@ -104,7 +104,18 @@ BaseClient::~BaseClient()
 void  BaseClient::SetHostName(const TCHAR * hostName)
 {
 	epl::LockObj lock(m_generalLock);
+	setHostName(hostName);
 
+}
+
+void  BaseClient::SetPort(const TCHAR *port)
+{
+	epl::LockObj lock(m_generalLock);
+	setPort(port);
+}
+
+void BaseClient::setHostName(const TCHAR * hostName)
+{
 	unsigned int strLength=epl::System::TcsLen(hostName);
 	if(strLength==0)
 		m_hostName=DEFAULT_HOSTNAME;
@@ -118,10 +129,8 @@ void  BaseClient::SetHostName(const TCHAR * hostName)
 	}
 }
 
-void  BaseClient::SetPort(const TCHAR *port)
+void BaseClient::setPort(const TCHAR *port)
 {
-	epl::LockObj lock(m_generalLock);
-
 	unsigned int strLength=epl::System::TcsLen(port);
 	if(strLength==0)
 		m_port=DEFAULT_PORT;
@@ -134,6 +143,7 @@ void  BaseClient::SetPort(const TCHAR *port)
 #endif// defined(_UNICODE) || defined(UNICODE)
 	}
 }
+
 epl::EpTString BaseClient::GetHostName() const
 {
 	epl::LockObj lock(m_generalLock);
@@ -286,11 +296,20 @@ int BaseClient::receive(Packet &packet)
 	return readLength;
 }
 
-bool BaseClient::Connect()
+bool BaseClient::Connect(const TCHAR * hostName, const TCHAR * port)
 {
-	epl::LockObj lock(m_generalLock);
+	LockObj lock(m_generalLock);
 	if(IsConnected())
 		return true;
+
+	if(hostName)
+	{
+		setHostName(hostName);
+	}
+	if(port)
+	{
+		setPort(port);
+	}
 
 	if(!m_port.length())
 	{

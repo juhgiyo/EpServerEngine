@@ -100,11 +100,21 @@ BaseClientManual::~BaseClientManual()
 	if(m_disconnectLock)
 		EP_DELETE m_disconnectLock;
 }
-
 void  BaseClientManual::SetHostName(const TCHAR * hostName)
 {
 	epl::LockObj lock(m_generalLock);
+	setHostName(hostName);
 
+}
+
+void  BaseClientManual::SetPort(const TCHAR *port)
+{
+	epl::LockObj lock(m_generalLock);
+	setPort(port);
+}
+
+void BaseClientManual::setHostName(const TCHAR * hostName)
+{
 	unsigned int strLength=epl::System::TcsLen(hostName);
 	if(strLength==0)
 		m_hostName=DEFAULT_HOSTNAME;
@@ -118,10 +128,8 @@ void  BaseClientManual::SetHostName(const TCHAR * hostName)
 	}
 }
 
-void  BaseClientManual::SetPort(const TCHAR *port)
+void BaseClientManual::setPort(const TCHAR *port)
 {
-	epl::LockObj lock(m_generalLock);
-
 	unsigned int strLength=epl::System::TcsLen(port);
 	if(strLength==0)
 		m_port=DEFAULT_PORT;
@@ -250,11 +258,20 @@ int BaseClientManual::receive(Packet &packet)
 	return readLength;
 }
 
-bool BaseClientManual::Connect()
+bool BaseClientManual::Connect(const TCHAR * hostName, const TCHAR * port)
 {
 	epl::LockObj lock(m_generalLock);
 	if(IsConnected())
 		return true;
+
+	if(hostName)
+	{
+		setHostName(hostName);
+	}
+	if(port)
+	{
+		setPort(port);
+	}
 
 	if(!m_port.length())
 	{

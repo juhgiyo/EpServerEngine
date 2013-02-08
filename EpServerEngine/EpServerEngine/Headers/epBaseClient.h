@@ -161,8 +161,11 @@ namespace epse{
 
 		/*!
 		Connect to the server
+		@param[in] hostName the hostname string
+		@param[in] port the port string
+		@remark if argument is NULL then previously setting value is used
 		*/
-		bool Connect();
+		bool Connect(const TCHAR * hostName=NULL, const TCHAR * port=NULL);
 
 		/*!
 		Disconnect from the server
@@ -198,7 +201,19 @@ namespace epse{
 		virtual BasePacketParser* createNewPacketParser()=0;
 
 	private:
-
+		/*!
+		Actually set the hostname for the server.
+		@remark Cannot be changed while connected to server
+		@param[in] hostName The hostname to set.
+		*/
+		void setHostName(const TCHAR * hostName);
+		
+		/*!
+		Actually set the port for the server.
+		@remark Cannot be changed while connected to server
+		@param[in] port The port to set.
+		*/
+		void setPort(const TCHAR *port);
 
 		/*!
 		Receive the packet from the server

@@ -106,6 +106,11 @@ BaseServerUDP::~BaseServerUDP()
 void  BaseServerUDP::SetPort(const TCHAR *  port)
 {
 	epl::LockObj lock(m_lock);
+	setPort(port);
+}
+
+void  BaseServerUDP::setPort(const TCHAR *  port)
+{
 	unsigned int strLength=epl::System::TcsLen(port);
 	if(strLength==0)
 		m_port=DEFAULT_PORT;
@@ -118,6 +123,7 @@ void  BaseServerUDP::SetPort(const TCHAR *  port)
 #endif// defined(_UNICODE) || defined(UNICODE)
 	}
 }
+
 
 epl::EpTString BaseServerUDP::GetPort() const
 {
@@ -211,12 +217,17 @@ void BaseServerUDP::execute()
 } 
 
 
-bool BaseServerUDP::StartServer()
+bool BaseServerUDP::StartServer(const TCHAR * port)
 {
 	epl::LockObj lock(m_lock);
 	if(IsServerStarted())
 		return true;
 	
+	if(port)
+	{
+		setPort(port);
+	}
+
 	if(!m_port.length())
 	{
 		m_port=DEFAULT_PORT;
