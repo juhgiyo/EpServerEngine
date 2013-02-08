@@ -121,6 +121,17 @@ namespace epse
 		*/
 		vector<BaseServerObject*> GetPacketParserList() const;
 
+		/*!
+		Check if the connection is alive
+		@return true if the connection is alive otherwise false
+		*/
+		bool IsConnectionAlive() const;
+
+		/*!
+		Kill the connection
+		*/
+		void KillConnection();
+
 	protected:
 		/*!
 		Return the new packet parser
@@ -142,6 +153,12 @@ namespace epse
 	
 	
 	private:
+		/*!
+		Actually Kill the connection
+		@param[in] fromInternal flag to check if the call is from internal or not
+		*/
+		void killConnection(bool fromInternal);
+
 		/*!
 		thread loop function
 		*/
@@ -167,6 +184,9 @@ namespace epse
 
 		/// send lock
 		epl::BaseLock *m_sendLock;
+
+		/// kill connection lock
+		epl::BaseLock *m_killConnectionLock;
 		
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;

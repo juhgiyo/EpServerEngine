@@ -25,15 +25,19 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(unsigned int waitTimeMilliSec,epl::Lock
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_lock=EP_NEW epl::CriticalSectionEx();
+		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_lock=EP_NEW epl::Mutex();
+		m_killConnectionLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_lock=EP_NEW epl::NoLock();
+		m_killConnectionLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_lock=NULL;
+		m_killConnectionLock=NULL;
 		break;
 	}
 	m_packet=NULL;
@@ -53,15 +57,19 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(const BaseServerWorkerUDP& b) : BaseSer
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_lock=EP_NEW epl::CriticalSectionEx();
+		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_lock=EP_NEW epl::Mutex();
+		m_killConnectionLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_lock=EP_NEW epl::NoLock();
+		m_killConnectionLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_lock=NULL;
+		m_killConnectionLock=NULL;
 		break;
 	}
 	m_parserList=NULL;
@@ -69,23 +77,20 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(const BaseServerWorkerUDP& b) : BaseSer
 
 BaseServerWorkerUDP::~BaseServerWorkerUDP()
 {
+	KillConnection();
+	
 	if(m_parser)
 		m_parser->ReleaseObj();
 	if(m_parserList)
-	{
 		m_parserList->ReleaseObj();
-	}
-	WaitFor(m_waitTime);
-	m_lock->Lock();
 	if(m_packet)
-	{
 		m_packet->ReleaseObj();	
-		m_packet=NULL;
-	}
-	m_lock->Unlock();
-
+	
 	if(m_lock)
 		EP_DELETE m_lock;
+
+	if(m_killConnectionLock)
+		EP_DELETE m_killConnectionLock;
 }
 
 void BaseServerWorkerUDP::setPacketPassUnit(const PacketPassUnit &packetPassUnit)
@@ -111,6 +116,43 @@ int BaseServerWorkerUDP::Send(const Packet &packet)
 		return m_server->send(packet,m_clientSocket);
 	return 0;
 }
+
+bool BaseServerWorkerUDP::IsConnectionAlive() const
+{
+	return (GetStatus()==Thread::THREAD_STATUS_STARTED);
+}
+
+void BaseServerWorkerUDP::KillConnection()
+{
+	epl::LockObj lock(m_lock);
+	if(!IsConnectionAlive())
+	{
+		return;
+	}
+	killConnection(false);
+}
+
+
+void BaseServerWorkerUDP::killConnection(bool fromInternal)
+{
+	if(!m_killConnectionLock->TryLock())
+	{
+		return;
+	}
+	if(IsConnectionAlive())
+	{
+		if(!fromInternal)
+			TerminateAfter(m_waitTime);
+		if(m_parser)
+		{
+			m_parser->ReleaseObj();
+			m_parser=NULL;
+		}
+	}
+
+	m_killConnectionLock->Unlock();
+}
+
 
 void BaseServerWorkerUDP::setServer(BaseServerUDP *server)
 {
@@ -140,12 +182,21 @@ void BaseServerWorkerUDP::execute()
 	if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS||m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
 	{
 		m_parser->Start();
-		m_parser->WaitFor(m_waitTime);
+		m_parser->WaitFor(WAITTIME_INIFINITE);
+		m_parser->ReleaseObj();
+		m_parser=NULL;
 	}
 	else
 	{
-		m_parserList->Push(m_parser);
+		if(m_parserList)
+		{
+			m_parserList->Push(m_parser);
+			m_parserList->ReleaseObj();
+			m_parserList=NULL;
+		}
+		
 	}
+	killConnection(true);
 
 }
 

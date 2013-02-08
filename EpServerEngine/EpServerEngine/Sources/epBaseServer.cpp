@@ -148,6 +148,21 @@ vector<BaseServerObject*> BaseServer::GetWorkerList() const
 void BaseServer::execute()
 {
 	SOCKET clientSocket;
+
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
+		if(!m_parserList || !m_parserList->StartParse())
+		{
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+			if(m_parserList)
+				m_parserList->ReleaseObj();
+			m_parserList=NULL;
+			stopServer(true);
+			return;
+		}
+	}
+
 	while(1)
 	{
 		clientSocket=accept(m_listenSocket, NULL, NULL);
@@ -249,19 +264,6 @@ bool BaseServer::StartServer(const TCHAR * port)
 	// Create thread 1.
 	if(Start())
 	{
-		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
-		{
-			m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
-			if(!m_parserList || !m_parserList->StartParse())
-			{
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-				stopServer(false);
-				if(m_parserList)
-					m_parserList->ReleaseObj();
-				m_parserList=NULL;
-				return false;
-			}
-		}
 		return true;
 	}
 	cleanUpServer();
@@ -283,9 +285,21 @@ void BaseServer::Broadcast(const Packet& packet)
 
 void BaseServer::ShutdownAllClient()
 {
-	m_workerList.Clear();
+	epl::LockObj lock(m_lock);
+	shutdownAllClient();
 }
 
+void BaseServer::shutdownAllClient()
+{
+	m_workerList.RemoveTerminated();
+	vector<BaseServerObject*>::iterator iter;
+	vector<BaseServerObject*> clientList=m_workerList.GetList();
+	for(iter=clientList.begin();iter!=clientList.end();iter++)
+	{
+		((BaseServerWorker*)(*iter))->KillConnection();
+	}
+	m_workerList.Clear();
+}
 
 bool BaseServer::IsServerStarted() const
 {
@@ -344,7 +358,7 @@ void BaseServer::stopServer(bool fromInternal)
 				m_parserList=NULL;
 			}
 		}		
-		ShutdownAllClient();
+		shutdownAllClient();
 	}
 	
 	cleanUpServer();

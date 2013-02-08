@@ -184,6 +184,20 @@ vector<BaseServerObject*> BaseServerUDP::GetWorkerList() const
 
 void BaseServerUDP::execute()
 {
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
+		if(!m_parserList || !m_parserList->StartParse())
+		{
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+			if(m_parserList)
+				m_parserList->ReleaseObj();
+			m_parserList=NULL;
+			stopServer(true);
+			return;
+		}
+	}
+
 	Packet recvPacket(NULL,m_maxPacketSize);
 	char *packetData=const_cast<char*>(recvPacket.GetPacket());
 	int length=recvPacket.GetPacketByteSize();
@@ -288,23 +302,9 @@ bool BaseServerUDP::StartServer(const TCHAR * port)
 	int nTmp = sizeof(int);
 	getsockopt(m_listenSocket, SOL_SOCKET,SO_MAX_MSG_SIZE, (char *)&m_maxPacketSize,&nTmp);
 
-
 	// Create thread 1.
 	if(Start())
 	{
-		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
-		{
-			m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
-			if(!m_parserList || !m_parserList->StartParse())
-			{
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-				stopServer(false);
-				if(m_parserList)
-					m_parserList->ReleaseObj();
-				m_parserList=NULL;
-				return false;
-			}
-		}
 		return true;
 	}
 	cleanUpServer();
@@ -327,10 +327,21 @@ void BaseServerUDP::Broadcast(const Packet& packet)
 
 void BaseServerUDP::ShutdownAllClient()
 {
-	m_workerList.Clear();
+	epl::LockObj lock(m_lock);
+	shutdownAllClient();
 }
 
-
+void BaseServerUDP::shutdownAllClient()
+{
+	m_workerList.RemoveTerminated();
+	vector<BaseServerObject*>::iterator iter;
+	vector<BaseServerObject*> clientList=m_workerList.GetList();
+	for(iter=clientList.begin();iter!=clientList.end();iter++)
+	{
+		((BaseServerWorkerUDP*)(*iter))->KillConnection();
+	}
+	m_workerList.Clear();
+}
 bool BaseServerUDP::IsServerStarted() const
 {
 	return (GetStatus()==Thread::THREAD_STATUS_STARTED);
@@ -395,7 +406,7 @@ void BaseServerUDP::stopServer(bool fromInternal)
 				m_parserList=NULL;
 			}
 		}
-		ShutdownAllClient();
+		shutdownAllClient();
 	}
 	
 	cleanUpServer();

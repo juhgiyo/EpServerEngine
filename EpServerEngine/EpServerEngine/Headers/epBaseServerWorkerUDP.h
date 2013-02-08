@@ -132,6 +132,17 @@ namespace epse
 		virtual int Send(const Packet &packet);
 
 		/*!
+		Check if the connection is alive
+		@return true if the connection is alive otherwise false
+		*/
+		bool IsConnectionAlive() const;
+
+		/*!
+		Kill the connection
+		*/
+		void KillConnection();
+
+		/*!
 		Get the maximum packet byte size
 		@return the maximum packet byte size
 		*/
@@ -156,7 +167,11 @@ namespace epse
 	
 	
 	private:	
-
+		/*!
+		Actually Kill the connection
+		@param[in] fromInternal flag to check if the call is from internal or not
+		*/
+		void killConnection(bool fromInternal);
 
 		/*! 
 		@struct PacketPassUnit epBaseServerWorkerUDP.h
@@ -202,6 +217,9 @@ namespace epse
 
 		/// general lock 
 		epl::BaseLock *m_lock;
+
+		/// kill connection lock
+		epl::BaseLock *m_killConnectionLock;
 
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;

@@ -26,19 +26,24 @@ BaseServerWorker::BaseServerWorker(unsigned int waitTimeMilliSec,epl::LockPolicy
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
+		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
+		m_killConnectionLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
+		m_killConnectionLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
+		m_killConnectionLock=NULL;
 		break;
 	}
 	m_recvSizePacket=Packet(NULL,4);
 	m_parserList=NULL;
+	m_clientSocket=INVALID_SOCKET;
 }
 BaseServerWorker::BaseServerWorker(const BaseServerWorker& b) : BaseServerSendObject(b)
 {
@@ -47,41 +52,38 @@ BaseServerWorker::BaseServerWorker(const BaseServerWorker& b) : BaseServerSendOb
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
+		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
+		m_killConnectionLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
+		m_killConnectionLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
+		m_killConnectionLock=NULL;
 		break;
 	}
 	m_recvSizePacket=Packet(NULL,4);
 	m_parserList=NULL;
+	m_clientSocket=INVALID_SOCKET;
 }
 
 BaseServerWorker::~BaseServerWorker()
 {
-	m_sendLock->Lock();
-	int iResult;
-	iResult = shutdown(m_clientSocket, SD_SEND);
-	if (iResult == SOCKET_ERROR) {
-		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-	}
-	closesocket(m_clientSocket);
-	m_sendLock->Unlock();
-	WaitFor(m_waitTime);
-
+	KillConnection();
 	if(m_parserList)
 	{
 		m_parserList->ReleaseObj();
 	}
 	
-
 	if(m_sendLock)
 		EP_DELETE m_sendLock;
+	if(m_killConnectionLock)
+		EP_DELETE m_killConnectionLock;
 }
 
 
@@ -92,9 +94,12 @@ void BaseServerWorker::setClientSocket(const SOCKET& clientSocket )
 }
 
 int BaseServerWorker::Send(const Packet &packet)
-{
-	
+{	
 	epl::LockObj lock(m_sendLock);
+	
+	if(m_clientSocket==INVALID_SOCKET)
+		return 0;
+
 	int writeLength=0;
 	const char *packetData=packet.GetPacket();
 	int length=packet.GetPacketByteSize();
@@ -118,6 +123,58 @@ int BaseServerWorker::Send(const Packet &packet)
 vector<BaseServerObject*> BaseServerWorker::GetPacketParserList() const
 {
 	return m_parserList->GetList();
+}
+bool BaseServerWorker::IsConnectionAlive() const
+{
+	return (GetStatus()==Thread::THREAD_STATUS_STARTED);
+}
+
+void BaseServerWorker::KillConnection()
+{
+	epl::LockObj lock(m_sendLock);
+	if(!IsConnectionAlive())
+	{
+		return;
+	}
+	killConnection(false);
+}
+
+void BaseServerWorker::killConnection(bool fromInternal)
+{
+	if(!m_killConnectionLock->TryLock())
+	{
+		return;
+	}
+	if(IsConnectionAlive())
+	{
+		// No longer need client socket
+		if(m_clientSocket!=INVALID_SOCKET)
+		{
+			int iResult;
+			iResult = shutdown(m_clientSocket, SD_SEND);
+			if (iResult == SOCKET_ERROR) {
+				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+			}
+			closesocket(m_clientSocket);
+			m_clientSocket=INVALID_SOCKET;
+		}
+		
+
+		if(!fromInternal)
+			TerminateAfter(m_waitTime);
+		if(m_parserList&&m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
+		{
+			if(m_parserList)
+			{
+				m_parserList->StopParse();
+				m_parserList->Clear();
+				m_parserList->ReleaseObj();
+				m_parserList=NULL;
+			}
+		}		
+	}
+
+	m_killConnectionLock->Unlock();
 }
 
 
@@ -204,6 +261,7 @@ void BaseServerWorker::execute()
 		}
 
 	} while (iResult > 0);
+	killConnection(true);
 }
 
 

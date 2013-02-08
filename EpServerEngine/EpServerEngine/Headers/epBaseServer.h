@@ -195,6 +195,11 @@ namespace epse{
 		void cleanUpServer();
 
 		/*!
+		Actually shut down all the clients (worker).
+		*/
+		void shutdownAllClient();
+
+		/*!
 		Actually Stop the server
 		@param[in] fromInternal flag to check if the call is from internal or not
 		*/
