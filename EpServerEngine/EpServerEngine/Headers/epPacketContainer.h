@@ -221,7 +221,7 @@ namespace epse
 		/// flag whether memory is allocated in this object or now
 		bool m_isAllocated;
 		/// lock
-		epl::BaseLock *m_lock;
+		epl::BaseLock *m_packetContainerLock;
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;
 	};
@@ -248,16 +248,16 @@ namespace epse
 		switch(lockPolicyType)
 		{
 		case epl::LOCK_POLICY_CRITICALSECTION:
-			m_lock=EP_NEW epl::CriticalSectionEx();
+			m_packetContainerLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
-			m_lock=EP_NEW epl::Mutex();
+			m_packetContainerLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
-			m_lock=EP_NEW epl::NoLock();
+			m_packetContainerLock=EP_NEW epl::NoLock();
 			break;
 		default:
-			m_lock=NULL;
+			m_packetContainerLock=NULL;
 			break;
 		}
 	}
@@ -282,16 +282,16 @@ namespace epse
 		switch(lockPolicyType)
 		{
 		case epl::LOCK_POLICY_CRITICALSECTION:
-			m_lock=EP_NEW epl::CriticalSectionEx();
+			m_packetContainerLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
-			m_lock=EP_NEW epl::Mutex();
+			m_packetContainerLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
-			m_lock=EP_NEW epl::NoLock();
+			m_packetContainerLock=EP_NEW epl::NoLock();
 			break;
 		default:
-			m_lock=NULL;
+			m_packetContainerLock=NULL;
 			break;
 		}
 	}
@@ -327,16 +327,16 @@ namespace epse
 		switch(lockPolicyType)
 		{
 		case epl::LOCK_POLICY_CRITICALSECTION:
-			m_lock=EP_NEW epl::CriticalSectionEx();
+			m_packetContainerLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
-			m_lock=EP_NEW epl::Mutex();
+			m_packetContainerLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
-			m_lock=EP_NEW epl::NoLock();
+			m_packetContainerLock=EP_NEW epl::NoLock();
 			break;
 		default:
-			m_lock=NULL;
+			m_packetContainerLock=NULL;
 			break;
 		}
 	}
@@ -366,16 +366,16 @@ namespace epse
 		switch(m_lockPolicy)
 		{
 		case epl::LOCK_POLICY_CRITICALSECTION:
-			m_lock=EP_NEW epl::CriticalSectionEx();
+			m_packetContainerLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
-			m_lock=EP_NEW epl::Mutex();
+			m_packetContainerLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
-			m_lock=EP_NEW epl::NoLock();
+			m_packetContainerLock=EP_NEW epl::NoLock();
 			break;
 		default:
-			m_lock=NULL;
+			m_packetContainerLock=NULL;
 			break;
 		}
 	}
@@ -383,12 +383,12 @@ namespace epse
 	template<typename PacketStruct, typename ArrayType>
 	PacketContainer<PacketStruct,ArrayType>::~PacketContainer()
 	{
-		m_lock->Lock();
+		m_packetContainerLock->Lock();
 		if(m_isAllocated && m_packetContainer)
 			EP_Free(m_packetContainer);	
-		m_lock->Unlock();
-		if(m_lock)
-			EP_DELETE m_lock;
+		m_packetContainerLock->Unlock();
+		if(m_packetContainerLock)
+			EP_DELETE m_packetContainerLock;
 	}
 	
 
@@ -407,7 +407,7 @@ namespace epse
 	template<typename PacketStruct, typename ArrayType>
 	void PacketContainer<PacketStruct,ArrayType>::SetPacket(const PacketStruct & packet, unsigned int arraySize)
 	{
-		epl::LockObj lock(m_lock);
+		epl::LockObj lock(m_packetContainerLock);
 		if(m_isAllocated && m_packetContainer)
 			EP_Free(m_packetContainer);
 		m_packetContainer=NULL;
@@ -429,7 +429,7 @@ namespace epse
 	template<typename PacketStruct, typename ArrayType>
 	bool PacketContainer<PacketStruct,ArrayType>::SetPacket(const void * rawData, unsigned int byteSize)
 	{
-		epl::LockObj lock(m_lock);
+		epl::LockObj lock(m_packetContainerLock);
 		if(byteSize<sizeof(PacketStruct))
 		{
 			epl::EpString errMsg;
@@ -468,7 +468,7 @@ namespace epse
 	template<typename PacketStruct, typename ArrayType>
 	bool PacketContainer<PacketStruct,ArrayType>::SetArray(const ArrayType *arr,unsigned int arraySize, unsigned int offset)
 	{
-		epl::LockObj lock(m_lock);
+		epl::LockObj lock(m_packetContainerLock);
 		if(m_isAllocated)
 		{
 			if(m_length<arraySize+offset)
@@ -511,7 +511,7 @@ namespace epse
 	template<typename PacketStruct, typename ArrayType>
 	bool PacketContainer<PacketStruct,ArrayType>::SetArraySize(unsigned int arrSize)
 	{
-		epl::LockObj lock(m_lock);
+		epl::LockObj lock(m_packetContainerLock);
 		return setArraySize(arrSize);
 	}
 
@@ -536,7 +536,7 @@ namespace epse
 	{
 		if(this!=&b)
 		{
-			epl::LockObj lock(m_lock);
+			epl::LockObj lock(m_packetContainerLock);
 			if(m_isAllocated && m_packetContainer)
 				EP_Free(m_packetContainer);
 			m_packetContainer=NULL;
@@ -564,7 +564,7 @@ namespace epse
 	template<typename PacketStruct, typename ArrayType>
 	PacketContainer<PacketStruct,ArrayType>& PacketContainer<PacketStruct,ArrayType>::operator =(const PacketStruct& b)
 	{
-		epl::LockObj lock(m_lock);
+		epl::LockObj lock(m_packetContainerLock);
 		if(m_isAllocated)
 			m_packetContainer->m_packet=b;
 		else

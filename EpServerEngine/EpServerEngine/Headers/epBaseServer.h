@@ -98,7 +98,7 @@ namespace epse{
 		{
 			if(this!=&b)
 			{
-				epl::LockObj lock(m_lock);
+				epl::LockObj lock(m_baseServerLock);
 				BaseServerObject::operator =(b);
 				m_port=b.m_port;
 			}
@@ -216,7 +216,7 @@ namespace epse{
 		struct addrinfo m_hints;
 
 		/// general lock 
-		epl::BaseLock *m_lock;
+		epl::BaseLock *m_baseServerLock;
 		/// disconnect lock
 		epl::BaseLock *m_disconnectLock;
 

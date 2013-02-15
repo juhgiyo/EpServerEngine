@@ -26,22 +26,22 @@ BaseServerUDP::BaseServerUDP(const TCHAR *  port,SyncPolicy syncPolicy,unsigned 
 	switch(lockPolicyType)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_lock=EP_NEW epl::CriticalSectionEx();
+		m_baseServerLock=EP_NEW epl::CriticalSectionEx();
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
-		m_lock=EP_NEW epl::Mutex();
+		m_baseServerLock=EP_NEW epl::Mutex();
 		m_sendLock=EP_NEW epl::Mutex();
 		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
-		m_lock=EP_NEW epl::NoLock();
+		m_baseServerLock=EP_NEW epl::NoLock();
 		m_sendLock=EP_NEW epl::NoLock();
 		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
-		m_lock=NULL;
+		m_baseServerLock=NULL;
 		m_sendLock=NULL;
 		m_disconnectLock=NULL;
 		break;
@@ -65,22 +65,22 @@ BaseServerUDP::BaseServerUDP(const BaseServerUDP& b):BaseServerObject(b)
 	switch(m_lockPolicy)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_lock=EP_NEW epl::CriticalSectionEx();
+		m_baseServerLock=EP_NEW epl::CriticalSectionEx();
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
-		m_lock=EP_NEW epl::Mutex();
+		m_baseServerLock=EP_NEW epl::Mutex();
 		m_sendLock=EP_NEW epl::Mutex();
 		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
-		m_lock=EP_NEW epl::NoLock();
+		m_baseServerLock=EP_NEW epl::NoLock();
 		m_sendLock=EP_NEW epl::NoLock();
 		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
-		m_lock=NULL;
+		m_baseServerLock=NULL;
 		m_sendLock=NULL;
 		m_disconnectLock=NULL;
 		break;
@@ -91,8 +91,8 @@ BaseServerUDP::BaseServerUDP(const BaseServerUDP& b):BaseServerObject(b)
 BaseServerUDP::~BaseServerUDP()
 {
 	StopServer();
-	if(m_lock)
-		EP_DELETE m_lock;
+	if(m_baseServerLock)
+		EP_DELETE m_baseServerLock;
 	if(m_sendLock)
 		EP_DELETE m_sendLock;
 	if(m_disconnectLock)
@@ -105,7 +105,7 @@ BaseServerUDP::~BaseServerUDP()
 
 void  BaseServerUDP::SetPort(const TCHAR *  port)
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	setPort(port);
 }
 
@@ -127,7 +127,7 @@ void  BaseServerUDP::setPort(const TCHAR *  port)
 
 epl::EpTString BaseServerUDP::GetPort() const
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	if(!m_port.length())
 		return _T("");
 #if defined(_UNICODE) || defined(UNICODE)
@@ -166,14 +166,14 @@ bool BaseServerUDP::SetSyncPolicy(SyncPolicy syncPolicy)
 {
 	if(IsServerStarted())
 		return false;
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	setSyncPolicy(syncPolicy);
 	return true;
 }
 
 SyncPolicy BaseServerUDP::GetSyncPolicy() const
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	return m_syncPolicy;
 }
 
@@ -233,7 +233,7 @@ void BaseServerUDP::execute()
 
 bool BaseServerUDP::StartServer(const TCHAR * port)
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	if(IsServerStarted())
 		return true;
 	
@@ -327,7 +327,7 @@ void BaseServerUDP::Broadcast(const Packet& packet)
 
 void BaseServerUDP::ShutdownAllClient()
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	shutdownAllClient();
 }
 
@@ -349,7 +349,7 @@ bool BaseServerUDP::IsServerStarted() const
 
 void BaseServerUDP::StopServer()
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	if(!IsServerStarted())
 	{
 		return;

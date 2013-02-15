@@ -26,19 +26,19 @@ BaseServer::BaseServer(const TCHAR *  port,SyncPolicy syncPolicy,unsigned int wa
 	switch(lockPolicyType)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_lock=EP_NEW epl::CriticalSectionEx();
+		m_baseServerLock=EP_NEW epl::CriticalSectionEx();
 		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
-		m_lock=EP_NEW epl::Mutex();
+		m_baseServerLock=EP_NEW epl::Mutex();
 		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
-		m_lock=EP_NEW epl::NoLock();
+		m_baseServerLock=EP_NEW epl::NoLock();
 		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
-		m_lock=NULL;
+		m_baseServerLock=NULL;
 		m_disconnectLock=NULL;
 		break;
 	}
@@ -59,19 +59,19 @@ BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 	switch(m_lockPolicy)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_lock=EP_NEW epl::CriticalSectionEx();
+		m_baseServerLock=EP_NEW epl::CriticalSectionEx();
 		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
-		m_lock=EP_NEW epl::Mutex();
+		m_baseServerLock=EP_NEW epl::Mutex();
 		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
-		m_lock=EP_NEW epl::NoLock();
+		m_baseServerLock=EP_NEW epl::NoLock();
 		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
-		m_lock=NULL;
+		m_baseServerLock=NULL;
 		m_disconnectLock=NULL;
 		break;
 	}
@@ -82,8 +82,8 @@ BaseServer::~BaseServer()
 {
 	StopServer();
 
-	if(m_lock)
-		EP_DELETE m_lock;
+	if(m_baseServerLock)
+		EP_DELETE m_baseServerLock;
 	if(m_disconnectLock)
 		EP_DELETE m_disconnectLock;
 	if(m_parserList)
@@ -94,7 +94,7 @@ BaseServer::~BaseServer()
 
 void  BaseServer::SetPort(const TCHAR *  port)
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	setPort(port);
 }
 
@@ -115,7 +115,7 @@ void  BaseServer::setPort(const TCHAR *  port)
 
 epl::EpTString BaseServer::GetPort() const
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	if(!m_port.length())
 		return _T("");
 #if defined(_UNICODE) || defined(UNICODE)
@@ -130,14 +130,14 @@ bool BaseServer::SetSyncPolicy(SyncPolicy syncPolicy)
 {
 	if(IsServerStarted())
 		return false;
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	setSyncPolicy(syncPolicy);
 	return true;
 }
 
 SyncPolicy BaseServer::GetSyncPolicy() const
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	return m_syncPolicy;
 }
 
@@ -189,7 +189,7 @@ void BaseServer::execute()
 
 bool BaseServer::StartServer(const TCHAR * port)
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	if(IsServerStarted())
 		return true;
 
@@ -285,7 +285,7 @@ void BaseServer::Broadcast(const Packet& packet)
 
 void BaseServer::ShutdownAllClient()
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	shutdownAllClient();
 }
 
@@ -308,7 +308,7 @@ bool BaseServer::IsServerStarted() const
 
 void BaseServer::StopServer()
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseServerLock);
 	if(!IsServerStarted())
 	{
 		return;

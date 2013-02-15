@@ -45,16 +45,16 @@ Packet::Packet(const void *packet, unsigned int byteSize, bool shouldAllocate, e
 	switch(lockPolicyType)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_lock=EP_NEW epl::CriticalSectionEx();
+		m_packetLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
-		m_lock=EP_NEW epl::Mutex();
+		m_packetLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
-		m_lock=EP_NEW epl::NoLock();
+		m_packetLock=EP_NEW epl::NoLock();
 		break;
 	default:
-		m_lock=NULL;
+		m_packetLock=NULL;
 		break;
 	}
 }
@@ -81,16 +81,16 @@ Packet::Packet(const Packet& b):SmartObject(b)
 	switch(m_lockPolicy)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_lock=EP_NEW epl::CriticalSectionEx();
+		m_packetLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
-		m_lock=EP_NEW epl::Mutex();
+		m_packetLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
-		m_lock=EP_NEW epl::NoLock();
+		m_packetLock=EP_NEW epl::NoLock();
 		break;
 	default:
-		m_lock=NULL;
+		m_packetLock=NULL;
 		break;
 	}
 }
@@ -128,15 +128,15 @@ Packet & Packet::operator=(const Packet&b)
 
 Packet::~Packet()
 {
-	m_lock->Lock();
+	m_packetLock->Lock();
 	if(m_isAllocated && m_packet)
 	{
 		EP_DELETE[] m_packet;
 	}
 	m_packet=NULL;
-	m_lock->Unlock();
-	if(m_lock)
-		EP_DELETE m_lock;
+	m_packetLock->Unlock();
+	if(m_packetLock)
+		EP_DELETE m_packetLock;
 }
 
 unsigned int Packet::GetPacketByteSize() const
@@ -151,7 +151,7 @@ const char *Packet::GetPacket() const
 
 void Packet::SetPacket(const void* packet, unsigned int packetByteSize)
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_packetLock);
 	if(m_isAllocated)
 	{
 		if(m_packet)

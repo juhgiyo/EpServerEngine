@@ -24,19 +24,19 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(unsigned int waitTimeMilliSec,epl::Lock
 	switch(lockPolicyType)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_lock=EP_NEW epl::CriticalSectionEx();
+		m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
 		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
-		m_lock=EP_NEW epl::Mutex();
+		m_baseWorkerLock=EP_NEW epl::Mutex();
 		m_killConnectionLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
-		m_lock=EP_NEW epl::NoLock();
+		m_baseWorkerLock=EP_NEW epl::NoLock();
 		m_killConnectionLock=EP_NEW epl::NoLock();
 		break;
 	default:
-		m_lock=NULL;
+		m_baseWorkerLock=NULL;
 		m_killConnectionLock=NULL;
 		break;
 	}
@@ -56,19 +56,19 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(const BaseServerWorkerUDP& b) : BaseSer
 	switch(m_lockPolicy)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_lock=EP_NEW epl::CriticalSectionEx();
+		m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
 		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
-		m_lock=EP_NEW epl::Mutex();
+		m_baseWorkerLock=EP_NEW epl::Mutex();
 		m_killConnectionLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
-		m_lock=EP_NEW epl::NoLock();
+		m_baseWorkerLock=EP_NEW epl::NoLock();
 		m_killConnectionLock=EP_NEW epl::NoLock();
 		break;
 	default:
-		m_lock=NULL;
+		m_baseWorkerLock=NULL;
 		m_killConnectionLock=NULL;
 		break;
 	}
@@ -86,8 +86,8 @@ BaseServerWorkerUDP::~BaseServerWorkerUDP()
 	if(m_packet)
 		m_packet->ReleaseObj();	
 	
-	if(m_lock)
-		EP_DELETE m_lock;
+	if(m_baseWorkerLock)
+		EP_DELETE m_baseWorkerLock;
 
 	if(m_killConnectionLock)
 		EP_DELETE m_killConnectionLock;
@@ -95,7 +95,7 @@ BaseServerWorkerUDP::~BaseServerWorkerUDP()
 
 void BaseServerWorkerUDP::setPacketPassUnit(const PacketPassUnit &packetPassUnit)
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseWorkerLock);
 	m_clientSocket=packetPassUnit.m_clientSocket;
 	m_server=packetPassUnit.m_server;
 
@@ -110,7 +110,7 @@ void BaseServerWorkerUDP::setPacketPassUnit(const PacketPassUnit &packetPassUnit
 
 int BaseServerWorkerUDP::Send(const Packet &packet)
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseWorkerLock);
 	EP_ASSERT(packet.GetPacketByteSize()<=m_maxPacketSize);
 	if(m_server)
 		return m_server->send(packet,m_clientSocket);
@@ -124,7 +124,7 @@ bool BaseServerWorkerUDP::IsConnectionAlive() const
 
 void BaseServerWorkerUDP::KillConnection()
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseWorkerLock);
 	if(!IsConnectionAlive())
 	{
 		return;
@@ -156,7 +156,7 @@ void BaseServerWorkerUDP::killConnection(bool fromInternal)
 
 void BaseServerWorkerUDP::setServer(BaseServerUDP *server)
 {
-	epl::LockObj lock(m_lock);
+	epl::LockObj lock(m_baseWorkerLock);
 	m_server=server;
 }
 

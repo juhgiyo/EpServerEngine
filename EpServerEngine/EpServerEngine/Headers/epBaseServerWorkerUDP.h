@@ -95,7 +95,7 @@ namespace epse
 		{
 			if(this!=&b)
 			{
-				epl::LockObj lock(m_lock);
+				epl::LockObj lock(m_baseWorkerLock);
 				BaseServerSendObject::operator =(b);
 // 				m_clientSocket=b.m_clientSocket;
 // 				m_server=b.m_server;
@@ -216,7 +216,7 @@ namespace epse
 		unsigned int m_maxPacketSize;
 
 		/// general lock 
-		epl::BaseLock *m_lock;
+		epl::BaseLock *m_baseWorkerLock;
 
 		/// kill connection lock
 		epl::BaseLock *m_killConnectionLock;

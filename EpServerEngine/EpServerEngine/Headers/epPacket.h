@@ -113,7 +113,7 @@ namespace epse{
 		/// flag whether memory is allocated in this object or now
 		bool m_isAllocated;
 		/// lock
-		epl::BaseLock *m_lock;
+		epl::BaseLock *m_packetLock;
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;
 	};
