@@ -162,15 +162,20 @@ void BaseServerWorker::killConnection(bool fromInternal)
 
 		if(!fromInternal)
 			TerminateAfter(m_waitTime);
-		if(m_parserList&&m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
+		if(m_parserList)
 		{
-			if(m_parserList)
+			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
 			{
 				m_parserList->StopParse();
-				m_parserList->Clear();
-				m_parserList->ReleaseObj();
-				m_parserList=NULL;
 			}
+
+			if(m_syncPolicy!=SYNC_POLICY_ASYNCHRONOUS)
+			{
+				m_parserList->Clear();
+			}
+
+			m_parserList->ReleaseObj();
+			m_parserList=NULL;
 		}		
 	}
 
