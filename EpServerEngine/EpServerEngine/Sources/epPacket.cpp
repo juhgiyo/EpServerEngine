@@ -110,7 +110,7 @@ Packet & Packet::operator=(const Packet&b)
 			if(b.m_packetSize>0)
 			{
 				m_packet=EP_NEW char[b.m_packetSize];
-				EP_VERIFY_BAD_ALLOC(m_packet);
+				EP_ASSERT(m_packet);
 				epl::System::Memcpy(m_packet,b.m_packet,b.m_packetSize);
 			}
 			m_packetSize=b.m_packetSize;
@@ -160,7 +160,7 @@ void Packet::SetPacket(const void* packet, unsigned int packetByteSize)
 		if(packetByteSize>0)
 		{
 			m_packet=EP_NEW char[packetByteSize];
-			EP_VERIFY_BAD_ALLOC(m_packet);
+			EP_ASSERT(m_packet);
 		}
 		if(packet)
 			epl::System::Memcpy(m_packet,packet,packetByteSize);

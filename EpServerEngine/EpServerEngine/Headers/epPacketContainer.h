@@ -235,7 +235,7 @@ namespace epse
 		if(shouldAllocate)
 		{
 			m_packetContainer=reinterpret_cast<PacketContainerStruct*>(EP_Malloc(sizeof(PacketContainerStruct) + (arraySize*sizeof(ArrayType)) ));
-			EP_VERIFY_BAD_ALLOC(m_packetContainer);
+			EP_ASSERT(m_packetContainer);
 			m_length=arraySize;
 		}
 		else
@@ -268,7 +268,7 @@ namespace epse
 		if(shouldAllocate)
 		{
 			m_packetContainer=reinterpret_cast<PacketContainerStruct*>( EP_Malloc(sizeof(PacketContainerStruct) + (arraySize*sizeof(ArrayType)) ) );
-			EP_VERIFY_BAD_ALLOC(m_packetContainer);
+			EP_ASSERT(m_packetContainer);
 			epl::System::Memcpy(m_packetContainer,&packet,sizeof(PacketContainerStruct) + (arraySize*sizeof(ArrayType)));
 			m_length=arraySize;
 		}
@@ -305,16 +305,16 @@ namespace epse
 		m_isAllocated=shouldAllocate;
 		if(byteSize<sizeof(PacketStruct))
 		{
-			epl::EpString errMsg;
-			epl::System::SPrintf(errMsg,"byteSize is smaller than PacketStruct size.\r\nbyteSize must be greater than sizeof(PacketStruct)=%d.\r\nbyteSize = %d\r\n",sizeof(PacketStruct),byteSize);
-			EP_VERIFY_INVALID_ARGUMENT_W_MSG(byteSize>=sizeof(PacketStruct),errMsg);
+			epl::EpTString errMsg;
+			epl::System::STPrintf(errMsg,_T("byteSize is smaller than PacketStruct size.\r\nbyteSize must be greater than sizeof(PacketStruct)=%d.\r\nbyteSize = %d\r\n"),sizeof(PacketStruct),byteSize);
+			EP_ASSERT_EXPR(byteSize>=sizeof(PacketStruct),errMsg);
 		}
 
 
 		if(m_isAllocated)
 		{
 			m_packetContainer=reinterpret_cast<PacketContainerStruct*>( EP_Malloc(byteSize) );
-			EP_VERIFY_BAD_ALLOC(m_packetContainer);
+			EP_ASSERT(m_packetContainer);
 			epl::System::Memcpy(m_packetContainer,rawData,byteSize);
 			m_length=(byteSize-sizeof(PacketContainerStruct))/sizeof(ArrayType);
 		}
@@ -348,7 +348,7 @@ namespace epse
 		if(orig.m_isAllocated)
 		{
 			m_packetContainer=reinterpret_cast<PacketContainerStruct*>( EP_Malloc(sizeof(PacketContainerStruct) + (orig.m_length*sizeof(ArrayType)) ) );
-			EP_VERIFY_BAD_ALLOC(m_packetContainer);
+			EP_ASSERT(m_packetContainer);
 			m_packetContainer->m_packet=orig.m_packetContainer->m_packet;
 			m_length=orig.m_length;
 			for(int trav=0;trav<m_length;trav++)
@@ -415,7 +415,7 @@ namespace epse
 		if(m_isAllocated)
 		{
 			m_packetContainer=reinterpret_cast<PacketContainerStruct*>( EP_Malloc(sizeof(PacketContainerStruct) + (arraySize*sizeof(ArrayType)) ) );
-			EP_VERIFY_BAD_ALLOC(m_packetContainer);
+			EP_ASSERT(m_packetContainer);
 			epl::System::Memcpy(m_packetContainer,&packet,sizeof(PacketContainerStruct) + (arraySize*sizeof(ArrayType)));
 			m_length=arraySize;
 		}
@@ -432,9 +432,9 @@ namespace epse
 		epl::LockObj lock(m_packetContainerLock);
 		if(byteSize<sizeof(PacketStruct))
 		{
-			epl::EpString errMsg;
-			epl::System::SPrintf(errMsg,"byteSize is smaller than PacketStruct size.\r\nbyteSize must be greater than sizeof(PacketStruct)=%d.\r\nbyteSize = %d\r\n",sizeof(PacketStruct),byteSize);
-			EP_VERIFY_INVALID_ARGUMENT_W_MSG(byteSize>=sizeof(PacketStruct),errMsg);
+			epl::EpTString errMsg;
+			epl::System::STPrintf(errMsg,_T("byteSize is smaller than PacketStruct size.\r\nbyteSize must be greater than sizeof(PacketStruct)=%d.\r\nbyteSize = %d\r\n"),sizeof(PacketStruct),byteSize);
+			EP_ASSERT_EXPR(byteSize>=sizeof(PacketStruct),errMsg);
 		}
 
 
@@ -445,7 +445,7 @@ namespace epse
 		if(m_isAllocated)
 		{
 			m_packetContainer=reinterpret_cast<PacketContainerStruct*>( EP_Malloc(byteSize) );
-			EP_VERIFY_BAD_ALLOC(m_packetContainer);
+			EP_ASSERT(m_packetContainer);
 			epl::System::Memcpy(m_packetContainer,rawData,byteSize);
 			m_length=(byteSize-sizeof(PacketContainerStruct))/sizeof(ArrayType);
 		}
@@ -518,16 +518,16 @@ namespace epse
 	template<typename PacketStruct, typename ArrayType>
 	ArrayType & PacketContainer<PacketStruct,ArrayType>::operator[](unsigned int index)
 	{
-		EP_VERIFY_DOMAIN_ERROR_W_MSG(m_packetContainer,"Actual packet is NULL.");
-		EP_VERIFY_OUT_OF_RANGE(index<m_length);
+		EP_ASSERT_EXPR(m_packetContainer,_T("Actual packet is NULL."));
+		EP_ASSERT(index<m_length);
 		return m_packetContainer->m_array[index];
 	}
 
 	template<typename PacketStruct, typename ArrayType>
 	const ArrayType & PacketContainer<PacketStruct,ArrayType>::operator[](unsigned int index) const
 	{
-		EP_VERIFY_DOMAIN_ERROR_W_MSG(m_packetContainer,"Actual packet is NULL.");
-		EP_VERIFY_OUT_OF_RANGE(index<m_length);
+		EP_ASSERT_EXPR(m_packetContainer,_T("Actual packet is NULL."));
+		EP_ASSERT(index<m_length);
 		return m_packetContainer->m_array[index];
 	}
 
@@ -543,7 +543,7 @@ namespace epse
 			if(b.m_isAllocated)
 			{
 				m_packetContainer=reinterpret_cast<PacketContainerStruct*>( EP_Malloc(sizeof(PacketContainerStruct) + (b.m_length*sizeof(ArrayType)) ) );
-				EP_VERIFY_BAD_ALLOC(m_packetContainer);
+				EP_ASSERT(m_packetContainer);
 				m_packetContainer->m_packet=b.m_packetContainer->m_packet;
 				m_length=b.m_length;
 				for(int trav=0;trav<m_length;trav++)
@@ -568,7 +568,7 @@ namespace epse
 		if(m_isAllocated)
 			m_packetContainer->m_packet=b;
 		else
-			EP_VERIFY_LOGIC_ERROR_W_MSG(0,"This Function Should NOT be used when m_isAllocated is false.\r\nInstead USE SetPacket Function.");
+			EP_ASSERT_EXPR(0,_T("This Function Should NOT be used when m_isAllocated is false.\r\nInstead USE SetPacket Function."));
 		return *this;
 	}
 	
@@ -583,20 +583,20 @@ namespace epse
 
 			if(arrSize<=m_length)
 			{
-				epl::EpString errMsg;
-				epl::System::SPrintf(errMsg,"Given size = %d is smaller than the original = %d.\r\nNew array size must be (greater than/equal to) original array size.",arrSize,m_length);
-				EP_VERIFY_INVALID_ARGUMENT_W_MSG(arrSize>=m_length,errMsg);
+				epl::EpTString errMsg;
+				epl::System::STPrintf(errMsg,_T("Given size = %d is smaller than the original = %d.\r\nNew array size must be (greater than/equal to) original array size."),arrSize,m_length);
+				EP_ASSERT_EXPR(arrSize>=m_length,errMsg);
 			}
 			
 			m_packetContainer=reinterpret_cast<PacketContainerStruct*>(EP_Realloc(m_packetContainer,sizeof(PacketContainerStruct)+ (arrSize*sizeof(ArrayType))));
 			epl::System::Memset(((char*)m_packetContainer)+sizeof(PacketContainerStruct)+ (m_length*sizeof(ArrayType)),0,((arrSize-m_length)*sizeof(ArrayType)));
-			EP_VERIFY_BAD_ALLOC(m_packetContainer);
+			EP_ASSERT(m_packetContainer);
 			m_length=arrSize;
 			return true;
 		}
 		else
 		{
-			EP_VERIFY_LOGIC_ERROR_W_MSG(0,"This Function Should NOT be used when m_isAllocated is false.\r\nInstead USE SetPacket Function.");
+			EP_ASSERT_EXPR(0,_T("This Function Should NOT be used when m_isAllocated is false.\r\nInstead USE SetPacket Function."));
 			return false;
 		}
 	}
