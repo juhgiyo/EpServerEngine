@@ -305,9 +305,7 @@ namespace epse
 		m_isAllocated=shouldAllocate;
 		if(byteSize<sizeof(PacketStruct))
 		{
-			epl::EpTString errMsg;
-			epl::System::STPrintf(errMsg,_T("byteSize is smaller than PacketStruct size.\r\nbyteSize must be greater than sizeof(PacketStruct)=%d.\r\nbyteSize = %d\r\n"),sizeof(PacketStruct),byteSize);
-			EP_ASSERT_EXPR(byteSize>=sizeof(PacketStruct),errMsg);
+			EP_ASSERT_EXPR(byteSize>=sizeof(PacketStruct),_T("byteSize is smaller than PacketStruct size.\r\nbyteSize must be greater than sizeof(PacketStruct)=%d.\r\nbyteSize = %d\r\n"),sizeof(PacketStruct),byteSize);
 		}
 
 
@@ -432,9 +430,7 @@ namespace epse
 		epl::LockObj lock(m_packetContainerLock);
 		if(byteSize<sizeof(PacketStruct))
 		{
-			epl::EpTString errMsg;
-			epl::System::STPrintf(errMsg,_T("byteSize is smaller than PacketStruct size.\r\nbyteSize must be greater than sizeof(PacketStruct)=%d.\r\nbyteSize = %d\r\n"),sizeof(PacketStruct),byteSize);
-			EP_ASSERT_EXPR(byteSize>=sizeof(PacketStruct),errMsg);
+			EP_ASSERT_EXPR(byteSize>=sizeof(PacketStruct),_T("byteSize is smaller than PacketStruct size.\r\nbyteSize must be greater than sizeof(PacketStruct)=%d.\r\nbyteSize = %d\r\n"),sizeof(PacketStruct),byteSize);
 		}
 
 
@@ -583,9 +579,7 @@ namespace epse
 
 			if(arrSize<=m_length)
 			{
-				epl::EpTString errMsg;
-				epl::System::STPrintf(errMsg,_T("Given size = %d is smaller than the original = %d.\r\nNew array size must be (greater than/equal to) original array size."),arrSize,m_length);
-				EP_ASSERT_EXPR(arrSize>=m_length,errMsg);
+				EP_ASSERT_EXPR(arrSize>=m_length,_T("Given size = %d is smaller than the original = %d.\r\nNew array size must be (greater than/equal to) original array size."),arrSize,m_length);
 			}
 			
 			m_packetContainer=reinterpret_cast<PacketContainerStruct*>(EP_Realloc(m_packetContainer,sizeof(PacketContainerStruct)+ (arrSize*sizeof(ArrayType))));
