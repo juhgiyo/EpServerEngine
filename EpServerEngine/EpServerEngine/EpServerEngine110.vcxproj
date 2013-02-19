@@ -391,6 +391,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EpLibraryHeaders\epBaseTextFile.h" />
+    <ClInclude Include="EpLibraryHeaders\epCmdLineOptions.h" />
     <ClInclude Include="EpLibraryHeaders\epLib.h" />
     <ClInclude Include="Headers\epBaseClientManual.h" />
     <ClInclude Include="Headers\epBaseClientUDPManual.h" />
