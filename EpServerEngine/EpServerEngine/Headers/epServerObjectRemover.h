@@ -1,9 +1,9 @@
 /*! 
-@file epParserList.h
+@file epServerObjectRemover.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/epserverengine>
-@date January 31, 2013
-@brief Parser List Interface
+@date July 20, 2012
+@brief Server Object Remover Interface
 @version 1.0
 
 @section LICENSE
@@ -25,15 +25,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for Parser List.
+An Interface for Server Object Remover.
 
 */
-#ifndef __EP_PARSER_LIST_H__
-#define __EP_PARSER_LIST_H__
+#ifndef __EP_SERVER_OBJECT_REMOVER_H__
+#define __EP_SERVER_OBJECT_REMOVER_H__
 
 #include "epServerEngine.h"
-#include "epBasePacketParser.h"
-#include "epServerObjectList.h"
+#include "epBaseServerObject.h"
+#include <queue>
 
 
 using namespace std;
@@ -42,56 +42,50 @@ using namespace std;
 namespace epse{
 
 	/*! 
-	@class ParserList epParserList.h
-	@brief A class for Parser List.
+	@class ServerObjectRemover epServerObjectRemover.h
+	@brief A class for Server Object Remover.
 	*/
-	class EP_SERVER_ENGINE ParserList:protected ServerObjectList, protected epl::Thread, protected SmartObject {
-		friend class BaseClient;
-		friend class BaseClientUDP;
-		friend class BaseServer;
-		friend class BaseServerWorker;
-		friend class BaseServerUDP;
-		friend class BaseServerWorkerUDP;
+	class EP_SERVER_ENGINE ServerObjectRemover:protected epl::Thread, protected SmartObject{
+
 	protected:
+		friend class ServerObjectList;
+		friend class ParserList;
 		/*!
 		Default Constructor
 
-		Initializes the List
-		@param[in] syncPolicy The sync policy
+		Initializes the Remover
 		@param[in] waitTimeMilliSec the wait time in millisecond for terminating
 		@param[in] lockPolicyType The lock policy
 		*/
-		ParserList(SyncPolicy syncPolicy=SYNC_POLICY_ASYNCHRONOUS, unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		ServerObjectRemover(unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
 
-		Initializes the List
+		Initializes the Remover
 		@param[in] b the second object
 		*/
-		ParserList(const ParserList& b);
+		ServerObjectRemover(const ServerObjectRemover& b);
 		/*!
 		Default Destructor
 
 		Destroy the List
 		*/
-		virtual ~ParserList();
+		virtual ~ServerObjectRemover();
 
 		/*!
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		ParserList & operator=(const ParserList&b)
+		ServerObjectRemover & operator=(const ServerObjectRemover&b)
 		{
 			if(this!=&b)
 			{
-				ServerObjectList::operator =(b);
 				SmartObject::operator =(b);
 				epl::LockObj lock(m_listLock);
 				Thread::operator=(b);
 				m_waitTime=b.m_waitTime;
-				m_syncPolicy=b.m_syncPolicy;
 			}
 			return *this;
 		}
@@ -108,50 +102,36 @@ namespace epse{
 		*/
 		unsigned int GetWaitTime();
 
-		
 		/*!
-		Remove all object which its thread is terminated
-		@remark it also releases the object
-		@remark This function removes object only for SYNC_POLICY_ASYNCHRONOUS policy.
+		Push the new object to the list
+		@param[in] obj the object to push in
 		*/
-		virtual void RemoveTerminated();
+		void Push(BaseServerObject* obj);
 
+	protected:
 		/*!
-		Start Parse
-		@return true if successfully started otherwise false
-		*/
-		bool StartParse();
-
-		/*!
-		Stop Parse
-		*/
-		void StopParse();
-	private:
-		/*!
-		Set the Parser List's SyncPolicy
-		@param[in] syncPolicy synchronous policy
-		*/
-        void setSyncPolicy(SyncPolicy syncPolicy);
-
-		/*!
-		Parse Loop Function
+		Release Loop Function
 		*/
 		virtual void execute() ;
-
-	private:
-
+	
 		/// Thread Terminate
 		bool m_shouldTerminate;
 
 		/// wait time in millisecond for terminating thread
 		unsigned int m_waitTime;
 
-		/// Synchronous Policy
-		SyncPolicy m_syncPolicy;
+		/// list lock
+		epl::BaseLock *m_listLock;
+
+		/// parser thread list
+		queue<BaseServerObject*> m_objectList;
+
+		/// Lock Policy
+		epl::LockPolicy m_lockPolicy;
 
 	};
 	
 }
 
 
-#endif //__EP_SERVER_OBJECT_LIST_H__
+#endif //__EP_SERVER_OBJECT_REMOVER_H__
