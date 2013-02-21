@@ -202,7 +202,7 @@ int BaseClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 		return 0;
 
 	// select routine
-	TIMEVAL	stTimeOut;
+	TIMEVAL	timeOutVal;
 	fd_set	fdSet;
 	int		retfdNum = 0;
 
@@ -211,11 +211,11 @@ int BaseClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 	if(waitTimeInMilliSec!=WAITTIME_INIFINITE)
 	{
 		// socket select time out setting
-		stTimeOut.tv_sec = (long)(waitTimeInMilliSec/1000); // Convert to seconds
-		stTimeOut.tv_usec = (long)(waitTimeInMilliSec%1000)*1000; // Convert remainders to micro-seconds
+		timeOutVal.tv_sec = (long)(waitTimeInMilliSec/1000); // Convert to seconds
+		timeOutVal.tv_usec = (long)(waitTimeInMilliSec%1000)*1000; // Convert remainders to micro-seconds
 		// socket select
 		// socket read select
-		retfdNum = select(0, NULL, &fdSet, NULL, &stTimeOut);
+		retfdNum = select(0, NULL, &fdSet, NULL, &timeOutVal);
 	}
 	else
 	{
