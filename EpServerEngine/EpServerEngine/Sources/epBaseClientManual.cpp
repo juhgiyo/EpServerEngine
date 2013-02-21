@@ -171,11 +171,42 @@ epl::EpTString BaseClientManual::GetPort() const
 
 }
 
-int BaseClientManual::Send(const Packet &packet)
+int BaseClientManual::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 {
 	epl::LockObj lock(m_sendLock);
 	if(!IsConnected())
 		return 0;
+
+	// select routine
+	TIMEVAL	stTimeOut;
+	fd_set	fdSet;
+	int		retfdNum = 0;
+
+	FD_ZERO(&fdSet);
+	FD_SET(m_connectSocket, &fdSet);
+	if(waitTimeInMilliSec!=WAITTIME_INIFINITE)
+	{
+		// socket select time out setting
+		stTimeOut.tv_sec = (long)(waitTimeInMilliSec/1000); // Convert to seconds
+		stTimeOut.tv_usec = (long)(waitTimeInMilliSec%1000)*1000; // Convert remainders to micro-seconds
+		// socket select
+		// socket read select
+		retfdNum = select(0, NULL, &fdSet, NULL, &stTimeOut);
+	}
+	else
+	{
+		retfdNum = select(0, NULL, &fdSet, NULL, NULL);
+	}
+	if (retfdNum == SOCKET_ERROR)	// select failed
+	{
+		return retfdNum;
+	}
+	else if (retfdNum == 0)		    // select time-out
+	{
+		return retfdNum;
+	}
+
+	// send routine
 	int writeLength=0;
 	const char *packetData=packet.GetPacket();
 	int length=packet.GetPacketByteSize();
@@ -199,11 +230,43 @@ int BaseClientManual::Send(const Packet &packet)
 	return writeLength;
 }
 
-Packet *BaseClientManual::Receive()
+Packet *BaseClientManual::Receive(unsigned int waitTimeInMilliSec)
 {
 	if(!IsConnected())
 		return NULL;
-	
+
+	// select routine
+	TIMEVAL	stTimeOut;
+	fd_set	fdSet;
+	int		retfdNum = 0;
+
+	FD_ZERO(&fdSet);
+	FD_SET(m_connectSocket, &fdSet);
+	if(waitTimeInMilliSec!=WAITTIME_INIFINITE)
+	{
+		// socket select time out setting
+		stTimeOut.tv_sec = (long)(waitTimeInMilliSec/1000); // Convert to seconds
+		stTimeOut.tv_usec = (long)(waitTimeInMilliSec%1000)*1000; // Convert remainders to micro-seconds
+		// socket select
+		// socket read select
+		retfdNum = select(0,&fdSet, NULL, NULL, &stTimeOut);
+	}
+	else
+	{
+		retfdNum = select(0, &fdSet,NULL, NULL, NULL);
+	}
+	if (retfdNum == SOCKET_ERROR)	// select failed
+	{
+		disconnect(true);
+		m_isConnected=false;
+		return NULL;
+	}
+	else if (retfdNum == 0)		    // select time-out
+	{
+		return NULL;
+	}
+
+	// receive routine
 	int iResult;
 	int size =receive(m_recvSizePacket);
 	if(size>0)

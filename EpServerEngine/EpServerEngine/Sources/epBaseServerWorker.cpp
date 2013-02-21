@@ -93,16 +93,46 @@ void BaseServerWorker::setClientSocket(const SOCKET& clientSocket )
 	m_clientSocket=clientSocket;
 }
 
-int BaseServerWorker::Send(const Packet &packet)
+int BaseServerWorker::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 {	
 	epl::LockObj lock(m_sendLock);
 	
 	if(m_clientSocket==INVALID_SOCKET)
 		return 0;
 
+	TIMEVAL	stTimeOut;
+	fd_set	fdSet;
+	int		retfdNum = 0;
+
+	FD_ZERO(&fdSet);
+	FD_SET(m_clientSocket, &fdSet);
+	if(waitTimeInMilliSec!=WAITTIME_INIFINITE)
+	{
+		// socket select time out setting
+		stTimeOut.tv_sec = (long)(waitTimeInMilliSec/1000); // Convert to seconds
+		stTimeOut.tv_usec = (long)(waitTimeInMilliSec%1000)*1000; // Convert remainders to micro-seconds
+		// socket select
+		// socket read select
+		retfdNum = select(0, NULL, &fdSet, NULL, &stTimeOut);
+	}
+	else
+	{
+		retfdNum = select(0, NULL, &fdSet, NULL, NULL);
+	}
+	if (retfdNum == SOCKET_ERROR)	// select failed
+	{
+		return retfdNum;
+	}
+	else if (retfdNum == 0)		// select time-out
+	{
+		return retfdNum;
+	}
+
+	// send routine
 	int writeLength=0;
 	const char *packetData=packet.GetPacket();
 	int length=packet.GetPacketByteSize();
+
 	if(length>0)
 	{
 		int sentLength=send(m_clientSocket,reinterpret_cast<char*>(&length),4,0);
