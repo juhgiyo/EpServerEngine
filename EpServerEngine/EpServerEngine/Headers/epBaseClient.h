@@ -181,9 +181,11 @@ namespace epse{
 		/*!
 		Send the packet to the server
 		@param[in] packet the packet to be sent
+		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
 		@return sent byte size
+		@remark return -1 if error occurred
 		*/
-		virtual int Send(const Packet &packet);
+		virtual int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
 
 		/*!
 		Get Packet Parser List

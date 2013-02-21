@@ -157,17 +157,20 @@ namespace epse{
 		/*!
 		Send the packet to the server
 		@param[in] packet the packet to be sent
+		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
 		@return sent byte size
+		@remark return -1 if error occurred
 		*/
-		virtual int Send(const Packet &packet);
+		virtual int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
 
 		/*!
 		Receive the packet from the server
+		@param[in] waitTimeInMilliSec wait time for receiving the packet in millisecond
 		@return received packet
 		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
 		@remark if ClientSynchronousPolicy!=CLIENT_SYNC_POLICY_MANUAL then assertion.
 		*/
-		Packet *Receive();
+		Packet *Receive(unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
 
 
 	private:
