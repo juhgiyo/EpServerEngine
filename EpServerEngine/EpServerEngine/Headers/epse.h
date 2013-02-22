@@ -44,6 +44,11 @@ An Interface for EP Server Engine
 #include "epBaseServerUDP.h"
 #include "epBaseServerWorkerUDP.h"
 
+// ServerObject List
+#include "epServerObjectList.h"
+#include "epParserList.h"
+#include "epServerObjectRemover.h"
+
 // General
 #include "epBasePacketParser.h"
 #include "epBaseServerObject.h"
@@ -51,8 +56,7 @@ An Interface for EP Server Engine
 #include "epPacket.h"
 #include "epPacketContainer.h"
 #include "epServerConf.h"
-#include "epServerObjectList.h"
-#include "epParserList.h"
+
 
 
 #endif //__EP_EPSE_H__
