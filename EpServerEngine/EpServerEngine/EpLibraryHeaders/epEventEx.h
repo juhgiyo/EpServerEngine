@@ -124,14 +124,30 @@ namespace epl
 		/*!
 		Reset the event raised
 		@return true if succeeded otherwise false
+		@remark if event is not raised then no effect
 		*/
 		bool ResetEvent();
+
+		/*!
+		Set the event to be raised
+		@return true if succeeded otherwise false
+		@remark if event is already raised then no effect
+		@remark this function is same as unlock
+		*/
+		bool SetEvent();
 
 		/*!
 		Returns the flag whether this event is resetting manually.
 		@return true if the event is resetting manually, otherwise false.
 		*/
 		bool IsManualReset() const;
+
+		/*!
+		Wait for the event raised for given time
+		@param[in] dwMilliSecond the wait time.
+		@return true if the wait is succeeded, otherwise false.
+		*/
+		bool WaitForEvent(const unsigned int dwMilliSecond=WAITTIME_INIFINITE);
 
 	private:
 

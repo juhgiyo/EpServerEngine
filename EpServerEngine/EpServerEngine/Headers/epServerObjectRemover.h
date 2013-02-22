@@ -78,18 +78,8 @@ namespace epse{
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		ServerObjectRemover & operator=(const ServerObjectRemover&b)
-		{
-			if(this!=&b)
-			{
-				SmartObject::operator =(b);
-				epl::LockObj lock(m_listLock);
-				Thread::operator=(b);
-				m_waitTime=b.m_waitTime;
-			}
-			return *this;
-		}
-
+		ServerObjectRemover & operator=(const ServerObjectRemover&b);
+		
 		/*!
 		Set the wait time for the thread termination
 		@param[in] milliSec the time for waiting in millisecond
@@ -108,7 +98,16 @@ namespace epse{
 		*/
 		void Push(BaseServerObject* obj);
 
+		/*!
+		Clear the remover list
+		*/
+		void Clear();
+
 	protected:
+		/*!
+		Stop the Loop Function
+		*/
+		void stopRemover();
 		/*!
 		Release Loop Function
 		*/
@@ -128,6 +127,9 @@ namespace epse{
 
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;
+
+		/// Event
+		epl::EventEx m_event;
 
 	};
 	

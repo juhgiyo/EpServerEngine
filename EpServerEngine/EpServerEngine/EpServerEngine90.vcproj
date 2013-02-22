@@ -573,14 +573,6 @@
 				RelativePath=".\Sources\epPacket.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\Sources\epParserList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Sources\epServerObjectList.cpp"
-				>
-			</File>
 			<Filter
 				Name="Client Side"
 				>
@@ -637,6 +629,22 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="ServerObject List"
+				>
+				<File
+					RelativePath=".\Sources\epParserList.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Sources\epServerObjectList.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Sources\epServerObjectRemover.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -664,10 +672,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Headers\epParserList.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Headers\epse.h"
 				>
 			</File>
@@ -677,10 +681,6 @@
 			</File>
 			<File
 				RelativePath=".\Headers\epServerEngine.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Headers\epServerObjectList.h"
 				>
 			</File>
 			<Filter
@@ -738,6 +738,22 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="ServerObject List"
+				>
+				<File
+					RelativePath=".\Headers\epParserList.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Headers\epServerObjectList.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Headers\epServerObjectRemover.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

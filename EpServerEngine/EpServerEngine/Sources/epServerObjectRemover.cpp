@@ -23,14 +23,38 @@ ServerObjectRemover::ServerObjectRemover(unsigned int waitTimeMilliSec,epl::Lock
 {
 	m_shouldTerminate=false;
 	m_waitTime=waitTimeMilliSec;
+	m_event=EventEx(false,false);
 }
-ServerObjectRemover::ServerObjectRemover(const ServerObjectRemover& b):ServerObjectList(b),Thread(b),SmartObject(b)
+ServerObjectRemover::ServerObjectRemover(const ServerObjectRemover& b):Thread(b),SmartObject(b)
 {
 	m_shouldTerminate=false;
 	m_waitTime=b.m_waitTime;
+	m_event=EventEx(false,false);
+	m_objectList=b.m_objectList;
+	ServerObjectRemover & unSafeB=const_cast<ServerObjectRemover&>(b);
+	while(unSafeB.m_objectList.size())
+		unSafeB.m_objectList.pop();
 }
 ServerObjectRemover::~ServerObjectRemover()
 {
+	stopRemover();
+	Clear();
+}
+
+ServerObjectRemover & ServerObjectRemover::operator=(const ServerObjectRemover&b)
+{
+	if(this!=&b)
+	{
+		SmartObject::operator =(b);
+		epl::LockObj lock(m_listLock);
+		Thread::operator=(b);
+		m_waitTime=b.m_waitTime;
+		m_objectList=b.m_objectList;
+		ServerObjectRemover & unSafeB=const_cast<ServerObjectRemover&>(b);
+		while(unSafeB.m_objectList.size())
+			unSafeB.m_objectList.pop();
+	}
+	return *this;
 }
 
 void ServerObjectRemover::SetWaitTime(unsigned int milliSec)
@@ -42,6 +66,14 @@ unsigned int ServerObjectRemover::GetWaitTime()
 {
 	epl::LockObj lock(m_listLock);
 	return m_waitTime;
+}
+
+void ServerObjectRemover::Push(BaseServerObject* obj)
+{
+	m_listLock->Lock();
+	m_objectList.push(obj);
+	m_listLock->Unlock();
+	m_event.SetEvent();
 }
 void ServerObjectRemover::execute()
 {
@@ -58,12 +90,35 @@ void ServerObjectRemover::execute()
 		if(!m_objectList.size())
 		{
 			m_listLock->Unlock();
-			Sleep(0);
+			m_event.WaitForEvent();
 			continue;
 		}
 		BaseServerObject* serverObj=m_objectList.front();
 		m_objectList.pop();
 		m_listLock->Unlock();
+
+		serverObj->ReleaseObj();
+	}
+}
+
+void ServerObjectRemover::stopRemover()
+{
+	if(GetStatus()==Thread::THREAD_STATUS_TERMINATED)
+		return;
+	m_listLock->Lock();
+	m_shouldTerminate=true;
+	m_listLock->Unlock();
+	m_event.SetEvent();
+	TerminateAfter(m_waitTime);
+}
+
+void ServerObjectRemover::Clear()
+{
+	epl::LockObj lock(m_listLock);
+	while(!m_objectList.size())
+	{
+		BaseServerObject* serverObj=m_objectList.front();
+		m_objectList.pop();
 		serverObj->ReleaseObj();
 	}
 }

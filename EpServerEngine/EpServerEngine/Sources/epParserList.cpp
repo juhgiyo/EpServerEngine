@@ -24,16 +24,31 @@ ParserList::ParserList(SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::
 	m_shouldTerminate=false;
 	m_waitTime=waitTimeMilliSec;
 	m_syncPolicy=syncPolicy;
+	m_event=EventEx(false,false);
 }
 ParserList::ParserList(const ParserList& b):ServerObjectList(b),Thread(b),SmartObject(b)
 {
 	m_shouldTerminate=false;
 	m_waitTime=b.m_waitTime;
 	m_syncPolicy=b.m_syncPolicy;
+	m_event=EventEx(false,false);
 }
 ParserList::~ParserList()
 {
 	StopParse();
+}
+ParserList & ParserList::operator=(const ParserList&b)
+{
+	if(this!=&b)
+	{
+		ServerObjectList::operator =(b);
+		SmartObject::operator =(b);
+		epl::LockObj lock(m_listLock);
+		Thread::operator=(b);
+		m_waitTime=b.m_waitTime;
+		m_syncPolicy=b.m_syncPolicy;
+	}
+	return *this;
 }
 
 void ParserList::SetWaitTime(unsigned int milliSec)
@@ -61,15 +76,15 @@ void ParserList::execute()
 		if(!m_objectList.size())
 		{
 			m_listLock->Unlock();
-			Sleep(0);
+			m_event.WaitForEvent();
 			continue;
 		}
 		BasePacketParser* parser=(BasePacketParser*)m_objectList.front();
 		m_objectList.erase(m_objectList.begin());
-		parser->ParsePacket(*(parser->GetPacketReceived()));
-		parser->ReleaseObj();
 		m_listLock->Unlock();
 
+		parser->ParsePacket(*(parser->GetPacketReceived()));
+		m_serverObjRemover.Push(parser);
 	}
 }
 
@@ -96,7 +111,14 @@ void ParserList::StopParse()
 	m_listLock->Lock();
 	m_shouldTerminate=true;
 	m_listLock->Unlock();
+	m_event.SetEvent();
 	TerminateAfter(m_waitTime);
+}
+
+void ParserList::Push(BaseServerObject* obj)
+{
+	ServerObjectList::Push(obj);
+	m_event.SetEvent();
 }
 void ParserList::setSyncPolicy(SyncPolicy syncPolicy)
 {

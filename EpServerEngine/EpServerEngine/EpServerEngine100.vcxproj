@@ -352,6 +352,7 @@
     <ClCompile Include="Sources\epBaseServerWorker.cpp" />
     <ClCompile Include="Sources\epBaseServerUDP.cpp" />
     <ClCompile Include="Sources\epBaseServerWorkerUDP.cpp" />
+    <ClCompile Include="Sources\epServerObjectRemover.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EpLibraryHeaders\epBaseTextFile.h" />
@@ -436,6 +437,7 @@
     <ClInclude Include="EpLibraryHeaders\epWorkerThreadSingle.h" />
     <ClInclude Include="EpLibraryHeaders\epXMLFile.h" />
     <ClInclude Include="EpLibraryHeaders\epXMLite.h" />
+    <ClInclude Include="Headers\epServerObjectRemover.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LICENSE" />

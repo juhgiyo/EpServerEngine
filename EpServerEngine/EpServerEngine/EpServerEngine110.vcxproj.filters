@@ -52,15 +52,18 @@
     <Filter Include="EpLibraryHeaders">
       <UniqueIdentifier>{1491596d-364e-472c-a1d7-7fb2aeb5314f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ServerObject List">
+      <UniqueIdentifier>{cb1d1a4c-511c-4a15-8a72-1a6e75b38c3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ServerObject List">
+      <UniqueIdentifier>{e907a104-c115-4ac2-aff6-89f86848b6df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\epBasePacketParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epPacket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epServerObjectList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epBaseClient.cpp">
@@ -81,14 +84,20 @@
     <ClCompile Include="Sources\epBaseServerWorkerUDP.cpp">
       <Filter>Source Files\Server Side\UDP</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\epParserList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\epBaseClientManual.cpp">
       <Filter>Source Files\Client Side\TCP</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epBaseClientUDPManual.cpp">
       <Filter>Source Files\Client Side\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epParserList.cpp">
+      <Filter>Source Files\ServerObject List</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epServerObjectList.cpp">
+      <Filter>Source Files\ServerObject List</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epServerObjectRemover.cpp">
+      <Filter>Source Files\ServerObject List</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -114,9 +123,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Headers\epServerEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epServerObjectList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Headers\epBaseClient.h">
@@ -317,9 +323,6 @@
     <ClInclude Include="EpLibraryHeaders\epXMLite.h">
       <Filter>EpLibraryHeaders</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\epParserList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EpLibraryHeaders\epBaseTextFile.h">
       <Filter>EpLibraryHeaders</Filter>
     </ClInclude>
@@ -337,6 +340,15 @@
     </ClInclude>
     <ClInclude Include="EpLibraryHeaders\epEventEx.h">
       <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epParserList.h">
+      <Filter>Header Files\ServerObject List</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epServerObjectList.h">
+      <Filter>Header Files\ServerObject List</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epServerObjectRemover.h">
+      <Filter>Header Files\ServerObject List</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

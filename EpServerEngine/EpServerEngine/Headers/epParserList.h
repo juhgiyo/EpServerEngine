@@ -82,19 +82,7 @@ namespace epse{
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		ParserList & operator=(const ParserList&b)
-		{
-			if(this!=&b)
-			{
-				ServerObjectList::operator =(b);
-				SmartObject::operator =(b);
-				epl::LockObj lock(m_listLock);
-				Thread::operator=(b);
-				m_waitTime=b.m_waitTime;
-				m_syncPolicy=b.m_syncPolicy;
-			}
-			return *this;
-		}
+		ParserList & operator=(const ParserList&b);
 
 		/*!
 		Set the wait time for the thread termination
@@ -126,6 +114,12 @@ namespace epse{
 		Stop Parse
 		*/
 		void StopParse();
+
+		/*!
+		Push the new object to the list
+		@param[in] obj the object to push in
+		*/
+		virtual void Push(BaseServerObject* obj);
 	private:
 		/*!
 		Set the Parser List's SyncPolicy
@@ -148,6 +142,9 @@ namespace epse{
 
 		/// Synchronous Policy
 		SyncPolicy m_syncPolicy;
+
+		/// Event
+		epl::EventEx m_event;
 
 	};
 	

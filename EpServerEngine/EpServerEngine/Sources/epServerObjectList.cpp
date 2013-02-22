@@ -57,6 +57,7 @@ ServerObjectList::ServerObjectList(const ServerObjectList& b)
 		m_listLock=NULL;
 		break;
 	}
+	m_serverObjRemover=b.m_serverObjRemover;
 	vector<BaseServerObject*>::const_iterator iter;
 	for(iter=b.m_objectList.begin();iter!=b.m_objectList.end();iter++)
 	{
@@ -68,8 +69,21 @@ ServerObjectList::ServerObjectList(const ServerObjectList& b)
 ServerObjectList::~ServerObjectList()
 {
 	Clear();
+	m_serverObjRemover.Clear();
 	if(m_listLock)
 		EP_DELETE m_listLock;
+}
+ServerObjectList & ServerObjectList::operator=(const ServerObjectList&b)
+{
+	if(this!=&b)
+	{
+		Clear();
+		epl::LockObj lock(m_listLock);
+		m_objectList=b.m_objectList;
+		ServerObjectList & unSafeB=const_cast<ServerObjectList&>(b);
+		unSafeB.m_objectList.clear();
+	}
+	return *this;
 }
 
 void ServerObjectList::RemoveTerminated()
@@ -80,7 +94,7 @@ void ServerObjectList::RemoveTerminated()
 	{
 		if((*iter)->GetStatus()==epl::Thread::THREAD_STATUS_TERMINATED)
 		{
-			(*iter)->ReleaseObj();
+			m_serverObjRemover.Push(*iter);
 			iter=m_objectList.erase(iter);
 		}
 		else
@@ -96,7 +110,7 @@ void ServerObjectList::Clear()
 	for(iter=m_objectList.begin();iter!=m_objectList.end();iter++)
 	{
 		if(*iter)
-			(*iter)->ReleaseObj();
+			m_serverObjRemover.Push(*iter);
 	}
 	m_objectList.clear();
 }

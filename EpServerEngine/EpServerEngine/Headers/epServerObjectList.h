@@ -33,6 +33,7 @@ An Interface for Server Object List.
 
 #include "epServerEngine.h"
 #include "epBaseServerObject.h"
+#include "epServerObjectRemover.h"
 #include <vector>
 
 
@@ -81,20 +82,7 @@ namespace epse{
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		ServerObjectList & operator=(const ServerObjectList&b)
-		{
-			if(this!=&b)
-			{
-				epl::LockObj lock(m_listLock);
-// 				vector<BaseServerObject*>::const_iterator iter;
-// 				for(iter=b.m_objectList.begin();iter!=b.m_objectList.end();iter++)
-// 				{
-// 					(*iter)->RetainObj();
-// 					m_objectList.push_back(*iter);
-// 				}
-			}
-			return *this;
-		}
+		ServerObjectList & operator=(const ServerObjectList&b);
 
 		/*!
 		Remove all object which its thread is terminated
@@ -113,7 +101,7 @@ namespace epse{
 		Push the new object to the list
 		@param[in] obj the object to push in
 		*/
-		void Push(BaseServerObject* obj);
+		virtual void Push(BaseServerObject* obj);
 		
 		/*!
 		Returns the list in vector
@@ -131,6 +119,9 @@ namespace epse{
 
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;
+
+		/// Object Remover
+		ServerObjectRemover m_serverObjRemover;
 
 	};
 	
