@@ -21,9 +21,8 @@ using namespace epse;
 
 ServerObjectRemover::ServerObjectRemover(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):Thread(lockPolicyType),SmartObject(lockPolicyType)
 {
-	m_shouldTerminate=false;
 	m_waitTime=waitTimeMilliSec;
-	m_event=EventEx(false,false);
+	m_threadStopEvent=EventEx(false,false);
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
 	{
@@ -44,19 +43,26 @@ ServerObjectRemover::ServerObjectRemover(unsigned int waitTimeMilliSec,epl::Lock
 }
 ServerObjectRemover::ServerObjectRemover(const ServerObjectRemover& b):Thread(b),SmartObject(b)
 {
-	ServerObjectRemover & unSafeB=const_cast<ServerObjectRemover&>(b);
-	unSafeB.stopRemover();
-	m_shouldTerminate=unSafeB.m_shouldTerminate;
-	m_waitTime=unSafeB.m_waitTime;
-	m_event=unSafeB.m_event;
-	m_objectList=unSafeB.m_objectList;
-	m_listLock=unSafeB.m_listLock;
-
-	unSafeB.m_listLock->Lock();
-	while(unSafeB.m_objectList.size())
-		unSafeB.m_objectList.pop();
-	unSafeB.m_listLock->Unlock();
-	unSafeB.m_listLock=NULL;
+	m_waitTime=b.m_waitTime;
+	m_threadStopEvent=b.m_threadStopEvent;
+	m_objectList=b.m_objectList;
+	m_lockPolicy=b.m_lockPolicy;
+	switch(m_lockPolicy)
+	{
+	case epl::LOCK_POLICY_CRITICALSECTION:
+		m_listLock=EP_NEW epl::CriticalSectionEx();
+		break;
+	case epl::LOCK_POLICY_MUTEX:
+		m_listLock=EP_NEW epl::Mutex();
+		break;
+	case epl::LOCK_POLICY_NONE:
+		m_listLock=EP_NEW epl::NoLock();
+		break;
+	default:
+		m_listLock=NULL;
+		break;
+	}
+	m_threadStopEvent.ResetEvent();
 	Start();
 }
 ServerObjectRemover::~ServerObjectRemover()
@@ -73,32 +79,32 @@ ServerObjectRemover & ServerObjectRemover::operator=(const ServerObjectRemover&b
 	if(this!=&b)
 	{		
 		stopRemover();
-		SmartObject::operator =(b);
-		m_listLock->Lock();
-		Thread::operator=(b);
-		while(m_objectList.size())
-		{
-			BaseServerObject* serverObj=m_objectList.front();
-			m_objectList.pop();
-			serverObj->ReleaseObj();
-		}
-		m_listLock->Unlock();
 		if(m_listLock)
 			EP_DELETE m_listLock;
+		m_listLock=NULL;
+		SmartObject::operator =(b);
+		Thread::operator=(b);
 		
-		ServerObjectRemover & unSafeB=const_cast<ServerObjectRemover&>(b);
-		unSafeB.stopRemover();
-		m_shouldTerminate=unSafeB.m_shouldTerminate;
-		m_waitTime=unSafeB.m_waitTime;
-		m_event=unSafeB.m_event;
-		
-		unSafeB.m_listLock->Lock();
+		m_waitTime=b.m_waitTime;
+		m_threadStopEvent=b.m_threadStopEvent;
 		m_objectList=b.m_objectList;
-		m_listLock=b.m_listLock;
-		while(unSafeB.m_objectList.size())
-			unSafeB.m_objectList.pop();
-		unSafeB.m_listLock->Unlock();
-		unSafeB.m_listLock=NULL;
+		m_lockPolicy=b.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_listLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_listLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_listLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_listLock=NULL;
+			break;
+		}
+		m_threadStopEvent.ResetEvent();
 		Start();
 	}
 	return *this;
@@ -120,7 +126,8 @@ void ServerObjectRemover::Push(BaseServerObject* obj)
 	m_listLock->Lock();
 	m_objectList.push(obj);
 	m_listLock->Unlock();
-	m_event.SetEvent();
+	if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
+		Resume();
 }
 void ServerObjectRemover::execute()
 {
@@ -128,7 +135,7 @@ void ServerObjectRemover::execute()
 	{
 		m_listLock->Lock();
 
-		if(m_shouldTerminate)
+		if(m_threadStopEvent.WaitForEvent(WAITTIME_IGNORE))
 		{
 			m_listLock->Unlock();
 			break;
@@ -137,7 +144,7 @@ void ServerObjectRemover::execute()
 		if(!m_objectList.size())
 		{
 			m_listLock->Unlock();
-			m_event.WaitForEvent();
+			Suspend();
 			continue;
 		}
 		while(m_objectList.size())
@@ -157,12 +164,8 @@ void ServerObjectRemover::stopRemover()
 {
 	if(GetStatus()==Thread::THREAD_STATUS_TERMINATED)
 		return;
-	m_listLock->Lock();
-	m_shouldTerminate=true;
-	m_listLock->Unlock();
-	m_event.SetEvent();
+	m_threadStopEvent.SetEvent();
+	if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
+		Resume();
 	TerminateAfter(m_waitTime);
-	m_listLock->Lock();
-	m_shouldTerminate=false;
-	m_listLock->Unlock();
 }

@@ -74,21 +74,7 @@ namespace epse
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		BasePacketParser & operator=(const BasePacketParser&b)
-		{
-			if(this!=&b)
-			{
-				epl::LockObj lock(m_generalLock);
-				BaseServerObject::operator =(b);
-// 				m_owner=b.m_owner;
-// 				if(m_packetReceived)
-// 					m_packetReceived->ReleaseObj();
-// 				m_packetReceived=b.m_packetReceived;
-// 				m_packetReceived->RetainObj();
-				
-			}
-			return *this;
-		}
+		BasePacketParser & operator=(const BasePacketParser&b);
 
 		/*!
 		Send the packet to the client
@@ -130,7 +116,11 @@ namespace epse
 		*/
 		const Packet* GetPacketReceived();
 		
-		
+	protected:
+
+		/// Thread Stop Event
+		/// @remark if this is raised, the thread should quickly stop.
+		epl::EventEx m_threadStopEvent;
 
 
 	private:	
@@ -149,6 +139,11 @@ namespace epse
 		thread loop function
 		*/
 		virtual void execute();
+
+		/*!
+		Reset Parser
+		*/
+		void resetParser();
 
 
 

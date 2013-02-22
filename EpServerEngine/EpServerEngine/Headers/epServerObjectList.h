@@ -69,7 +69,6 @@ namespace epse{
 
 		Initializes the List
 		@param[in] b the second object
-		@remark this is NOT copying!! This moves b to a.
 		*/
 		ServerObjectList(const ServerObjectList& b);
 		/*!
@@ -83,7 +82,6 @@ namespace epse{
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
-		@remark this is NOT copying!! This moves b to a.
 		*/
 		ServerObjectList & operator=(const ServerObjectList&b);
 
@@ -125,6 +123,10 @@ namespace epse{
 		vector<BaseServerObject*> GetList() const;
 
 	protected:
+		/*!
+		Reset the list
+		*/
+		void resetList();
 	
 		/// list lock
 		epl::BaseLock *m_listLock;

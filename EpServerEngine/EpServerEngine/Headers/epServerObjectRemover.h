@@ -64,7 +64,6 @@ namespace epse{
 
 		Initializes the Remover
 		@param[in] b the second object
-		@remark this is NOT copying!! This moves b to a.
 		*/
 		ServerObjectRemover(const ServerObjectRemover& b);
 		/*!
@@ -78,7 +77,6 @@ namespace epse{
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
-		@remark this is NOT copying!! This moves b to a.
 		*/
 		ServerObjectRemover & operator=(const ServerObjectRemover&b);
 		
@@ -110,9 +108,6 @@ namespace epse{
 		*/
 		virtual void execute() ;
 	
-		/// Thread Terminate
-		bool m_shouldTerminate;
-
 		/// wait time in millisecond for terminating thread
 		unsigned int m_waitTime;
 
@@ -125,8 +120,9 @@ namespace epse{
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;
 
-		/// Event
-		epl::EventEx m_event;
+		/// Thread Stop Event
+		/// @remark if this is raised, the thread should quickly stop.
+		epl::EventEx m_threadStopEvent;
 
 	};
 	

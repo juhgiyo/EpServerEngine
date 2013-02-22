@@ -21,22 +21,13 @@ using namespace epse;
 
 ParserList::ParserList(SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):ServerObjectList(waitTimeMilliSec,lockPolicyType),Thread(lockPolicyType),SmartObject(lockPolicyType)
 {
-	m_shouldTerminate=false;
 	m_syncPolicy=syncPolicy;
-	m_event=EventEx(false,false);
+	m_threadStopEvent=EventEx(false,false);
 }
 ParserList::ParserList(const ParserList& b):ServerObjectList(b),Thread(b),SmartObject(b)
 {
-	ParserList & unSafeB=const_cast<ParserList&>(b);
-	bool currentlyStarted=(b.GetStatus()!=Thread::THREAD_STATUS_TERMINATED);
-	unSafeB.StopParse();
-	m_shouldTerminate=unSafeB.m_shouldTerminate;
 	m_syncPolicy=b.m_syncPolicy;
-	m_event=unSafeB.m_event;
-
-	if(currentlyStarted)
-		StartParse();
-
+	m_threadStopEvent=b.m_threadStopEvent;
 }
 ParserList::~ParserList()
 {
@@ -47,23 +38,12 @@ ParserList & ParserList::operator=(const ParserList&b)
 	if(this!=&b)
 	{		
 		StopParse();
-		ParserList & unSafeB=const_cast<ParserList&>(b);
-		bool currentlyStarted=(b.GetStatus()!=Thread::THREAD_STATUS_TERMINATED);
-		if(currentlyStarted)
-			unSafeB.StopParse();
-
 		ServerObjectList::operator =(b);
 		SmartObject::operator =(b);
-		m_listLock->Lock();
 		Thread::operator=(b);
-		m_listLock->Unlock();
 
-		m_syncPolicy=unSafeB.m_syncPolicy;
-		m_event=unSafeB.m_event;
-		m_shouldTerminate=unSafeB.m_shouldTerminate;
-
-		if(currentlyStarted)
-			StartParse();
+		m_syncPolicy=b.m_syncPolicy;
+		m_threadStopEvent=b.m_threadStopEvent;
 
 	}
 	return *this;
@@ -75,7 +55,7 @@ void ParserList::execute()
 	{
 		m_listLock->Lock();
 
-		if(m_shouldTerminate)
+		if(m_threadStopEvent.WaitForEvent(WAITTIME_IGNORE))
 		{
 			m_listLock->Unlock();
 			break;
@@ -84,7 +64,7 @@ void ParserList::execute()
 		if(!m_objectList.size())
 		{
 			m_listLock->Unlock();
-			m_event.WaitForEvent();
+			Suspend();
 			continue;
 		}
 		BasePacketParser* parser=(BasePacketParser*)m_objectList.front();
@@ -107,29 +87,24 @@ bool ParserList::StartParse()
 	if(GetStatus()!=Thread::THREAD_STATUS_TERMINATED)
 		return false;
 	Clear();
-	m_listLock->Lock();
-	m_shouldTerminate=false;
-	m_listLock->Unlock();
+	m_threadStopEvent.ResetEvent();
 	return Start();
 }
 void ParserList::StopParse()
 {
 	if(GetStatus()==Thread::THREAD_STATUS_TERMINATED)
 		return;
-	m_listLock->Lock();
-	m_shouldTerminate=true;
-	m_listLock->Unlock();
-	m_event.SetEvent();
+	m_threadStopEvent.SetEvent();
+	if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
+		Resume();
 	TerminateAfter(m_waitTime);
-	m_listLock->Lock();
-	m_shouldTerminate=false;
-	m_listLock->Unlock();
 }
 
 void ParserList::Push(BaseServerObject* obj)
 {
 	ServerObjectList::Push(obj);
-	m_event.SetEvent();
+	if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
+		Resume();
 }
 void ParserList::setSyncPolicy(SyncPolicy syncPolicy)
 {

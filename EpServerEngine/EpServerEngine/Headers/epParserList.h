@@ -68,7 +68,6 @@ namespace epse{
 
 		Initializes the List
 		@param[in] b the second object
-		@remark this is NOT copying!! This moves b to a.
 		*/
 		ParserList(const ParserList& b);
 		/*!
@@ -82,7 +81,6 @@ namespace epse{
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
-		@remark this is NOT copying!! This moves b to a.
 		*/
 		ParserList & operator=(const ParserList&b);
 
@@ -124,14 +122,13 @@ namespace epse{
 
 	private:
 
-		/// Thread Terminate
-		bool m_shouldTerminate;
 
 		/// Synchronous Policy
 		SyncPolicy m_syncPolicy;
 
-		/// Event
-		epl::EventEx m_event;
+		/// Thread Stop Event
+		/// @remark if this is raised, the thread should quickly stop.
+		epl::EventEx m_threadStopEvent;
 
 	};
 	

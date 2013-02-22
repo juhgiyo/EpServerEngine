@@ -21,6 +21,7 @@ using namespace epse;
 
 BasePacketParser::BasePacketParser(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):BaseServerObject(waitTimeMilliSec,lockPolicyType)
 {
+	m_threadStopEvent=EventEx(false,false);
 	m_owner=NULL;
 	m_packetReceived=NULL;
 	m_lockPolicy=lockPolicyType;
@@ -43,7 +44,10 @@ BasePacketParser::BasePacketParser(unsigned int waitTimeMilliSec,epl::LockPolicy
 
 BasePacketParser::BasePacketParser(const BasePacketParser& b):BaseServerObject(b)
 {
+	m_threadStopEvent=b.m_threadStopEvent;
 	m_owner=b.m_owner;
+	if(m_owner)
+		m_owner->RetainObj();
 	m_packetReceived=b.m_packetReceived;
 	if(m_packetReceived)
 		m_packetReceived->RetainObj();
@@ -66,8 +70,54 @@ BasePacketParser::BasePacketParser(const BasePacketParser& b):BaseServerObject(b
 }
 BasePacketParser::~BasePacketParser()
 {
-	TerminateAfter(m_waitTime);
-	
+	resetParser();
+}
+
+BasePacketParser & BasePacketParser::operator=(const BasePacketParser&b)
+{
+	if(this!=&b)
+	{
+
+		resetParser();
+		BaseServerObject::operator =(b);
+		m_threadStopEvent=b.m_threadStopEvent;
+		m_owner=b.m_owner;
+		if(m_owner)
+			m_owner->RetainObj();
+		m_packetReceived=b.m_packetReceived;
+		if(m_owner)
+			m_packetReceived->RetainObj();
+		m_lockPolicy=b.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_generalLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_generalLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_generalLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_generalLock=NULL;
+			break;
+		}
+
+	}
+	return *this;
+}
+
+void BasePacketParser::resetParser()
+{
+	if(GetStatus()!=Thread::THREAD_STATUS_TERMINATED)
+	{
+		m_threadStopEvent.SetEvent();
+		if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
+			Resume();
+		TerminateAfter(m_waitTime);
+	}
+
 	m_generalLock->Lock();
 	if(m_owner)
 		m_owner->ReleaseObj();
@@ -77,6 +127,10 @@ BasePacketParser::~BasePacketParser()
 
 	if(m_generalLock)
 		EP_DELETE m_generalLock;
+	
+	m_owner=NULL;
+	m_packetReceived=NULL;
+	m_generalLock=NULL;
 }
 
 int BasePacketParser::Send(const Packet &packet)
@@ -92,7 +146,10 @@ int BasePacketParser::Send(const Packet &packet)
 void BasePacketParser::execute()
 {
 	if(m_packetReceived)
+	{
+		m_threadStopEvent.ResetEvent();
 		ParsePacket(*m_packetReceived);
+	}
 }
 
 const Packet* BasePacketParser::GetPacketReceived()

@@ -43,47 +43,79 @@ ServerObjectList::ServerObjectList(unsigned int waitTimeMilliSec, epl::LockPolic
 
 ServerObjectList::ServerObjectList(const ServerObjectList& b)
 {
-	ServerObjectList & unSafeB=const_cast<ServerObjectList&>(b);
-	unSafeB.m_listLock->Lock();
 	m_waitTime=b.m_waitTime;
-	m_lockPolicy=b.m_lockPolicy;
-	
-	m_listLock=b.m_listLock;
 	m_objectList=b.m_objectList;
+	vector<BaseServerObject*>::iterator iter;
+	for(iter=m_objectList.begin();iter!=m_objectList.end();)
+	{
+		(*iter)->RetainObj();
+
+	}
 	m_serverObjRemover=b.m_serverObjRemover;
 
-	unSafeB.m_objectList.clear();
-	unSafeB.m_listLock->Unlock();
-	unSafeB.m_listLock=NULL;
+	m_lockPolicy=b.m_lockPolicy;
+	switch(m_lockPolicy)
+	{
+	case epl::LOCK_POLICY_CRITICALSECTION:
+		m_listLock=EP_NEW epl::CriticalSectionEx();
+		break;
+	case epl::LOCK_POLICY_MUTEX:
+		m_listLock=EP_NEW epl::Mutex();
+		break;
+	case epl::LOCK_POLICY_NONE:
+		m_listLock=EP_NEW epl::NoLock();
+		break;
+	default:
+		m_listLock=NULL;
+		break;
+	}
 }
 
 ServerObjectList::~ServerObjectList()
 {
+	resetList();
+}
+
+void ServerObjectList::resetList()
+{
 	Clear();
 	if(m_listLock)
 		EP_DELETE m_listLock;
+	m_listLock=NULL;
 }
 ServerObjectList & ServerObjectList::operator=(const ServerObjectList&b)
 {
 	if(this!=&b)
 	{
-		Clear();
-		m_listLock->Lock();
-		m_serverObjRemover=b.m_serverObjRemover;
-		m_waitTime=b.m_waitTime;		
-		
-		ServerObjectList & unSafeB=const_cast<ServerObjectList&>(b);
-		unSafeB.m_listLock->Lock();
+		resetList();
+		m_waitTime=b.m_waitTime;
 		m_objectList=b.m_objectList;
-		unSafeB.m_objectList.clear();
-		unSafeB.m_listLock->Unlock();
+		vector<BaseServerObject*>::iterator iter;
+		for(iter=m_objectList.begin();iter!=m_objectList.end();)
+		{
+			(*iter)->RetainObj();
 
-		m_listLock->Unlock();
+		}
+		m_serverObjRemover=b.m_serverObjRemover;
 
-		if(m_listLock)
-			EP_DELETE m_listLock;
-		m_listLock=b.m_listLock;
-		unSafeB.m_listLock=NULL;
+		m_lockPolicy=b.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_listLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_listLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_listLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_listLock=NULL;
+			break;
+		}
+
+		
 
 	}
 	return *this;
