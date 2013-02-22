@@ -19,19 +19,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-ParserList::ParserList(SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):ServerObjectList(lockPolicyType),Thread(lockPolicyType),SmartObject(lockPolicyType)
+ParserList::ParserList(SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):ServerObjectList(waitTimeMilliSec,lockPolicyType),Thread(lockPolicyType),SmartObject(lockPolicyType)
 {
 	m_shouldTerminate=false;
-	m_waitTime=waitTimeMilliSec;
 	m_syncPolicy=syncPolicy;
 	m_event=EventEx(false,false);
 }
 ParserList::ParserList(const ParserList& b):ServerObjectList(b),Thread(b),SmartObject(b)
 {
-	m_shouldTerminate=false;
-	m_waitTime=b.m_waitTime;
+	ParserList & unSafeB=const_cast<ParserList&>(b);
+	bool currentlyStarted=(b.GetStatus()!=Thread::THREAD_STATUS_TERMINATED);
+	unSafeB.StopParse();
+	m_shouldTerminate=unSafeB.m_shouldTerminate;
 	m_syncPolicy=b.m_syncPolicy;
-	m_event=EventEx(false,false);
+	m_event=unSafeB.m_event;
+
+	if(currentlyStarted)
+		StartParse();
+
 }
 ParserList::~ParserList()
 {
@@ -40,27 +45,30 @@ ParserList::~ParserList()
 ParserList & ParserList::operator=(const ParserList&b)
 {
 	if(this!=&b)
-	{
+	{		
+		StopParse();
+		ParserList & unSafeB=const_cast<ParserList&>(b);
+		bool currentlyStarted=(b.GetStatus()!=Thread::THREAD_STATUS_TERMINATED);
+		if(currentlyStarted)
+			unSafeB.StopParse();
+
 		ServerObjectList::operator =(b);
 		SmartObject::operator =(b);
-		epl::LockObj lock(m_listLock);
+		m_listLock->Lock();
 		Thread::operator=(b);
-		m_waitTime=b.m_waitTime;
-		m_syncPolicy=b.m_syncPolicy;
+		m_listLock->Unlock();
+
+		m_syncPolicy=unSafeB.m_syncPolicy;
+		m_event=unSafeB.m_event;
+		m_shouldTerminate=unSafeB.m_shouldTerminate;
+
+		if(currentlyStarted)
+			StartParse();
+
 	}
 	return *this;
 }
 
-void ParserList::SetWaitTime(unsigned int milliSec)
-{
-	epl::LockObj lock(m_listLock);
-	m_waitTime=milliSec;
-}
-unsigned int ParserList::GetWaitTime()
-{
-	epl::LockObj lock(m_listLock);
-	return m_waitTime;
-}
 void ParserList::execute()
 {
 	while(1)
@@ -113,6 +121,9 @@ void ParserList::StopParse()
 	m_listLock->Unlock();
 	m_event.SetEvent();
 	TerminateAfter(m_waitTime);
+	m_listLock->Lock();
+	m_shouldTerminate=false;
+	m_listLock->Unlock();
 }
 
 void ParserList::Push(BaseServerObject* obj)

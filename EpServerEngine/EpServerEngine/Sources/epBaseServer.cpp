@@ -22,6 +22,7 @@ using namespace epse;
 
 BaseServer::BaseServer(const TCHAR *  port,SyncPolicy syncPolicy,unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType):BaseServerObject(waitTimeMilliSec,lockPolicyType)
 {
+	m_workerList=ServerObjectList(waitTimeMilliSec,lockPolicyType);
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
 	{
@@ -75,7 +76,7 @@ BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 		m_disconnectLock=NULL;
 		break;
 	}
-
+	m_workerList=b.m_workerList;
 	m_parserList=NULL;
 }
 BaseServer::~BaseServer()

@@ -19,9 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-ServerObjectList::ServerObjectList(epl::LockPolicy lockPolicyType)
+ServerObjectList::ServerObjectList(unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType)
 {
+	m_waitTime=waitTimeMilliSec;
 	m_lockPolicy=lockPolicyType;
+	m_serverObjRemover=ServerObjectRemover(waitTimeMilliSec,lockPolicyType);
 	switch(lockPolicyType)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
@@ -41,35 +43,23 @@ ServerObjectList::ServerObjectList(epl::LockPolicy lockPolicyType)
 
 ServerObjectList::ServerObjectList(const ServerObjectList& b)
 {
+	ServerObjectList & unSafeB=const_cast<ServerObjectList&>(b);
+	unSafeB.m_listLock->Lock();
+	m_waitTime=b.m_waitTime;
 	m_lockPolicy=b.m_lockPolicy;
-	switch(m_lockPolicy)
-	{
-	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_listLock=EP_NEW epl::CriticalSectionEx();
-		break;
-	case epl::LOCK_POLICY_MUTEX:
-		m_listLock=EP_NEW epl::Mutex();
-		break;
-	case epl::LOCK_POLICY_NONE:
-		m_listLock=EP_NEW epl::NoLock();
-		break;
-	default:
-		m_listLock=NULL;
-		break;
-	}
+	
+	m_listLock=b.m_listLock;
+	m_objectList=b.m_objectList;
 	m_serverObjRemover=b.m_serverObjRemover;
-	vector<BaseServerObject*>::const_iterator iter;
-	for(iter=b.m_objectList.begin();iter!=b.m_objectList.end();iter++)
-	{
-		(*iter)->RetainObj();
-		m_objectList.push_back(*iter);
-	}
+
+	unSafeB.m_objectList.clear();
+	unSafeB.m_listLock->Unlock();
+	unSafeB.m_listLock=NULL;
 }
 
 ServerObjectList::~ServerObjectList()
 {
 	Clear();
-	m_serverObjRemover.Clear();
 	if(m_listLock)
 		EP_DELETE m_listLock;
 }
@@ -78,12 +68,36 @@ ServerObjectList & ServerObjectList::operator=(const ServerObjectList&b)
 	if(this!=&b)
 	{
 		Clear();
-		epl::LockObj lock(m_listLock);
-		m_objectList=b.m_objectList;
+		m_listLock->Lock();
+		m_serverObjRemover=b.m_serverObjRemover;
+		m_waitTime=b.m_waitTime;		
+		
 		ServerObjectList & unSafeB=const_cast<ServerObjectList&>(b);
+		unSafeB.m_listLock->Lock();
+		m_objectList=b.m_objectList;
 		unSafeB.m_objectList.clear();
+		unSafeB.m_listLock->Unlock();
+
+		m_listLock->Unlock();
+
+		if(m_listLock)
+			EP_DELETE m_listLock;
+		m_listLock=b.m_listLock;
+		unSafeB.m_listLock=NULL;
+
 	}
 	return *this;
+}
+
+void ServerObjectList::SetWaitTime(unsigned int milliSec)
+{
+	epl::LockObj lock(m_listLock);
+	m_waitTime=milliSec;
+}
+unsigned int ServerObjectList::GetWaitTime()
+{
+	epl::LockObj lock(m_listLock);
+	return m_waitTime;
 }
 
 void ServerObjectList::RemoveTerminated()

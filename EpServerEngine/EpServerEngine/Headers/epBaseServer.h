@@ -101,6 +101,7 @@ namespace epse{
 				epl::LockObj lock(m_baseServerLock);
 				BaseServerObject::operator =(b);
 				m_port=b.m_port;
+				m_workerList=b.m_workerList;
 			}
 			return *this;
 		}

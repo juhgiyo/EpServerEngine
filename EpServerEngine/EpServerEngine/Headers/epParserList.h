@@ -68,6 +68,7 @@ namespace epse{
 
 		Initializes the List
 		@param[in] b the second object
+		@remark this is NOT copying!! This moves b to a.
 		*/
 		ParserList(const ParserList& b);
 		/*!
@@ -81,20 +82,9 @@ namespace epse{
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
+		@remark this is NOT copying!! This moves b to a.
 		*/
 		ParserList & operator=(const ParserList&b);
-
-		/*!
-		Set the wait time for the thread termination
-		@param[in] milliSec the time for waiting in millisecond
-		*/
-		void SetWaitTime(unsigned int milliSec);
-
-		/*!
-		Get the wait time for the parser thread termination
-		@return the current time for waiting in millisecond
-		*/
-		unsigned int GetWaitTime();
 
 		
 		/*!
@@ -136,9 +126,6 @@ namespace epse{
 
 		/// Thread Terminate
 		bool m_shouldTerminate;
-
-		/// wait time in millisecond for terminating thread
-		unsigned int m_waitTime;
 
 		/// Synchronous Policy
 		SyncPolicy m_syncPolicy;

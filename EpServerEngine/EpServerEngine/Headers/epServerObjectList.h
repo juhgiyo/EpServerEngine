@@ -59,15 +59,17 @@ namespace epse{
 		Default Constructor
 
 		Initializes the List
+		@param[in] waitTimeMilliSec the wait time in millisecond for terminating
 		@param[in] lockPolicyType The lock policy
 		*/
-		ServerObjectList(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		ServerObjectList(unsigned int waitTimeMilliSec=WAITTIME_INIFINITE, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
 
 		Initializes the List
 		@param[in] b the second object
+		@remark this is NOT copying!! This moves b to a.
 		*/
 		ServerObjectList(const ServerObjectList& b);
 		/*!
@@ -81,8 +83,21 @@ namespace epse{
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
+		@remark this is NOT copying!! This moves b to a.
 		*/
 		ServerObjectList & operator=(const ServerObjectList&b);
+
+		/*!
+		Set the wait time for the thread termination
+		@param[in] milliSec the time for waiting in millisecond
+		*/
+		void SetWaitTime(unsigned int milliSec);
+
+		/*!
+		Get the wait time for the parser thread termination
+		@return the current time for waiting in millisecond
+		*/
+		unsigned int GetWaitTime();
 
 		/*!
 		Remove all object which its thread is terminated
@@ -116,6 +131,10 @@ namespace epse{
 
 		/// parser thread list
 		vector<BaseServerObject*> m_objectList;
+
+		/// wait time in millisecond for terminating thread
+		/// @remark for ParserList and ServerObjectRemover
+		unsigned int m_waitTime;
 
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;

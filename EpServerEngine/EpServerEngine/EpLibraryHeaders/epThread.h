@@ -113,6 +113,8 @@ namespace epl
 
 		Initializes the Thread class
 		@param[in] b the second object
+		@remark This is NOT copying!!<br/>
+		        This moves b to a, if m_threadFunc==dummyThreadFunc
 		*/
 		Thread(const Thread & b);
 
@@ -128,31 +130,12 @@ namespace epl
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
+		@remark This is NOT copying!!<br/>
+		        This moves b to a, if m_threadFunc==dummyThreadFunc<br/>
+		        otherwise, it stop the current thread and resets.
 		*/
-		Thread &operator=(const Thread & b)
-		{
-			if(this!=&b)
-			{
-				m_threadFunc=b.m_threadFunc;
-				if(m_threadFunc!=dummyThreadFunc)
-				{
-					resetThread();
-					m_lockPolicy=b.m_lockPolicy;
-					m_threadLock=b.m_threadLock;
-					m_type=b.m_type;
-					m_parentThreadHandle=b.m_parentThreadHandle;
-					m_parentThreadId=b.m_parentThreadId;
-					m_threadHandle=b.m_threadHandle;
-					m_threadId=b.m_threadId;
-					m_status=b.m_status;
-
-					Thread &unSafeB=const_cast<Thread&>(b);
-					unSafeB.Detach();
-					unSafeB.m_threadLock=NULL;
-				}
-			}
-			return *this;
-		}
+		Thread &operator=(const Thread & b);
+		
 
 		/*!
 		Start the Thread according to parameters given.

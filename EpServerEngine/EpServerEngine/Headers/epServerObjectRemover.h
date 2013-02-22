@@ -64,6 +64,7 @@ namespace epse{
 
 		Initializes the Remover
 		@param[in] b the second object
+		@remark this is NOT copying!! This moves b to a.
 		*/
 		ServerObjectRemover(const ServerObjectRemover& b);
 		/*!
@@ -77,6 +78,7 @@ namespace epse{
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
+		@remark this is NOT copying!! This moves b to a.
 		*/
 		ServerObjectRemover & operator=(const ServerObjectRemover&b);
 		
@@ -97,11 +99,6 @@ namespace epse{
 		@param[in] obj the object to push in
 		*/
 		void Push(BaseServerObject* obj);
-
-		/*!
-		Clear the remover list
-		*/
-		void Clear();
 
 	protected:
 		/*!
