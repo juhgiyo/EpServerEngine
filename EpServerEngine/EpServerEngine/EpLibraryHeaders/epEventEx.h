@@ -1,9 +1,9 @@
 /*! 
-@file epSemaphore.h
+@file epEventEx.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/eplibrary>
 @date April 16, 2011
-@brief Semaphore Interface
+@brief EventEx Interface
 @version 2.0
 
 @section LICENSE
@@ -25,72 +25,70 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for Semaphore Class.
+An Interface for EventEx Class.
 
 */
-#ifndef __EP_SEMAPHORE_H__
-#define __EP_SEMAPHORE_H__
-
+#ifndef __EP_EVENT_EX_H__
+#define __EP_EVENT_EX_H__
 #include "epLib.h"
 #include "epSystem.h"
 #include "epBaseLock.h"
 
 namespace epl
 {
+
 	/*! 
-	@class Semaphore epSemaphore.h
-	@brief A class that handles the semaphore functionality.
+	@class EventEx epEventEx.h
+	@brief A class that handles the event functionality.
 	*/
-	class EP_LIBRARY Semaphore :public BaseLock
+	class EP_LIBRARY EventEx :public BaseLock
 	{
 	public:
 		/*!
 		Default Constructor
 
 		Initializes the lock.
-		@remark semName must be supplied if the object will be used across process boundaries.
-		@param[in] count lock count
-		@param[in] semName name of the semaphore to distinguish
+		@remark eventName must be supplied if the object will be used across process boundaries.
+		@param[in] eventName name of the event to distinguish
 		@param[in] lpsaAttributes the security attribute
 		*/
-		Semaphore(unsigned int count=1,const TCHAR *semName=NULL, LPSECURITY_ATTRIBUTES lpsaAttributes = NULL);
+		EventEx(const TCHAR *eventName=NULL, LPSECURITY_ATTRIBUTES lpsaAttributes = NULL);
 
 		/*!
 		Default Constructor
 
 		Initializes the lock.
-		@remark semName must be supplied if the object will be used across process boundaries.
-		@param[in] count lock count
-		@param[in] initialCount The initial count for the semaphore object. 
-		@param[in] semName name of the semaphore to distinguish
+		@param[in] isInitialRaised flag to raise the event on creation
+		@param[in] isManualReset flag to whether event is reset manually
+		@param[in] eventName name of the event to distinguish
 		@param[in] lpsaAttributes the security attribute
-		@remark initialCount must be greater than or equal to zero and less than or equal to lMaximumCount.<br/>
-		          The state of a semaphore is signaled when its count is greater than zero and nonsignaled when it is zero.
+		@remark eventName must be supplied if the object will be used across process boundaries.
+		@remark if isInitialRaised is TRUE then the event is raised on creation.
 		*/
-		Semaphore(unsigned int count, unsigned int initialCount,const TCHAR *semName=NULL, LPSECURITY_ATTRIBUTES lpsaAttributes = NULL);
-
+		EventEx(bool isInitialRaised,bool isManualReset,const TCHAR *eventName=NULL , LPSECURITY_ATTRIBUTES lpsaAttributes=NULL);
 
 		/*!
 		Default Copy Constructor
 
-		Initializes the Semaphore
+		Initializes the EventEx
 		@param[in] b the second object
 		*/
-		Semaphore(const Semaphore& b);
+		EventEx(const EventEx& b);
 
 		/*!
 		Default Destructor
 
 		Deletes the lock
 		*/
-		virtual ~Semaphore();
+		virtual ~EventEx();
 
 		/*!
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		Semaphore & operator=(const Semaphore&b);
+		EventEx & operator=(const EventEx&b);
+
 
 		/*!
 		Locks the Critical Section
@@ -101,7 +99,7 @@ namespace epl
 		/*!
 		Try to Lock the Critical Section
 
-		If other thread is already in the Critical Section, it just returns false and continue, otherwise obtain the Critical Section.
+		If other process is already in the Critical Section, it just returns false and continue, otherwise obtain the Critical Section.
 		@return true if the lock is succeeded, otherwise false.
 		*/
 		virtual long TryLock();
@@ -109,7 +107,7 @@ namespace epl
 		/*!
 		Locks the Critical Section
 
-		if other thread is already in the Critical Section,
+		if other process is already in the Critical Section,
 		and if it fails to lock in given time, it returns false, otherwise lock and return true.
 		@param[in] dwMilliSecond the wait time.
 		@return true if the lock is succeeded, otherwise false.
@@ -124,27 +122,38 @@ namespace epl
 		virtual void Unlock();
 
 		/*!
-		Release the semaphore with given count
-		@param[in] releaseCount the count of the semaphore to release
-		@param[out] retPreviousCount the count of the semaphore before the release
-		@return nonzero if successful otherwise 0
-		@remark Use with care since by calling this function, the debugger might indicate as deadlock even though it is not.
+		Reset the event raised
+		@return true if succeeded otherwise false
 		*/
-		long Release(long releaseCount, long * retPreviousCount=NULL);
+		bool ResetEvent();
+
+		/*!
+		Returns the flag whether this event is resetting manually.
+		@return true if the event is resetting manually, otherwise false.
+		*/
+		bool IsManualReset() const;
 
 	private:
-		/// Actual Semaphore		
-		HANDLE m_sem;
-		/// Creation Info
+
+		/// EventEx
+		HANDLE m_event;
+		/// Creation Security Info
 		LPSECURITY_ATTRIBUTES m_lpsaAttributes;
-		/// Semaphore Flag
-		unsigned int m_count;
-		/// Semaphore Initial Count
-		unsigned int m_initialiCount;
-		/// Semaphore Name
+		/// Flag for whether the event is raised on creation
+		bool m_isInitialRaised;
+		/// Flag for whether the event is resetting manually.
+		bool m_isManualReset;
+		/// Event Name
 		EpTString m_name;
+
+#if defined(_DEBUG) && defined(ENABLE_POSSIBLE_DEADLOCK_CHECK)
+		/// thread ID that currently holding this event
+		unsigned long m_threadID;
+		/// EventEx Debug
+		HANDLE m_eventDebug;
+#endif //defined(_DEBUG) && defined(ENABLE_POSSIBLE_DEADLOCK_CHECK)
 	};
 
 }
 
-#endif //__EP_SEMAPHORE_H__
+#endif //__EP_EVENT_EX_H__

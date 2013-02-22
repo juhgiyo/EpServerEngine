@@ -36,10 +36,6 @@ An Interface for InterlockedEx Class.
 #include "epBaseLock.h"
 
 
-#if defined(_DEBUG)
-#include <vector>
-#endif //defined(_DEBUG)
-
 namespace epl
 {
 	/*! 
@@ -115,11 +111,12 @@ namespace epl
 	private:
 		/// Actual Semaphore		
 		volatile long m_interLock;
-#if defined(_DEBUG)
+#if defined(_DEBUG) && defined(ENABLE_POSSIBLE_DEADLOCK_CHECK)
+		/// thread ID that currently holding this interlock
 		unsigned long m_threadID;
 		/// Semaphore Debug	
 		volatile long m_interLockDebug;
-#endif //defined(_DEBUG)
+#endif //defined(_DEBUG) && defined(ENABLE_POSSIBLE_DEADLOCK_CHECK)
 	};
 
 }
