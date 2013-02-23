@@ -61,10 +61,8 @@ BaseClientUDP::BaseClientUDP(const BaseClientUDP& b):BaseServerSendObject(b)
 	m_connectSocket=INVALID_SOCKET;
 	m_result=0;
 	m_ptr=0;
-	m_hostName=b.m_hostName;
-	m_port=b.m_port;
+
 	m_lockPolicy=b.m_lockPolicy;
-	m_maxPacketSize=b.m_maxPacketSize;
 	switch(m_lockPolicy)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
@@ -88,10 +86,69 @@ BaseClientUDP::BaseClientUDP(const BaseClientUDP& b):BaseServerSendObject(b)
 		m_disconnectLock=NULL;
 		break;
 	}
-	m_parserList=ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
+	
+	LockObj lock(b.m_generalLock);
+	m_hostName=b.m_hostName;
+	m_port=b.m_port;
+	m_maxPacketSize=b.m_maxPacketSize;
+	m_parserList=b.m_parserList;
 
 }
 BaseClientUDP::~BaseClientUDP()
+{
+	resetClient();
+}
+
+BaseClientUDP & BaseClientUDP::operator=(const BaseClientUDP&b)
+{
+	if(this!=&b)
+	{				
+	
+		resetClient();
+
+		BaseServerSendObject::operator =(b);
+
+		m_connectSocket=INVALID_SOCKET;
+		m_result=0;
+		m_ptr=0;
+
+		m_lockPolicy=b.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_sendLock=EP_NEW epl::CriticalSectionEx();
+			m_generalLock=EP_NEW epl::CriticalSectionEx();
+			m_disconnectLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_sendLock=EP_NEW epl::Mutex();
+			m_generalLock=EP_NEW epl::Mutex();
+			m_disconnectLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_sendLock=EP_NEW epl::NoLock();
+			m_generalLock=EP_NEW epl::NoLock();
+			m_disconnectLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_sendLock=NULL;
+			m_generalLock=NULL;
+			m_disconnectLock=NULL;
+			break;
+		}
+
+		LockObj lock(b.m_generalLock);
+		m_hostName=b.m_hostName;
+		m_port=b.m_port;
+		m_maxPacketSize=b.m_maxPacketSize;
+		m_parserList=b.m_parserList;
+
+
+	}
+	return *this;
+}
+
+void BaseClientUDP::resetClient()
 {
 	Disconnect();
 
@@ -101,9 +158,10 @@ BaseClientUDP::~BaseClientUDP()
 		EP_DELETE m_generalLock;
 	if(m_disconnectLock)
 		EP_DELETE m_disconnectLock;
+	m_sendLock=NULL;
+	m_generalLock=NULL;
+	m_disconnectLock=NULL;
 }
-
-
 void  BaseClientUDP::SetHostName(const TCHAR * hostName)
 {
 	epl::LockObj lock(m_generalLock);

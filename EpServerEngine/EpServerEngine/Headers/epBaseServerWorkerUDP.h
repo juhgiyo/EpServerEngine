@@ -91,38 +91,8 @@ namespace epse
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		BaseServerWorkerUDP & operator=(const BaseServerWorkerUDP&b)
-		{
-			if(this!=&b)
-			{
-				epl::LockObj lock(m_baseWorkerLock);
-				BaseServerSendObject::operator =(b);
-// 				m_clientSocket=b.m_clientSocket;
-// 				m_server=b.m_server;
-// 
-// 				if(m_packet)
-// 					m_packet->ReleaseObj();
-// 				m_packet=b.m_packet;
-// 				if(m_packet)
-// 					m_packet->RetainObj();
-// 
-// 				if(m_parser)
-// 					m_parser->ReleaseObj();
-// 				m_parser=b.m_parser;
-// 				if(m_parser)
-// 					m_parser->RetainObj();
-// 
-// 				if(m_parserList)
-// 					m_parserList->ReleaseObj();
-// 				m_parserList=m_parserList;
-// 				if(m_parserList)
-// 					m_parserList->RetainObj();
+		BaseServerWorkerUDP & operator=(const BaseServerWorkerUDP&b);
 
-				m_maxPacketSize=b.m_maxPacketSize;
-
-			}
-			return *this;
-		}
 
 		/*!
 		Send the packet to the client
@@ -166,7 +136,11 @@ namespace epse
 		void setParserList(ParserList *parserList);
 	
 	
-	private:	
+	private:
+		/*!
+		Reset worker
+		*/
+		void resetWorker();
 		/*!
 		Actually Kill the connection
 		@param[in] fromInternal flag to check if the call is from internal or not

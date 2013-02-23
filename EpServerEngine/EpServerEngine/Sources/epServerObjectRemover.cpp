@@ -43,9 +43,6 @@ ServerObjectRemover::ServerObjectRemover(unsigned int waitTimeMilliSec,epl::Lock
 }
 ServerObjectRemover::ServerObjectRemover(const ServerObjectRemover& b):Thread(b),SmartObject(b)
 {
-	m_waitTime=b.m_waitTime;
-	m_threadStopEvent=b.m_threadStopEvent;
-	m_objectList=b.m_objectList;
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
 	{
@@ -62,6 +59,15 @@ ServerObjectRemover::ServerObjectRemover(const ServerObjectRemover& b):Thread(b)
 		m_listLock=NULL;
 		break;
 	}
+
+	m_waitTime=b.m_waitTime;
+	m_threadStopEvent=b.m_threadStopEvent;
+	
+	ServerObjectRemover&unSafeB=const_cast<ServerObjectRemover&>(b);
+	unSafeB.m_listLock->Lock();
+	m_objectList=b.m_objectList;
+	unSafeB.m_listLock->Unlock();
+
 	m_threadStopEvent.ResetEvent();
 	Start();
 }
@@ -72,6 +78,7 @@ ServerObjectRemover::~ServerObjectRemover()
 	/// Not recommend to use waitTimeMilliSec other than WAITTIME_INFINITE
 	if(m_listLock)
 		EP_DELETE m_listLock;
+	m_listLock=NULL;
 }
 
 ServerObjectRemover & ServerObjectRemover::operator=(const ServerObjectRemover&b)
@@ -82,12 +89,10 @@ ServerObjectRemover & ServerObjectRemover::operator=(const ServerObjectRemover&b
 		if(m_listLock)
 			EP_DELETE m_listLock;
 		m_listLock=NULL;
+
 		SmartObject::operator =(b);
 		Thread::operator=(b);
-		
-		m_waitTime=b.m_waitTime;
-		m_threadStopEvent=b.m_threadStopEvent;
-		m_objectList=b.m_objectList;
+	
 		m_lockPolicy=b.m_lockPolicy;
 		switch(m_lockPolicy)
 		{
@@ -104,6 +109,15 @@ ServerObjectRemover & ServerObjectRemover::operator=(const ServerObjectRemover&b
 			m_listLock=NULL;
 			break;
 		}
+
+		m_waitTime=b.m_waitTime;
+		m_threadStopEvent=b.m_threadStopEvent;
+
+		ServerObjectRemover&unSafeB=const_cast<ServerObjectRemover&>(b);
+		unSafeB.m_listLock->Lock();
+		m_objectList=b.m_objectList;
+		unSafeB.m_listLock->Unlock();
+	
 		m_threadStopEvent.ResetEvent();
 		Start();
 	}
@@ -152,9 +166,10 @@ void ServerObjectRemover::execute()
 			BaseServerObject* serverObj=m_objectList.front();
 			m_objectList.pop();
 			m_listLock->Unlock();
-			
 			serverObj->ReleaseObj();
-			m_listLock->Lock();
+			m_listLock->Lock();				
+			
+			
 		}
 		m_listLock->Unlock();
 	}

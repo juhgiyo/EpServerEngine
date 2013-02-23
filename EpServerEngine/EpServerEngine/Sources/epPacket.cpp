@@ -61,22 +61,6 @@ Packet::Packet(const void *packet, unsigned int byteSize, bool shouldAllocate, e
 
 Packet::Packet(const Packet& b):SmartObject(b)
 {
-	m_packet=NULL;
-	if(b.m_isAllocated)
-	{
-		if(b.m_packetSize>0)
-		{
-			m_packet=EP_NEW char[b.m_packetSize];
-			epl::System::Memcpy(m_packet,b.m_packet,b.m_packetSize);
-		}
-		m_packetSize=b.m_packetSize;
-	}
-	else
-	{
-		m_packet=b.m_packet;
-		m_packetSize=b.m_packetSize;
-	}
-	m_isAllocated=b.m_isAllocated;
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
 	{
@@ -93,24 +77,58 @@ Packet::Packet(const Packet& b):SmartObject(b)
 		m_packetLock=NULL;
 		break;
 	}
+
+	LockObj lock(b.m_packetLock);
+	m_packet=NULL;
+	if(b.m_isAllocated)
+	{
+		if(b.m_packetSize>0)
+		{
+			m_packet=EP_NEW char[b.m_packetSize];
+			epl::System::Memcpy(m_packet,b.m_packet,b.m_packetSize);
+		}
+		m_packetSize=b.m_packetSize;
+	}
+	else
+	{
+		m_packet=b.m_packet;
+		m_packetSize=b.m_packetSize;
+	}
+	m_isAllocated=b.m_isAllocated;
+	
 }
 Packet & Packet::operator=(const Packet&b)
 {
 	if(this!=&b)
 	{
-		SmartObject::operator =(b);
-		if(m_isAllocated && m_packet)
-		{
-			EP_DELETE[] m_packet;
-		}
-		m_packet=NULL;
+		resetPacket();
 
+		SmartObject::operator =(b);
+
+		m_lockPolicy=b.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_packetLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_packetLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_packetLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_packetLock=NULL;
+			break;
+		}
+
+		LockObj lock(b.m_packetLock);
+		m_packet=NULL;
 		if(b.m_isAllocated)
 		{
 			if(b.m_packetSize>0)
 			{
 				m_packet=EP_NEW char[b.m_packetSize];
-				EP_ASSERT(m_packet);
 				epl::System::Memcpy(m_packet,b.m_packet,b.m_packetSize);
 			}
 			m_packetSize=b.m_packetSize;
@@ -125,8 +143,7 @@ Packet & Packet::operator=(const Packet&b)
 	}
 	return *this;
 }
-
-Packet::~Packet()
+void Packet::resetPacket()
 {
 	m_packetLock->Lock();
 	if(m_isAllocated && m_packet)
@@ -137,6 +154,12 @@ Packet::~Packet()
 	m_packetLock->Unlock();
 	if(m_packetLock)
 		EP_DELETE m_packetLock;
+	m_packetLock=NULL;
+}
+
+Packet::~Packet()
+{
+	resetPacket();
 }
 
 unsigned int Packet::GetPacketByteSize() const

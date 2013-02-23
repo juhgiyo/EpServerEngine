@@ -343,6 +343,23 @@ namespace epse
 	template<typename PacketStruct, typename ArrayType>
 	PacketContainer<PacketStruct,ArrayType>::PacketContainer(const PacketContainer<PacketStruct,ArrayType>& orig)
 	{	
+		m_lockPolicy=orig.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_packetContainerLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_packetContainerLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_packetContainerLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_packetContainerLock=NULL;
+			break;
+		}
+		LockObj lock(orig.m_packetContainerLock);
 		if(orig.m_isAllocated)
 		{
 			m_packetContainer=reinterpret_cast<PacketContainerStruct*>( EP_Malloc(sizeof(PacketContainerStruct) + (orig.m_length*sizeof(ArrayType)) ) );
@@ -360,22 +377,6 @@ namespace epse
 			m_length=orig.m_length;
 		}
 		m_isAllocated=orig.m_isAllocated;
-		m_lockPolicy=orig.m_lockPolicy;
-		switch(m_lockPolicy)
-		{
-		case epl::LOCK_POLICY_CRITICALSECTION:
-			m_packetContainerLock=EP_NEW epl::CriticalSectionEx();
-			break;
-		case epl::LOCK_POLICY_MUTEX:
-			m_packetContainerLock=EP_NEW epl::Mutex();
-			break;
-		case epl::LOCK_POLICY_NONE:
-			m_packetContainerLock=EP_NEW epl::NoLock();
-			break;
-		default:
-			m_packetContainerLock=NULL;
-			break;
-		}
 	}
 
 	template<typename PacketStruct, typename ArrayType>
@@ -384,9 +385,11 @@ namespace epse
 		m_packetContainerLock->Lock();
 		if(m_isAllocated && m_packetContainer)
 			EP_Free(m_packetContainer);	
+		m_packetContainer=NULL;
 		m_packetContainerLock->Unlock();
 		if(m_packetContainerLock)
 			EP_DELETE m_packetContainerLock;
+		m_packetContainerLock=NULL;
 	}
 	
 
@@ -532,10 +535,33 @@ namespace epse
 	{
 		if(this!=&b)
 		{
-			epl::LockObj lock(m_packetContainerLock);
+			m_packetContainerLock->Lock();
 			if(m_isAllocated && m_packetContainer)
-				EP_Free(m_packetContainer);
+				EP_Free(m_packetContainer);	
 			m_packetContainer=NULL;
+			m_packetContainerLock->Unlock();
+			if(m_packetContainerLock)
+				EP_DELETE m_packetContainerLock;
+			m_packetContainerLock=NULL;
+
+			
+			m_lockPolicy=b.m_lockPolicy;
+			switch(m_lockPolicy)
+			{
+			case epl::LOCK_POLICY_CRITICALSECTION:
+				m_packetContainerLock=EP_NEW epl::CriticalSectionEx();
+				break;
+			case epl::LOCK_POLICY_MUTEX:
+				m_packetContainerLock=EP_NEW epl::Mutex();
+				break;
+			case epl::LOCK_POLICY_NONE:
+				m_packetContainerLock=EP_NEW epl::NoLock();
+				break;
+			default:
+				m_packetContainerLock=NULL;
+				break;
+			}
+			LockObj lock(b.m_packetContainerLock);
 			if(b.m_isAllocated)
 			{
 				m_packetContainer=reinterpret_cast<PacketContainerStruct*>( EP_Malloc(sizeof(PacketContainerStruct) + (b.m_length*sizeof(ArrayType)) ) );

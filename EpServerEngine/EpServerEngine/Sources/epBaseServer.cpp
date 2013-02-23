@@ -54,8 +54,7 @@ BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 {
 	m_listenSocket=INVALID_SOCKET;
 	m_result=0;
-	m_port=b.m_port;
-
+		
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
 	{
@@ -76,10 +75,64 @@ BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 		m_disconnectLock=NULL;
 		break;
 	}
+
+	LockObj lock(b.m_baseServerLock);
+	m_port=b.m_port;
 	m_workerList=b.m_workerList;
-	m_parserList=NULL;
+	m_parserList=b.m_parserList;
+	if(m_parserList)
+		m_parserList->RetainObj();
+	
 }
 BaseServer::~BaseServer()
+{
+	resetServer();
+}
+
+BaseServer & BaseServer::operator=(const BaseServer&b)
+{
+	if(this!=&b)
+	{
+		resetServer();
+
+		BaseServerObject::operator =(b);
+
+		m_listenSocket=INVALID_SOCKET;
+		m_result=0;
+
+		m_lockPolicy=b.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_baseServerLock=EP_NEW epl::CriticalSectionEx();
+			m_disconnectLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_baseServerLock=EP_NEW epl::Mutex();
+			m_disconnectLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_baseServerLock=EP_NEW epl::NoLock();
+			m_disconnectLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_baseServerLock=NULL;
+			m_disconnectLock=NULL;
+			break;
+		}
+		
+		LockObj lock(b.m_baseServerLock);
+		m_port=b.m_port;
+		m_workerList=b.m_workerList;
+		m_parserList=b.m_parserList;
+		if(m_parserList)
+			m_parserList->RetainObj();
+
+	}
+	return *this;
+}
+
+void BaseServer::resetServer()
 {
 	StopServer();
 
@@ -91,6 +144,9 @@ BaseServer::~BaseServer()
 	{
 		m_parserList->ReleaseObj();
 	}
+	m_baseServerLock=NULL;
+	m_disconnectLock=NULL;
+	m_parserList=NULL;
 }
 
 void  BaseServer::SetPort(const TCHAR *  port)
@@ -152,15 +208,18 @@ void BaseServer::execute()
 
 	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 	{
-		m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
-		if(!m_parserList || !m_parserList->StartParse())
+		if(m_parserList==NULL)
 		{
-			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-			if(m_parserList)
-				m_parserList->ReleaseObj();
-			m_parserList=NULL;
-			stopServer(true);
-			return;
+			m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
+			if(!m_parserList || !m_parserList->StartParse())
+			{
+				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+				if(m_parserList)
+					m_parserList->ReleaseObj();
+				m_parserList=NULL;
+				stopServer(true);
+				return;
+			}
 		}
 	}
 
@@ -219,16 +278,17 @@ bool BaseServer::StartServer(const TCHAR * port)
 		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) WSAStartup failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 		return false;
 	}
-
-	ZeroMemory(&m_hints, sizeof(m_hints));
-	m_hints.ai_family = AF_INET;
-	m_hints.ai_socktype = SOCK_STREAM;
-	m_hints.ai_protocol = IPPROTO_TCP;
-	m_hints.ai_flags = AI_PASSIVE;
+	/// internal use variable2
+	struct addrinfo iHints;
+	ZeroMemory(&iHints, sizeof(iHints));
+	iHints.ai_family = AF_INET;
+	iHints.ai_socktype = SOCK_STREAM;
+	iHints.ai_protocol = IPPROTO_TCP;
+	iHints.ai_flags = AI_PASSIVE;
 
 
 	// Resolve the server address and port
-	iResult = getaddrinfo(NULL, m_port.c_str(), &m_hints, &m_result);
+	iResult = getaddrinfo(NULL, m_port.c_str(), &iHints, &m_result);
 	if ( iResult != 0 ) {
 		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) getaddrinfo failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);		
 		WSACleanup();

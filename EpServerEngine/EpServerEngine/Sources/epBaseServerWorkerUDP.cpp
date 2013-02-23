@@ -48,10 +48,6 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(unsigned int waitTimeMilliSec,epl::Lock
 }
 BaseServerWorkerUDP::BaseServerWorkerUDP(const BaseServerWorkerUDP& b) : BaseServerSendObject(b)
 {
-	m_packet=NULL;
-	m_server=NULL;
-	m_parser=NULL;
-	m_maxPacketSize=0;
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
 	{
@@ -72,25 +68,90 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(const BaseServerWorkerUDP& b) : BaseSer
 		m_killConnectionLock=NULL;
 		break;
 	}
-	m_parserList=NULL;
+
+	m_maxPacketSize=b.m_maxPacketSize;
+	m_server=b.m_server;
+	m_packet=b.m_packet;
+	if(m_packet)
+		m_packet->RetainObj();
+	m_parser=b.m_parser;
+	if(m_parser)
+		m_parser->RetainObj();
+	m_parserList=b.m_parserList;
+	if(m_parserList)
+		m_parserList->RetainObj();
 }
 
 BaseServerWorkerUDP::~BaseServerWorkerUDP()
 {
+	resetWorker();
+}
+
+BaseServerWorkerUDP & BaseServerWorkerUDP::operator=(const BaseServerWorkerUDP&b)
+{
+	if(this!=&b)
+	{
+		resetWorker();
+		
+		BaseServerSendObject::operator =(b);
+
+		m_lockPolicy=b.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
+			m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_baseWorkerLock=EP_NEW epl::Mutex();
+			m_killConnectionLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_baseWorkerLock=EP_NEW epl::NoLock();
+			m_killConnectionLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_baseWorkerLock=NULL;
+			m_killConnectionLock=NULL;
+			break;
+		}
+
+		m_maxPacketSize=b.m_maxPacketSize;
+		m_server=b.m_server;
+		m_packet=b.m_packet;
+		if(m_packet)
+			m_packet->RetainObj();
+		m_parser=b.m_parser;
+		if(m_parser)
+			m_parser->RetainObj();
+		m_parserList=b.m_parserList;
+		if(m_parserList)
+			m_parserList->RetainObj();
+	}
+	return *this;
+}
+
+void BaseServerWorkerUDP::resetWorker()
+{
 	KillConnection();
-	
+
 	if(m_parser)
 		m_parser->ReleaseObj();
 	if(m_parserList)
 		m_parserList->ReleaseObj();
 	if(m_packet)
 		m_packet->ReleaseObj();	
-	
 	if(m_baseWorkerLock)
 		EP_DELETE m_baseWorkerLock;
 
 	if(m_killConnectionLock)
 		EP_DELETE m_killConnectionLock;
+
+	m_parser=NULL;
+	m_parserList=NULL;
+	m_packet=NULL;
+	m_baseWorkerLock=NULL;
+	m_killConnectionLock=NULL;
 }
 
 void BaseServerWorkerUDP::setPacketPassUnit(const PacketPassUnit &packetPassUnit)
@@ -176,6 +237,11 @@ void BaseServerWorkerUDP::execute()
 	BasePacketParser::PacketPassUnit passUnit;
 	passUnit.m_packet=m_packet;
 	passUnit.m_owner=this;
+	if(m_parser)
+	{
+		m_parser->ReleaseObj();
+		m_parser=NULL;
+	}
 	m_parser =createNewPacketParser();
 	m_parser->setSyncPolicy(m_syncPolicy);
 	m_parser->setPacketPassUnit(passUnit);

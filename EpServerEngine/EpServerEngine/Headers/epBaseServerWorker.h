@@ -91,22 +91,8 @@ namespace epse
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		BaseServerWorker & operator=(const BaseServerWorker&b)
-		{
-			if(this!=&b)
-			{
-				epl::LockObj lock(m_sendLock);
-				BaseServerSendObject::operator =(b);
-// 				m_clientSocket=b.m_clientSocket;
-// 
-// 				if(m_parserList)
-// 					m_parserList->ReleaseObj();
-// 				m_parserList=m_parserList;
-// 				if(m_parserList)
-// 					m_parserList->RetainObj();
-			}
-			return *this;
-		}	
+		BaseServerWorker & operator=(const BaseServerWorker&b);
+	
 
 		/*!
 		Send the packet to the client
@@ -155,6 +141,11 @@ namespace epse
 	
 	
 	private:
+
+		/*!
+		Reset worker
+		*/
+		void resetWorker();
 		/*!
 		Actually Kill the connection
 		@param[in] fromInternal flag to check if the call is from internal or not

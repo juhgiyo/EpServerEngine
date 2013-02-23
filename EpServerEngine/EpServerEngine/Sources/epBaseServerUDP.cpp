@@ -60,9 +60,8 @@ BaseServerUDP::BaseServerUDP(const BaseServerUDP& b):BaseServerObject(b)
 {
 	m_listenSocket=INVALID_SOCKET;
 	m_result=0;
-	m_port=b.m_port;
+	
 	m_lockPolicy=b.m_lockPolicy;
-	m_maxPacketSize=b.m_maxPacketSize;
 	switch(m_lockPolicy)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
@@ -86,10 +85,67 @@ BaseServerUDP::BaseServerUDP(const BaseServerUDP& b):BaseServerObject(b)
 		m_disconnectLock=NULL;
 		break;
 	}
+
+	LockObj lock(b.m_baseServerLock);
+	m_maxPacketSize=b.m_maxPacketSize;
+	m_port=b.m_port;
 	m_workerList=b.m_workerList;
-	m_parserList=NULL;
+	m_parserList=b.m_parserList;
+	if(m_parserList)
+		m_parserList->RetainObj();
 }
 BaseServerUDP::~BaseServerUDP()
+{
+	resetServer();
+}
+BaseServerUDP & BaseServerUDP::operator=(const BaseServerUDP&b)
+{
+	if(this!=&b)
+	{
+		resetServer();
+		
+		BaseServerObject::operator =(b);
+
+		m_listenSocket=INVALID_SOCKET;
+		m_result=0;
+
+		m_lockPolicy=b.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_baseServerLock=EP_NEW epl::CriticalSectionEx();
+			m_sendLock=EP_NEW epl::CriticalSectionEx();
+			m_disconnectLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_baseServerLock=EP_NEW epl::Mutex();
+			m_sendLock=EP_NEW epl::Mutex();
+			m_disconnectLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_baseServerLock=EP_NEW epl::NoLock();
+			m_sendLock=EP_NEW epl::NoLock();
+			m_disconnectLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_baseServerLock=NULL;
+			m_sendLock=NULL;
+			m_disconnectLock=NULL;
+			break;
+		}
+
+		LockObj lock(b.m_baseServerLock);
+		m_maxPacketSize=b.m_maxPacketSize;
+		m_port=b.m_port;
+		m_workerList=b.m_workerList;
+		m_parserList=b.m_parserList;
+		if(m_parserList)
+			m_parserList->RetainObj();
+	}
+	return *this;
+}
+
+void BaseServerUDP::resetServer()
 {
 	StopServer();
 	if(m_baseServerLock)
@@ -102,6 +158,10 @@ BaseServerUDP::~BaseServerUDP()
 	{
 		m_parserList->ReleaseObj();
 	}
+	m_baseServerLock=NULL;
+	m_sendLock=NULL;
+	m_disconnectLock=NULL;
+	m_parserList=NULL;
 }
 
 void  BaseServerUDP::SetPort(const TCHAR *  port)
@@ -187,15 +247,18 @@ void BaseServerUDP::execute()
 {
 	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 	{
-		m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
-		if(!m_parserList || !m_parserList->StartParse())
+		if(m_parserList==NULL)
 		{
-			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-			if(m_parserList)
-				m_parserList->ReleaseObj();
-			m_parserList=NULL;
-			stopServer(true);
-			return;
+			m_parserList=EP_NEW ParserList(m_syncPolicy,m_waitTime,m_lockPolicy);
+			if(!m_parserList || !m_parserList->StartParse())
+			{
+				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+				if(m_parserList)
+					m_parserList->ReleaseObj();
+				m_parserList=NULL;
+				stopServer(true);
+				return;
+			}
 		}
 	}
 
@@ -264,16 +327,18 @@ bool BaseServerUDP::StartServer(const TCHAR * port)
 		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) WSAStartup failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 		return false;
 	}
-
-	ZeroMemory(&m_hints, sizeof(m_hints));
-	m_hints.ai_family = AF_INET;
-	m_hints.ai_socktype = SOCK_DGRAM;
-	m_hints.ai_protocol = IPPROTO_UDP;
-	m_hints.ai_flags = AI_PASSIVE;
+	
+	/// internal use variable2
+	struct addrinfo iHints;
+	ZeroMemory(&iHints, sizeof(iHints));
+	iHints.ai_family = AF_INET;
+	iHints.ai_socktype = SOCK_DGRAM;
+	iHints.ai_protocol = IPPROTO_UDP;
+	iHints.ai_flags = AI_PASSIVE;
 
 
 	// Resolve the server address and port
-	iResult = getaddrinfo(NULL, m_port.c_str(), &m_hints, &m_result);
+	iResult = getaddrinfo(NULL, m_port.c_str(), &iHints, &m_result);
 	if ( iResult != 0 ) {
 		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) getaddrinfo failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 		WSACleanup();

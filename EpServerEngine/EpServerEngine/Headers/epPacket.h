@@ -106,6 +106,11 @@ namespace epse{
 		void SetPacket(const void* packet, unsigned int packetByteSize);
 
 	private:
+
+		/*!
+		Reset Packet
+		*/
+		void resetPacket();
 		/// packet
 		char *m_packet;
 		/// packet Byte Size

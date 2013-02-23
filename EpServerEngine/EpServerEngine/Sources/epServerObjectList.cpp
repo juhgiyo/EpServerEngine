@@ -43,16 +43,6 @@ ServerObjectList::ServerObjectList(unsigned int waitTimeMilliSec, epl::LockPolic
 
 ServerObjectList::ServerObjectList(const ServerObjectList& b)
 {
-	m_waitTime=b.m_waitTime;
-	m_objectList=b.m_objectList;
-	vector<BaseServerObject*>::iterator iter;
-	for(iter=m_objectList.begin();iter!=m_objectList.end();)
-	{
-		(*iter)->RetainObj();
-
-	}
-	m_serverObjRemover=b.m_serverObjRemover;
-
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
 	{
@@ -69,6 +59,22 @@ ServerObjectList::ServerObjectList(const ServerObjectList& b)
 		m_listLock=NULL;
 		break;
 	}
+	m_waitTime=b.m_waitTime;
+
+	ServerObjectList&unSafeB=const_cast<ServerObjectList&>(b);
+	unSafeB.m_listLock->Lock();
+	m_objectList=b.m_objectList;
+	vector<BaseServerObject*>::iterator iter;
+	for(iter=m_objectList.begin();iter!=m_objectList.end();)
+	{
+		(*iter)->RetainObj();
+
+	}
+	unSafeB.m_listLock->Unlock();
+
+	m_serverObjRemover=b.m_serverObjRemover;
+
+	
 }
 
 ServerObjectList::~ServerObjectList()
@@ -88,15 +94,6 @@ ServerObjectList & ServerObjectList::operator=(const ServerObjectList&b)
 	if(this!=&b)
 	{
 		resetList();
-		m_waitTime=b.m_waitTime;
-		m_objectList=b.m_objectList;
-		vector<BaseServerObject*>::iterator iter;
-		for(iter=m_objectList.begin();iter!=m_objectList.end();)
-		{
-			(*iter)->RetainObj();
-
-		}
-		m_serverObjRemover=b.m_serverObjRemover;
 
 		m_lockPolicy=b.m_lockPolicy;
 		switch(m_lockPolicy)
@@ -114,8 +111,19 @@ ServerObjectList & ServerObjectList::operator=(const ServerObjectList&b)
 			m_listLock=NULL;
 			break;
 		}
+		m_waitTime=b.m_waitTime;
+		ServerObjectList&unSafeB=const_cast<ServerObjectList&>(b);
+		unSafeB.m_listLock->Lock();
+		m_objectList=b.m_objectList;
+		vector<BaseServerObject*>::iterator iter;
+		for(iter=m_objectList.begin();iter!=m_objectList.end();)
+		{
+			(*iter)->RetainObj();
 
-		
+		}
+		unSafeB.m_listLock->Unlock();
+
+		m_serverObjRemover=b.m_serverObjRemover;
 
 	}
 	return *this;
@@ -156,7 +164,9 @@ void ServerObjectList::Clear()
 	for(iter=m_objectList.begin();iter!=m_objectList.end();iter++)
 	{
 		if(*iter)
+		{
 			m_serverObjRemover.Push(*iter);
+		}
 	}
 	m_objectList.clear();
 }

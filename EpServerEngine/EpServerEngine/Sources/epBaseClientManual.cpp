@@ -50,7 +50,6 @@ BaseClientManual::BaseClientManual(const TCHAR * hostName, const TCHAR * port,ep
 	SetPort(port);
 	m_connectSocket=INVALID_SOCKET;
 	m_result=0;
-	m_ptr=0;
 	m_isConnected=false;
 }
 
@@ -58,12 +57,8 @@ BaseClientManual::BaseClientManual(const BaseClientManual& b) :BaseServerSendObj
 {
 	m_connectSocket=INVALID_SOCKET;
 	m_result=0;
-	m_ptr=0;
-	m_hostName=b.m_hostName;
-	m_port=b.m_port;
-	m_recvSizePacket=Packet(NULL,4);
 	m_isConnected=false;
-	
+
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
 	{
@@ -88,8 +83,65 @@ BaseClientManual::BaseClientManual(const BaseClientManual& b) :BaseServerSendObj
 		m_disconnectLock=NULL;
 		break;
 	}
+	LockObj lock(b.m_generalLock);
+	m_hostName=b.m_hostName;
+	m_port=b.m_port;
+	m_recvSizePacket=b.m_recvSizePacket;
+	
+	
+	
 }
 BaseClientManual::~BaseClientManual()
+{
+	resetClient();
+}
+
+BaseClientManual & BaseClientManual::operator=(const BaseClientManual&b)
+{
+	if(this!=&b)
+	{
+		resetClient();
+
+		BaseServerSendObject::operator =(b);
+
+		m_connectSocket=INVALID_SOCKET;
+		m_result=0;
+		m_isConnected=false;
+
+		m_lockPolicy=b.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_sendLock=EP_NEW epl::CriticalSectionEx();
+			m_generalLock=EP_NEW epl::CriticalSectionEx();
+			m_disconnectLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_sendLock=EP_NEW epl::Mutex();
+			m_generalLock=EP_NEW epl::Mutex();
+			m_disconnectLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_sendLock=EP_NEW epl::NoLock();
+			m_generalLock=EP_NEW epl::NoLock();
+			m_disconnectLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_sendLock=NULL;
+			m_generalLock=NULL;
+			m_disconnectLock=NULL;
+			break;
+		}
+		LockObj lock(b.m_generalLock);
+		m_hostName=b.m_hostName;
+		m_port=b.m_port;
+		m_recvSizePacket=b.m_recvSizePacket;
+
+	}
+	return *this;
+}
+
+void BaseClientManual::resetClient()
 {
 	Disconnect();
 
@@ -99,7 +151,11 @@ BaseClientManual::~BaseClientManual()
 		EP_DELETE m_generalLock;
 	if(m_disconnectLock)
 		EP_DELETE m_disconnectLock;
+	m_sendLock=NULL;
+	m_generalLock=NULL;
+	m_disconnectLock=NULL;
 }
+
 void  BaseClientManual::SetHostName(const TCHAR * hostName)
 {
 	epl::LockObj lock(m_generalLock);
@@ -373,11 +429,12 @@ bool BaseClientManual::Connect(const TCHAR * hostName, const TCHAR * port)
 	}
 
 	// Attempt to connect to an address until one succeeds
-	for(m_ptr=m_result; m_ptr != NULL ;m_ptr=m_ptr->ai_next) {
+	struct addrinfo *iPtr=0;
+	for(iPtr=m_result; iPtr != NULL ;iPtr=iPtr->ai_next) {
 
 		// Create a SOCKET for connecting to server
-		m_connectSocket = socket(m_ptr->ai_family, m_ptr->ai_socktype, 
-			m_ptr->ai_protocol);
+		m_connectSocket = socket(iPtr->ai_family, iPtr->ai_socktype, 
+			iPtr->ai_protocol);
 		if (m_connectSocket == INVALID_SOCKET) {
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Socket failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			cleanUpClient();
@@ -385,7 +442,7 @@ bool BaseClientManual::Connect(const TCHAR * hostName, const TCHAR * port)
 		}
 
 		// Connect to server.
-		iResult = connect( m_connectSocket, m_ptr->ai_addr, static_cast<int>(m_ptr->ai_addrlen));
+		iResult = connect( m_connectSocket, iPtr->ai_addr, static_cast<int>(iPtr->ai_addrlen));
 		if (iResult == SOCKET_ERROR) {
 			closesocket(m_connectSocket);
 			m_connectSocket = INVALID_SOCKET;

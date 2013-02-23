@@ -77,9 +77,10 @@ BasePacketParser & BasePacketParser::operator=(const BasePacketParser&b)
 {
 	if(this!=&b)
 	{
-
 		resetParser();
+
 		BaseServerObject::operator =(b);
+
 		m_threadStopEvent=b.m_threadStopEvent;
 		m_owner=b.m_owner;
 		if(m_owner)

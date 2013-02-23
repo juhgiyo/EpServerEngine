@@ -38,6 +38,7 @@ ParserList & ParserList::operator=(const ParserList&b)
 	if(this!=&b)
 	{		
 		StopParse();
+
 		ServerObjectList::operator =(b);
 		SmartObject::operator =(b);
 		Thread::operator=(b);

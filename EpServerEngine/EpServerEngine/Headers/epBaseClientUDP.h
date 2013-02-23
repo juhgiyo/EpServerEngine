@@ -101,18 +101,8 @@ namespace epse{
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		BaseClientUDP & operator=(const BaseClientUDP&b)
-		{
-			if(this!=&b)
-			{				
-				epl::LockObj lock(m_generalLock);
-				BaseServerSendObject::operator =(b);
-				m_port=b.m_port;
-				m_hostName=b.m_hostName;
-				
-			}
-			return *this;
-		}
+		BaseClientUDP & operator=(const BaseClientUDP&b);
+		
 
 		/*!
 		Set the hostname for the server.
@@ -211,6 +201,10 @@ namespace epse{
 
 	private:
 		/*!
+		Rseet client
+		*/
+		void resetClient();
+		/*!
 		Actually set the hostname for the server.
 		@remark Cannot be changed while connected to server
 		@param[in] hostName The hostname to set.
@@ -259,8 +253,6 @@ namespace epse{
 		struct addrinfo *m_result;
 		/// internal variable2
 		struct addrinfo *m_ptr;
-		/// internal variable3
-		struct addrinfo m_hints;
 
 		/// send lock
 		epl::BaseLock *m_sendLock;

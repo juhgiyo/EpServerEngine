@@ -100,18 +100,8 @@ namespace epse{
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		BaseClient & operator=(const BaseClient&b)
-		{
-			if(this!=&b)
-			{
-				epl::LockObj lock(m_generalLock);
-				BaseServerSendObject::operator =(b);
-				m_port=b.m_port;
-				m_hostName=b.m_hostName;
-				
-			}
-			return *this;
-		}
+		BaseClient & operator=(const BaseClient&b);
+	
 
 		/*!
 		Set the hostname for the server.
@@ -203,6 +193,11 @@ namespace epse{
 		virtual BasePacketParser* createNewPacketParser()=0;
 
 	private:
+
+		/*!
+		Reset Client
+		*/
+		void resetClient();
 		/*!
 		Actually set the hostname for the server.
 		@remark Cannot be changed while connected to server
@@ -251,10 +246,6 @@ namespace epse{
 		SOCKET m_connectSocket;
 		/// internal variable
 		struct addrinfo *m_result;
-		/// internal variable2
-		struct addrinfo *m_ptr;
-		/// internal variable3
-		struct addrinfo m_hints;
 	
 		/// send lock
 		epl::BaseLock *m_sendLock;

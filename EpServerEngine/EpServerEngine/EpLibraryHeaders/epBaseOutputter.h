@@ -72,17 +72,8 @@ namespace epl
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		BaseOutputter & operator=(const BaseOutputter&b)
-		{
-			if(this!=&b)
-			{
-				Clear();
-				LockObj lock(m_nodeListLock);
-				m_list=b.m_list;
-				m_fileName=b.m_fileName;
-			}
-			return *this;
-		}
+		BaseOutputter & operator=(const BaseOutputter&b);
+		
 
 	protected:
 

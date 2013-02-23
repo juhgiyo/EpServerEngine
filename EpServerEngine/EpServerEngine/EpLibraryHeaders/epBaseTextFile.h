@@ -70,17 +70,8 @@ namespace epl{
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		BaseTextFile & operator=(const BaseTextFile&b)
-		{
-			if(this!=&b)
-			{
-				LockObj lock(m_baseTextLock);
-				m_encodingType=b.m_encodingType;
-				m_file=b.m_file;
-			}
-			return *this;
-		}
-
+		BaseTextFile & operator=(const BaseTextFile&b);
+		
 		/*!
 		Default Destructor
 

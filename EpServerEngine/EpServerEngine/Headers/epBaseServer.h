@@ -94,17 +94,8 @@ namespace epse{
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		BaseServer & operator=(const BaseServer&b)
-		{
-			if(this!=&b)
-			{
-				epl::LockObj lock(m_baseServerLock);
-				BaseServerObject::operator =(b);
-				m_port=b.m_port;
-				m_workerList=b.m_workerList;
-			}
-			return *this;
-		}
+		BaseServer & operator=(const BaseServer&b);
+		
 
 		/*!
 		Get Worker List
@@ -207,14 +198,18 @@ namespace epse{
 		void stopServer(bool fromInternal);
 
 	private:
+
+		/*!
+		Reset Server
+		*/
+		void resetServer();
+
 		/// port number
 		epl::EpString m_port;
 		/// listening socket
 		SOCKET m_listenSocket;
 		/// internal use variable
 		struct addrinfo *m_result;
-		/// internal use variable2
-		struct addrinfo m_hints;
 
 		/// general lock 
 		epl::BaseLock *m_baseServerLock;

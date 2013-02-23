@@ -67,25 +67,74 @@ BaseServerWorker::BaseServerWorker(const BaseServerWorker& b) : BaseServerSendOb
 		m_killConnectionLock=NULL;
 		break;
 	}
-	m_recvSizePacket=Packet(NULL,4);
-	m_parserList=NULL;
-	m_clientSocket=INVALID_SOCKET;
+	
+	m_clientSocket=b.m_clientSocket;
+	m_recvSizePacket=b.m_recvSizePacket;
+	m_parserList=b.m_parserList;
+	if(m_parserList)
+		m_parserList->RetainObj();
+	
 }
 
 BaseServerWorker::~BaseServerWorker()
 {
-	KillConnection();
-	if(m_parserList)
+	resetWorker();
+}
+
+BaseServerWorker & BaseServerWorker::operator=(const BaseServerWorker&b)
+{
+	if(this!=&b)
 	{
-		m_parserList->ReleaseObj();
+		resetWorker();
+
+		BaseServerSendObject::operator =(b);
+
+		m_clientSocket=INVALID_SOCKET;
+
+		m_lockPolicy=b.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_sendLock=EP_NEW epl::CriticalSectionEx();
+			m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_sendLock=EP_NEW epl::Mutex();
+			m_killConnectionLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_sendLock=EP_NEW epl::NoLock();
+			m_killConnectionLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_sendLock=NULL;
+			m_killConnectionLock=NULL;
+			break;
+		}
+		m_clientSocket=b.m_clientSocket;
+		m_recvSizePacket=b.m_recvSizePacket;
+		m_parserList=b.m_parserList;
+		if(m_parserList)
+			m_parserList->RetainObj();
 	}
-	
+	return *this;
+}
+
+void BaseServerWorker::resetWorker()
+{
+	KillConnection();
 	if(m_sendLock)
 		EP_DELETE m_sendLock;
 	if(m_killConnectionLock)
 		EP_DELETE m_killConnectionLock;
+	if(m_parserList)
+	{
+		m_parserList->ReleaseObj();
+	}
+	m_sendLock=NULL;
+	m_killConnectionLock=NULL;
+	m_parserList=NULL;
 }
-
 
 void BaseServerWorker::setClientSocket(const SOCKET& clientSocket )
 {
