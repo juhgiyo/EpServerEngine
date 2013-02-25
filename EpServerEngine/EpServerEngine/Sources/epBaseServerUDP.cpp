@@ -482,6 +482,7 @@ void BaseServerUDP::stopServer(bool fromInternal)
 		}
 		if(!fromInternal)
 			TerminateAfter(m_waitTime);
+	
 		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 		{
 			if(m_parserList)

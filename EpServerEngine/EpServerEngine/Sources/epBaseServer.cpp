@@ -403,16 +403,18 @@ void BaseServer::StopServer()
 
 void BaseServer::cleanUpServer()
 {
-	if(m_result)
-	{
-		freeaddrinfo(m_result);
-		m_result=NULL;
-	}
 	if(m_listenSocket!=INVALID_SOCKET)
 	{
 		closesocket(m_listenSocket);
 		m_listenSocket=INVALID_SOCKET;
 	}
+
+	if(m_result)
+	{
+		freeaddrinfo(m_result);
+		m_result=NULL;
+	}
+
 	WSACleanup();
 
 }

@@ -415,8 +415,8 @@ void BaseClientUDPManual::disconnect(bool fromInternal)
 		int iResult = shutdown(m_connectSocket, SD_SEND);
 		if (iResult == SOCKET_ERROR)
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
-		closesocket(m_connectSocket);
-		m_connectSocket = INVALID_SOCKET;
+// 		closesocket(m_connectSocket);
+//		m_connectSocket = INVALID_SOCKET;
 	}
 
 	cleanUpClient();

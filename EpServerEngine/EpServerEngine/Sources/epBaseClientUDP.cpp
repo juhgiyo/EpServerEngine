@@ -413,16 +413,18 @@ bool BaseClientUDP::IsConnected() const
 
 void BaseClientUDP::cleanUpClient()
 {
-	if(m_result)
-	{
-		freeaddrinfo(m_result);
-		m_result=NULL;
-	}
 	if(m_connectSocket!=INVALID_SOCKET)
 	{
 		closesocket(m_connectSocket);
 		m_connectSocket = INVALID_SOCKET;
 	}
+
+	if(m_result)
+	{
+		freeaddrinfo(m_result);
+		m_result=NULL;
+	}
+
 	m_maxPacketSize=0;
 	WSACleanup();
 
@@ -443,12 +445,13 @@ void BaseClientUDP::disconnect(bool fromInternal)
 			int iResult = shutdown(m_connectSocket, SD_SEND);
 			if (iResult == SOCKET_ERROR)
 				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
-			closesocket(m_connectSocket);
-			m_connectSocket = INVALID_SOCKET;
+//	 		closesocket(m_connectSocket);
+// 			m_connectSocket = INVALID_SOCKET;
 		}
 		
 		if(!fromInternal)
 			TerminateAfter(m_waitTime);
+
 		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 		{
 			m_parserList.StopParse();

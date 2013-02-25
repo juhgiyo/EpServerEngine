@@ -264,13 +264,18 @@ void BaseServerWorker::killConnection(bool fromInternal)
 			if (iResult == SOCKET_ERROR) {
 				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			}
-			closesocket(m_clientSocket);
-			m_clientSocket=INVALID_SOCKET;
+// 			closesocket(m_clientSocket);
+//			m_clientSocket = INVALID_SOCKET;
 		}
 		
 
 		if(!fromInternal)
 			TerminateAfter(m_waitTime);
+
+		if(m_clientSocket!=INVALID_SOCKET)
+			closesocket(m_clientSocket);
+		m_clientSocket=INVALID_SOCKET;
+
 		RemoveSelfFromContainer();
 		if(m_parserList)
 		{
