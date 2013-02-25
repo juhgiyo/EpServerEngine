@@ -39,7 +39,7 @@ ServerObjectRemover::ServerObjectRemover(unsigned int waitTimeMilliSec,epl::Lock
 		m_listLock=NULL;
 		break;
 	}
-	Start();
+	Start(TRHEAD_OPCODE_CREATE_SUSPEND);
 }
 ServerObjectRemover::ServerObjectRemover(const ServerObjectRemover& b):Thread(b),SmartObject(b)
 {
@@ -69,7 +69,7 @@ ServerObjectRemover::ServerObjectRemover(const ServerObjectRemover& b):Thread(b)
 	unSafeB.m_listLock->Unlock();
 
 	m_threadStopEvent.ResetEvent();
-	Start();
+	Start(TRHEAD_OPCODE_CREATE_SUSPEND);
 }
 ServerObjectRemover::~ServerObjectRemover()
 {
@@ -119,7 +119,7 @@ ServerObjectRemover & ServerObjectRemover::operator=(const ServerObjectRemover&b
 		unSafeB.m_listLock->Unlock();
 	
 		m_threadStopEvent.ResetEvent();
-		Start();
+		Start(TRHEAD_OPCODE_CREATE_SUSPEND);
 	}
 	return *this;
 }
