@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "epServerObjectList.h"
 using namespace epse;
 
-BaseServerObject::BaseServerObject(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):epl::SmartObject(lockPolicyType),epl::Thread(lockPolicyType)
+BaseServerObject::BaseServerObject(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):epl::SmartObject(lockPolicyType),epl::Thread(EP_THREAD_PRIORITY_NORMAL,lockPolicyType)
 {
 	m_waitTime=waitTimeMilliSec;
 	m_syncPolicy=SYNC_POLICY_ASYNCHRONOUS;

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-ParserList::ParserList(SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):ServerObjectList(waitTimeMilliSec,lockPolicyType),Thread(lockPolicyType),SmartObject(lockPolicyType)
+ParserList::ParserList(SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):ServerObjectList(waitTimeMilliSec,lockPolicyType),Thread(EP_THREAD_PRIORITY_NORMAL,lockPolicyType),SmartObject(lockPolicyType)
 {
 	m_syncPolicy=syncPolicy;
 	m_threadStopEvent=EventEx(false,false);
