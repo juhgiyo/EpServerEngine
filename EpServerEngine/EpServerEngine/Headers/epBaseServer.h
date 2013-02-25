@@ -70,10 +70,11 @@ namespace epse{
 		Initializes the Server
 		@param[in] port the port string
 		@param[in] syncPolicy Synchronous Policy
+		@param[in] maximumConnectionCount the maximum number of connection
 		@param[in] waitTimeMilliSec wait time for Server Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServer(const TCHAR * port=_T(DEFAULT_PORT),SyncPolicy syncPolicy=SYNC_POLICY_ASYNCHRONOUS,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseServer(const TCHAR * port=_T(DEFAULT_PORT),SyncPolicy syncPolicy=SYNC_POLICY_ASYNCHRONOUS, unsigned int maximumConnectionCount=CONNECTION_LIMIT_INFINITE,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -115,6 +116,22 @@ namespace epse{
 		@return the port number in string
 		*/
 		epl::EpTString GetPort() const;
+
+		/*!
+		Set the Maximum Connection Count for the server.
+		@param[in] maxConnectionCount The Maximum Connection Count to set.
+		@remark 0 means there is no limit
+		*/
+		void GetMaximumConnectionCount(unsigned int maxConnectionCount);
+
+		/*!
+		Get the Maximum Connection Count of server
+		@return The Maximum Connection Count
+		@remark 0 means there is no limit
+		*/
+		unsigned int GetMaximumConnectionCount() const;
+
+		
 
 		/*!
 		Set Synchronous Policy
@@ -171,6 +188,22 @@ namespace epse{
 		Listening Loop Function
 		*/
 		virtual void execute() ;
+
+		/*!
+		Kill connection from the client
+		@param[in] clientObj client object
+		@param[in] argCount the argument count
+		@param[in] args the argument list
+		*/
+		static void killConnection(BaseServerObject *clientObj,unsigned int argCount,va_list args);
+
+		/*!
+		Send packet to given client
+		@param[in] clientObj client object
+		@param[in] argCount the argument count
+		@param[in] args the argument list
+		*/
+		static void sendPacket(BaseServerObject *clientObj,unsigned int argCount,va_list args);
 	protected:
 
 		/*!
@@ -224,6 +257,9 @@ namespace epse{
 
 		/// Server Parser List
 		ParserList *m_parserList;
+
+		/// Maximum Connection Count
+		unsigned int m_maxConnectionCount;
 	
 	};
 }

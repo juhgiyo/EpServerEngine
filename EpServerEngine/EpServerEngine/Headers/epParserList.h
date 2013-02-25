@@ -86,13 +86,6 @@ namespace epse{
 
 		
 		/*!
-		Remove all object which its thread is terminated
-		@remark it also releases the object
-		@remark This function removes object only for SYNC_POLICY_ASYNCHRONOUS policy.
-		*/
-		virtual void RemoveTerminated();
-
-		/*!
 		Start Parse
 		@return true if successfully started otherwise false
 		*/

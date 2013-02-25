@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
+BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,SyncPolicy syncPolicy,unsigned int maximumParserCount,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -48,6 +48,7 @@ BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,SyncPoli
 	}
 	SetHostName(hostName);
 	SetPort(port);
+	m_maxParserCount=maximumParserCount;
 	m_connectSocket=INVALID_SOCKET;
 	m_result=0;
 	m_ptr=0;
@@ -90,6 +91,7 @@ BaseClientUDP::BaseClientUDP(const BaseClientUDP& b):BaseServerSendObject(b)
 	LockObj lock(b.m_generalLock);
 	m_hostName=b.m_hostName;
 	m_port=b.m_port;
+	m_maxParserCount=b.m_maxParserCount;
 	m_maxPacketSize=b.m_maxPacketSize;
 	m_parserList=b.m_parserList;
 
@@ -140,6 +142,7 @@ BaseClientUDP & BaseClientUDP::operator=(const BaseClientUDP&b)
 		LockObj lock(b.m_generalLock);
 		m_hostName=b.m_hostName;
 		m_port=b.m_port;
+		m_maxParserCount=b.m_maxParserCount;
 		m_maxPacketSize=b.m_maxPacketSize;
 		m_parserList=b.m_parserList;
 
@@ -231,6 +234,18 @@ epl::EpTString BaseClientUDP::GetPort() const
 	return m_port;
 #endif //defined(_UNICODE) || defined(UNICODE)
 
+}
+
+void BaseClientUDP::GetMaximumParserCount(unsigned int maxParserCount)
+{
+	epl::LockObj lock(m_generalLock);
+	m_maxParserCount=maxParserCount;
+
+}
+unsigned int BaseClientUDP::GetMaximumParserCount() const
+{
+	epl::LockObj lock(m_generalLock);
+	return m_maxParserCount;
 }
 
 bool BaseClientUDP::SetSyncPolicy(SyncPolicy syncPolicy)
@@ -477,6 +492,13 @@ void BaseClientUDP::execute()
 			m_parserList.Push(parser);
 			parser->ReleaseObj();
 			passPacket->ReleaseObj();
+			if(GetMaximumParserCount()!=PARSER_LIMIT_INFINITE)
+			{
+				while(m_parserList.Count()>=GetMaximumParserCount())
+				{
+					m_parserList.WaitForListSizeDecrease();
+				}
+			}
 		}
 		else if (iResult == 0)
 		{
@@ -487,7 +509,6 @@ void BaseClientUDP::execute()
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) recv failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			break;
 		}
-		m_parserList.RemoveTerminated();
 
 	} while (iResult > 0);
 	disconnect(true);

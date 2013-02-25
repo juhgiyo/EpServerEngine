@@ -35,7 +35,7 @@ An Interface for Server Object List.
 #include "epBaseServerObject.h"
 #include "epServerObjectRemover.h"
 #include <vector>
-
+#include "epPacket.h"
 
 using namespace std;
 
@@ -55,6 +55,8 @@ namespace epse{
 		friend class BaseServerWorker;
 		friend class BaseServerUDP;
 		friend class BaseServerWorkerUDP;
+		
+		friend class BaseServerObject;
 		/*!
 		Default Constructor
 
@@ -97,11 +99,14 @@ namespace epse{
 		*/
 		unsigned int GetWaitTime();
 
+		
+
 		/*!
-		Remove all object which its thread is terminated
+		Remove the given object from the list
+		@param[in] serverObj the server object to remove
 		@remark it also releases the object
 		*/
-		virtual void RemoveTerminated();
+		virtual bool Remove(const BaseServerObject* serverObj);
 
 	
 		/*!
@@ -121,6 +126,23 @@ namespace epse{
 		@return the list of the objects
 		*/
 		vector<BaseServerObject*> GetList() const;
+
+		/*!
+		Returns the number of element in the list
+		@return the number of element in the list
+		*/
+		unsigned int Count() const;
+
+		/*!
+		Do the action given by input function for all elements
+		@param DoFunc the action for each element
+		*/
+		void Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int argCount,va_list args),unsigned int argCount,...);
+
+		/*!
+		Wait infinitely for the list size to be decreased
+		*/
+		void WaitForListSizeDecrease();
 
 	protected:
 		/*!
@@ -143,6 +165,8 @@ namespace epse{
 
 		/// Object Remover
 		ServerObjectRemover m_serverObjRemover;
+
+		epl::EventEx m_sizeEvent;
 
 	};
 	

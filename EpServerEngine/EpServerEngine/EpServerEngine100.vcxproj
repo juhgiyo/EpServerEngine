@@ -343,6 +343,7 @@
     <ClCompile Include="Sources\epBaseClientManual.cpp" />
     <ClCompile Include="Sources\epBaseClientUDPManual.cpp" />
     <ClCompile Include="Sources\epBasePacketParser.cpp" />
+    <ClCompile Include="Sources\epBaseServerObject.cpp" />
     <ClCompile Include="Sources\epPacket.cpp" />
     <ClCompile Include="Sources\epParserList.cpp" />
     <ClCompile Include="Sources\epServerObjectList.cpp" />

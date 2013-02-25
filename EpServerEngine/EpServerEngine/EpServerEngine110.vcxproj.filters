@@ -99,6 +99,9 @@
     <ClCompile Include="Sources\epServerObjectRemover.cpp">
       <Filter>Source Files\ServerObject List</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\epBaseServerObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\epBasePacketParser.h">

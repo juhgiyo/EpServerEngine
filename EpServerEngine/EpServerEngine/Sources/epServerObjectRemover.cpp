@@ -161,17 +161,10 @@ void ServerObjectRemover::execute()
 			Suspend();
 			continue;
 		}
-		while(m_objectList.size())
-		{
-			BaseServerObject* serverObj=m_objectList.front();
-			m_objectList.pop();
-			m_listLock->Unlock();
-			serverObj->ReleaseObj();
-			m_listLock->Lock();				
-			
-			
-		}
+		BaseServerObject* serverObj=m_objectList.front();
+		m_objectList.pop();
 		m_listLock->Unlock();
+		serverObj->ReleaseObj();
 	}
 }
 

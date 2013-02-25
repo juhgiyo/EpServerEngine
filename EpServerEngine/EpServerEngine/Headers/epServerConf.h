@@ -76,6 +76,22 @@ namespace epse{
 		SYNC_POLICY_SYNCHRONOUS_BY_CLIENT,
 		
 	}SyncPolicy;
+
+	/*!
+	@def CONNECTION_LIMIT_INFINITE
+	@brief No limit for the connection count
+
+	Macro for No limit for the connection count.
+	*/
+	#define CONNECTION_LIMIT_INFINITE 0
+
+	/*!
+	@def PARSER_LIMIT_INFINITE
+	@brief No limit for the parser count
+
+	Macro for No limit for the parser count.
+	*/
+	#define PARSER_LIMIT_INFINITE 0
 	
 }
 #endif //__EP_SERVER_CONF_H__

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "epBaseServerWorkerUDP.h"
 #include "epBaseServerUDP.h"
 using namespace epse;
-BaseServerWorkerUDP::BaseServerWorkerUDP(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
+BaseServerWorkerUDP::BaseServerWorkerUDP(unsigned int maximumParserCount,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -43,6 +43,7 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(unsigned int waitTimeMilliSec,epl::Lock
 	m_packet=NULL;
 	m_server=NULL;
 	m_maxPacketSize=0;
+	m_maxParserCount=maximumParserCount;
 	m_parser=NULL;
 	m_parserList=NULL;
 }
@@ -70,6 +71,7 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(const BaseServerWorkerUDP& b) : BaseSer
 	}
 
 	m_maxPacketSize=b.m_maxPacketSize;
+	m_maxParserCount=b.m_maxParserCount;
 	m_server=b.m_server;
 	m_packet=b.m_packet;
 	if(m_packet)
@@ -117,6 +119,7 @@ BaseServerWorkerUDP & BaseServerWorkerUDP::operator=(const BaseServerWorkerUDP&b
 		}
 
 		m_maxPacketSize=b.m_maxPacketSize;
+		m_maxParserCount=b.m_maxParserCount;
 		m_server=b.m_server;
 		m_packet=b.m_packet;
 		if(m_packet)
@@ -152,6 +155,17 @@ void BaseServerWorkerUDP::resetWorker()
 	m_packet=NULL;
 	m_baseWorkerLock=NULL;
 	m_killConnectionLock=NULL;
+}
+void BaseServerWorkerUDP::GetMaximumParserCount(unsigned int maxParserCount)
+{
+	epl::LockObj lock(m_baseWorkerLock);
+	m_maxParserCount=maxParserCount;
+
+}
+unsigned int BaseServerWorkerUDP::GetMaximumParserCount() const
+{
+	epl::LockObj lock(m_baseWorkerLock);
+	return m_maxParserCount;
 }
 
 void BaseServerWorkerUDP::setPacketPassUnit(const PacketPassUnit &packetPassUnit)
@@ -204,6 +218,7 @@ void BaseServerWorkerUDP::killConnection(bool fromInternal)
 	{
 		if(!fromInternal)
 			TerminateAfter(m_waitTime);
+		RemoveSelfFromContainer();
 		if(m_parser)
 		{
 			m_parser->ReleaseObj();
@@ -256,6 +271,13 @@ void BaseServerWorkerUDP::execute()
 	{
 		if(m_parserList)
 		{
+			if(GetMaximumParserCount()!=PARSER_LIMIT_INFINITE)
+			{
+				while(m_parserList->Count()>=GetMaximumParserCount())
+				{
+					m_parserList->WaitForListSizeDecrease();
+				}
+			}
 			m_parserList->Push(m_parser);
 			m_parserList->ReleaseObj();
 			m_parserList=NULL;

@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "epBasePacketParser.h"
-
+//#include "epServerObjectList.h"
 using namespace epse;
 
 BasePacketParser::BasePacketParser(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):BaseServerObject(waitTimeMilliSec,lockPolicyType)
@@ -117,6 +117,7 @@ void BasePacketParser::resetParser()
 		if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
 			Resume();
 		TerminateAfter(m_waitTime);
+		RemoveSelfFromContainer();
 	}
 
 	m_generalLock->Lock();
@@ -128,10 +129,12 @@ void BasePacketParser::resetParser()
 
 	if(m_generalLock)
 		EP_DELETE m_generalLock;
-	
+	if(m_containerLock)
+		EP_DELETE m_containerLock;
 	m_owner=NULL;
 	m_packetReceived=NULL;
 	m_generalLock=NULL;
+	m_containerLock=NULL;
 }
 
 int BasePacketParser::Send(const Packet &packet)
@@ -150,6 +153,7 @@ void BasePacketParser::execute()
 	{
 		m_threadStopEvent.ResetEvent();
 		ParsePacket(*m_packetReceived);
+		RemoveSelfFromContainer();
 	}
 }
 
@@ -157,6 +161,7 @@ const Packet* BasePacketParser::GetPacketReceived()
 {
 	return m_packetReceived;
 }
+
 void BasePacketParser::setPacketPassUnit(const PacketPassUnit& packetPassUnit)
 {
 	epl::LockObj lock(m_generalLock);

@@ -41,7 +41,7 @@ namespace epse{
 	@brief A class for Base Server Object.
 	*/
 	class EP_SERVER_ENGINE BaseServerObject:public epl::SmartObject, protected epl::Thread{
-		friend class ServerObjectList;
+		
 	public:
 		/*!
 		Default Constructor
@@ -50,11 +50,8 @@ namespace epse{
 		@param[in] waitTimeMilliSec wait time for Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServerObject(unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY):epl::SmartObject(lockPolicyType),epl::Thread(lockPolicyType)
-		{
-			m_waitTime=waitTimeMilliSec;
-			m_syncPolicy=SYNC_POLICY_ASYNCHRONOUS;
-		}
+		BaseServerObject(unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+
 
 		/*!
 		Default Copy Constructor
@@ -62,53 +59,40 @@ namespace epse{
 		Initializes the Object
 		@param[in] b the second object
 		*/
-		BaseServerObject(const BaseServerObject& b):SmartObject(b),Thread(b)
-		{
-			m_waitTime=b.m_waitTime;
-			m_syncPolicy=b.m_syncPolicy;
-		}
+		BaseServerObject(const BaseServerObject& b);
 		/*!
 		Default Destructor
 
 		Destroy the Object
 		*/
-		virtual ~BaseServerObject(){}
+		virtual ~BaseServerObject();
 
 		/*!
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		BaseServerObject & operator=(const BaseServerObject&b)
-		{
-			if(this!=&b)
-			{
-				Thread::operator=(b);
-				SmartObject::operator =(b);
-				m_waitTime=b.m_waitTime;
-				m_syncPolicy=b.m_syncPolicy;
-			}
-			return *this;
-		}
-
+		BaseServerObject & operator=(const BaseServerObject&b);
+		
 		/*!
 		Set the wait time for the thread termination
 		@param[in] milliSec the time for waiting in millisecond
 		*/
-		virtual void SetWaitTime(unsigned int milliSec)
-		{
-			m_waitTime=milliSec;
-		}
-
+		virtual void SetWaitTime(unsigned int milliSec);
+		
 		/*!
 		Get the wait time for the parser thread termination
 		@return the current time for waiting in millisecond
 		*/
-		unsigned int GetWaitTime()
-		{
-			return m_waitTime;
-		}
+		unsigned int GetWaitTime();
+		
+
+
+		
 	private:
+		friend class ServerObjectList;
+		friend class ParserList;
+
 		friend class BaseClient;
 		friend class BaseServer;
 		friend class BaseServerWorker;
@@ -120,15 +104,34 @@ namespace epse{
 		Set Synchronous Policy
 		@param[in] syncPolicy the synchronous policy to set
 		*/
-		void setSyncPolicy(SyncPolicy syncPolicy)
-		{
-			m_syncPolicy=syncPolicy;
-		}
+		void setSyncPolicy(SyncPolicy syncPolicy);
+
+		/*!
+		Set Container
+		@param[in] container the new container for this object
+		*/
+		void setContainer(ServerObjectList *container);
+
 	protected:
+		/*!
+		Remove self from the container
+		@return true if successfully removed otherwise false
+		*/
+		bool RemoveSelfFromContainer();
+
 		/// Synchronous Policy
 		SyncPolicy m_syncPolicy;
+
+		/// Lock Policy
+		LockPolicy m_lockPolicy;
 		/// Wait Time in Milliseconds
 		unsigned int m_waitTime;
+
+		/// Container
+		ServerObjectList *m_container;
+
+		/// container lock
+		epl::BaseLock *m_containerLock;
 	};
 }
 

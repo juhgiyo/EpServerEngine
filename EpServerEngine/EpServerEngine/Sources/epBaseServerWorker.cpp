@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 using namespace epse;
-BaseServerWorker::BaseServerWorker(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
+BaseServerWorker::BaseServerWorker(unsigned int maximumParserCount,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -27,22 +27,27 @@ BaseServerWorker::BaseServerWorker(unsigned int waitTimeMilliSec,epl::LockPolicy
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
+		m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
 		m_killConnectionLock=EP_NEW epl::Mutex();
+		m_baseWorkerLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
 		m_killConnectionLock=EP_NEW epl::NoLock();
+		m_baseWorkerLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
 		m_killConnectionLock=NULL;
+		m_baseWorkerLock=NULL;
 		break;
 	}
 	m_recvSizePacket=Packet(NULL,4);
 	m_parserList=NULL;
+	m_maxParserCount=maximumParserCount;
 	m_clientSocket=INVALID_SOCKET;
 }
 BaseServerWorker::BaseServerWorker(const BaseServerWorker& b) : BaseServerSendObject(b)
@@ -53,21 +58,25 @@ BaseServerWorker::BaseServerWorker(const BaseServerWorker& b) : BaseServerSendOb
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
+		m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
 		m_killConnectionLock=EP_NEW epl::Mutex();
+		m_baseWorkerLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
 		m_killConnectionLock=EP_NEW epl::NoLock();
+		m_baseWorkerLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
 		m_killConnectionLock=NULL;
+		m_baseWorkerLock=NULL;
 		break;
 	}
-	
+	m_maxParserCount=b.m_maxParserCount;
 	m_clientSocket=b.m_clientSocket;
 	m_recvSizePacket=b.m_recvSizePacket;
 	m_parserList=b.m_parserList;
@@ -97,20 +106,25 @@ BaseServerWorker & BaseServerWorker::operator=(const BaseServerWorker&b)
 		case epl::LOCK_POLICY_CRITICALSECTION:
 			m_sendLock=EP_NEW epl::CriticalSectionEx();
 			m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
+			m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
 			m_sendLock=EP_NEW epl::Mutex();
 			m_killConnectionLock=EP_NEW epl::Mutex();
+			m_baseWorkerLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
 			m_sendLock=EP_NEW epl::NoLock();
 			m_killConnectionLock=EP_NEW epl::NoLock();
+			m_baseWorkerLock=EP_NEW epl::NoLock();
 			break;
 		default:
 			m_sendLock=NULL;
 			m_killConnectionLock=NULL;
+			m_baseWorkerLock=NULL;
 			break;
 		}
+		m_maxParserCount=b.m_maxParserCount;
 		m_clientSocket=b.m_clientSocket;
 		m_recvSizePacket=b.m_recvSizePacket;
 		m_parserList=b.m_parserList;
@@ -127,14 +141,30 @@ void BaseServerWorker::resetWorker()
 		EP_DELETE m_sendLock;
 	if(m_killConnectionLock)
 		EP_DELETE m_killConnectionLock;
+	if(m_baseWorkerLock)
+		EP_DELETE m_baseWorkerLock;
 	if(m_parserList)
 	{
 		m_parserList->ReleaseObj();
 	}
 	m_sendLock=NULL;
 	m_killConnectionLock=NULL;
+	m_baseWorkerLock=NULL;
 	m_parserList=NULL;
 }
+
+void BaseServerWorker::GetMaximumParserCount(unsigned int maxParserCount)
+{
+	epl::LockObj lock(m_baseWorkerLock);
+	m_maxParserCount=maxParserCount;
+
+}
+unsigned int BaseServerWorker::GetMaximumParserCount() const
+{
+	epl::LockObj lock(m_baseWorkerLock);
+	return m_maxParserCount;
+}
+
 
 void BaseServerWorker::setClientSocket(const SOCKET& clientSocket )
 {
@@ -241,6 +271,7 @@ void BaseServerWorker::killConnection(bool fromInternal)
 
 		if(!fromInternal)
 			TerminateAfter(m_waitTime);
+		RemoveSelfFromContainer();
 		if(m_parserList)
 		{
 			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
@@ -325,6 +356,13 @@ void BaseServerWorker::execute()
 				m_parserList->Push(parser);
 				parser->ReleaseObj();
 				recvPacket->ReleaseObj();
+				if(GetMaximumParserCount()!=PARSER_LIMIT_INFINITE)
+				{
+					while(m_parserList->Count()>=GetMaximumParserCount())
+					{
+						m_parserList->WaitForListSizeDecrease();
+					}
+				}
 			}
 			else if (iResult == 0)
 			{
@@ -337,7 +375,6 @@ void BaseServerWorker::execute()
 				recvPacket->ReleaseObj();
 				break;
 			}
-			m_parserList->RemoveTerminated();
 		}
 		else
 		{

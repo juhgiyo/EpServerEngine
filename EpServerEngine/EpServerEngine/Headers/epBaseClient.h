@@ -76,10 +76,11 @@ namespace epse{
 		@param[in] hostName the hostname string
 		@param[in] port the port string
 		@param[in] syncPolicy Synchronous Policy
+		@param[in] maximumParserCount the maximum number of parser
 		@param[in] waitTimeMilliSec wait time for Client Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseClient(const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),SyncPolicy syncPolicy=SYNC_POLICY_ASYNCHRONOUS,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseClient(const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),SyncPolicy syncPolicy=SYNC_POLICY_ASYNCHRONOUS,unsigned int maximumParserCount=PARSER_LIMIT_INFINITE,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -128,6 +129,20 @@ namespace epse{
 		@return the port number in string
 		*/
 		epl::EpTString GetPort() const;
+
+		/*!
+		Set the Maximum Parser Count for the server.
+		@param[in] maxParserCount The Maximum Parser Count to set.
+		@remark 0 means there is no limit
+		*/
+		void GetMaximumParserCount(unsigned int maxParserCount);
+
+		/*!
+		Get the Maximum Parser Parser of server
+		@return The Maximum Connection Count
+		@remark 0 means there is no limit
+		*/
+		unsigned int GetMaximumParserCount() const;
 
 		/*!
 		Set Synchronous Policy
@@ -262,6 +277,9 @@ namespace epse{
 
 		/// Parser list
 		ParserList m_parserList;
+
+		/// Maximum Parser Count
+		unsigned int m_maxParserCount;
 
 	};
 }

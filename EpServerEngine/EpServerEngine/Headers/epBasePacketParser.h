@@ -115,13 +115,14 @@ namespace epse
 		@return the packet received.
 		*/
 		const Packet* GetPacketReceived();
+
+
 		
 	protected:
 
 		/// Thread Stop Event
 		/// @remark if this is raised, the thread should quickly stop.
 		epl::EventEx m_threadStopEvent;
-
 
 	private:	
 		friend class BaseClient;
@@ -150,6 +151,8 @@ namespace epse
         /// Owner
 		BaseServerSendObject *m_owner;
 
+
+
 		/// Packet received
 		Packet * m_packetReceived;
 
@@ -158,6 +161,7 @@ namespace epse
 
 		/// general lock
 		epl::BaseLock *m_generalLock;
+
 	};
 
 }

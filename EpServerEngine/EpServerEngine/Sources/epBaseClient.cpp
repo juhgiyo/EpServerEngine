@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-BaseClient::BaseClient(const TCHAR * hostName, const TCHAR * port,SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType) :BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
+BaseClient::BaseClient(const TCHAR * hostName, const TCHAR * port,SyncPolicy syncPolicy,unsigned int maximumParserCount,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType) :BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -48,6 +48,7 @@ BaseClient::BaseClient(const TCHAR * hostName, const TCHAR * port,SyncPolicy syn
 	m_recvSizePacket=Packet(NULL,4);
 	SetHostName(hostName);
 	SetPort(port);
+	m_maxParserCount=maximumParserCount;
 	m_connectSocket=INVALID_SOCKET;
 	m_result=0;
 	setSyncPolicy(syncPolicy);
@@ -86,6 +87,7 @@ BaseClient::BaseClient(const BaseClient& b) :BaseServerSendObject(b)
 	LockObj lock(b.m_generalLock);
 	m_hostName=b.m_hostName;
 	m_port=b.m_port;
+	m_maxParserCount=b.m_maxParserCount;
 	m_recvSizePacket=b.m_recvSizePacket;
 	m_parserList=b.m_parserList;
 }
@@ -132,6 +134,7 @@ BaseClient & BaseClient::operator=(const BaseClient&b)
 		LockObj lock(b.m_generalLock);
 		m_hostName=b.m_hostName;
 		m_port=b.m_port;
+		m_maxParserCount=b.m_maxParserCount;
 		m_recvSizePacket=b.m_recvSizePacket;
 		m_parserList=b.m_parserList;
 
@@ -195,6 +198,18 @@ void BaseClient::setPort(const TCHAR *port)
 		m_port=port;
 #endif// defined(_UNICODE) || defined(UNICODE)
 	}
+}
+
+void BaseClient::GetMaximumParserCount(unsigned int maxParserCount)
+{
+	epl::LockObj lock(m_generalLock);
+	m_maxParserCount=maxParserCount;
+
+}
+unsigned int BaseClient::GetMaximumParserCount() const
+{
+	epl::LockObj lock(m_generalLock);
+	return m_maxParserCount;
 }
 
 epl::EpTString BaseClient::GetHostName() const
@@ -338,6 +353,13 @@ void BaseClient::execute()
 				m_parserList.Push(parser);
 				parser->ReleaseObj();
 				recvPacket->ReleaseObj();
+				if(GetMaximumParserCount()!=PARSER_LIMIT_INFINITE)
+				{
+					while(m_parserList.Count()>=GetMaximumParserCount())
+					{
+						m_parserList.WaitForListSizeDecrease();
+					}
+				}
 			}
 			else if (iResult == 0)
 			{
@@ -350,8 +372,6 @@ void BaseClient::execute()
 				recvPacket->ReleaseObj();
 				break;
 			}
-
-			m_parserList.RemoveTerminated();
 		}
 		else
 		{

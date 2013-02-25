@@ -66,10 +66,11 @@ namespace epse
 		Default Constructor
 
 		Initializes the Worker
+		@param[in] maximumParserCount the maximum number of parser
 		@param[in] waitTimeMilliSec wait time for Worker Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServerWorker(unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseServerWorker(unsigned int maximumParserCount=PARSER_LIMIT_INFINITE,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -102,6 +103,20 @@ namespace epse
 		@remark return -1 if error occurred
 		*/
 		virtual int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
+
+		/*!
+		Set the Maximum Parser Count for the server.
+		@param[in] maxParserCount The Maximum Parser Count to set.
+		@remark 0 means there is no limit
+		*/
+		void GetMaximumParserCount(unsigned int maxParserCount);
+
+		/*!
+		Get the Maximum Parser Parser of server
+		@return The Maximum Connection Count
+		@remark 0 means there is no limit
+		*/
+		unsigned int GetMaximumParserCount() const;
 
 		/*!
 		Get Packet Parser List
@@ -175,11 +190,17 @@ namespace epse
 		/// client socket
 		SOCKET m_clientSocket;
 
+		/// Owner
+		BaseServerSendObject *m_owner;
+
 		/// send lock
 		epl::BaseLock *m_sendLock;
 
 		/// kill connection lock
 		epl::BaseLock *m_killConnectionLock;
+
+		/// general lock 
+		epl::BaseLock *m_baseWorkerLock;
 		
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;
@@ -189,6 +210,9 @@ namespace epse
 
 		/// parser thread list
 		ParserList *m_parserList;
+
+		/// Maximum Parser Count
+		unsigned int m_maxParserCount;
 	};
 
 }

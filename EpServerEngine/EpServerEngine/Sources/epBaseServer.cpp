@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-BaseServer::BaseServer(const TCHAR *  port,SyncPolicy syncPolicy,unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType):BaseServerObject(waitTimeMilliSec,lockPolicyType)
+BaseServer::BaseServer(const TCHAR *  port,SyncPolicy syncPolicy, unsigned int maximumConnectionCount,unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType):BaseServerObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_workerList=ServerObjectList(waitTimeMilliSec,lockPolicyType);
 	m_lockPolicy=lockPolicyType;
@@ -47,6 +47,7 @@ BaseServer::BaseServer(const TCHAR *  port,SyncPolicy syncPolicy,unsigned int wa
 	m_listenSocket=INVALID_SOCKET;
 	m_result=0;
 	setSyncPolicy(syncPolicy);
+	m_maxConnectionCount=maximumConnectionCount;
 	m_parserList=NULL;
 }
 
@@ -78,10 +79,12 @@ BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 
 	LockObj lock(b.m_baseServerLock);
 	m_port=b.m_port;
+	m_maxConnectionCount=b.m_maxConnectionCount;
 	m_workerList=b.m_workerList;
 	m_parserList=b.m_parserList;
 	if(m_parserList)
 		m_parserList->RetainObj();
+	
 	
 }
 BaseServer::~BaseServer()
@@ -123,6 +126,7 @@ BaseServer & BaseServer::operator=(const BaseServer&b)
 		
 		LockObj lock(b.m_baseServerLock);
 		m_port=b.m_port;
+		m_maxConnectionCount=b.m_maxConnectionCount;
 		m_workerList=b.m_workerList;
 		m_parserList=b.m_parserList;
 		if(m_parserList)
@@ -183,6 +187,17 @@ epl::EpTString BaseServer::GetPort() const
 #endif //defined(_UNICODE) || defined(UNICODE)
 }
 
+void BaseServer::GetMaximumConnectionCount(unsigned int maxConnectionCount)
+{
+	epl::LockObj lock(m_baseServerLock);
+	m_maxConnectionCount=maxConnectionCount;
+
+}
+unsigned int BaseServer::GetMaximumConnectionCount() const
+{
+	epl::LockObj lock(m_baseServerLock);
+	return m_maxConnectionCount;
+}
 bool BaseServer::SetSyncPolicy(SyncPolicy syncPolicy)
 {
 	if(IsServerStarted())
@@ -240,8 +255,15 @@ void BaseServer::execute()
 			accWorker->Start();
 			m_workerList.Push(accWorker);
 			accWorker->ReleaseObj();
+			if(GetMaximumConnectionCount()!=CONNECTION_LIMIT_INFINITE)
+			{
+				while(m_workerList.Count()>=GetMaximumConnectionCount())
+				{
+					m_workerList.WaitForListSizeDecrease();
+				}
+			}
+			
 		}
-		m_workerList.RemoveTerminated();
 	}
 	stopServer(true);
 } 
@@ -333,15 +355,23 @@ bool BaseServer::StartServer(const TCHAR * port)
 
 }
 
+void BaseServer::sendPacket(BaseServerObject *clientObj,unsigned int argCount,va_list args)
+{
+	void *argPtr=NULL;
+	EP_ASSERT(argCount);
+	argPtr = va_arg (args, void *);
+	Packet *packetPtr=(Packet*)argPtr;
+	((BaseServerWorker*)(clientObj))->Send(*packetPtr);
+}
+
+void BaseServer::killConnection(BaseServerObject *clientObj,unsigned int argCount,va_list args)
+{
+	((BaseServerWorker*)(clientObj))->KillConnection();
+}
+
 void BaseServer::Broadcast(const Packet& packet)
 {
-	m_workerList.RemoveTerminated();
-	vector<BaseServerObject*>::iterator iter;
-	vector<BaseServerObject*> clientList=m_workerList.GetList();
-	for(iter=clientList.begin();iter!=clientList.end();iter++)
-	{
-		((BaseServerWorker*)(*iter))->Send(packet);
-	}
+	m_workerList.Do(sendPacket,1,&packet);
 }
 
 void BaseServer::ShutdownAllClient()
@@ -352,13 +382,7 @@ void BaseServer::ShutdownAllClient()
 
 void BaseServer::shutdownAllClient()
 {
-	m_workerList.RemoveTerminated();
-	vector<BaseServerObject*>::iterator iter;
-	vector<BaseServerObject*> clientList=m_workerList.GetList();
-	for(iter=clientList.begin();iter!=clientList.end();iter++)
-	{
-		((BaseServerWorker*)(*iter))->KillConnection();
-	}
+	m_workerList.Do(killConnection,0);
 	m_workerList.Clear();
 }
 
@@ -423,7 +447,6 @@ void BaseServer::stopServer(bool fromInternal)
 	}
 	
 	cleanUpServer();
-
 
 	m_disconnectLock->Unlock();
 }

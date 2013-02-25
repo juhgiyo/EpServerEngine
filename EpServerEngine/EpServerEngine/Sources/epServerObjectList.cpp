@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "epServerObjectList.h"
-
+#include "epPacket.h"
 using namespace epse;
 
 ServerObjectList::ServerObjectList(unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType)
@@ -24,6 +24,7 @@ ServerObjectList::ServerObjectList(unsigned int waitTimeMilliSec, epl::LockPolic
 	m_waitTime=waitTimeMilliSec;
 	m_lockPolicy=lockPolicyType;
 	m_serverObjRemover=ServerObjectRemover(waitTimeMilliSec,lockPolicyType);
+	m_sizeEvent=EventEx(false,false);
 	switch(lockPolicyType)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
@@ -43,6 +44,7 @@ ServerObjectList::ServerObjectList(unsigned int waitTimeMilliSec, epl::LockPolic
 
 ServerObjectList::ServerObjectList(const ServerObjectList& b)
 {
+	m_sizeEvent=b.m_sizeEvent;
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
 	{
@@ -68,6 +70,7 @@ ServerObjectList::ServerObjectList(const ServerObjectList& b)
 	for(iter=m_objectList.begin();iter!=m_objectList.end();)
 	{
 		(*iter)->RetainObj();
+		(*iter)->setContainer(this);
 
 	}
 	unSafeB.m_listLock->Unlock();
@@ -95,6 +98,7 @@ ServerObjectList & ServerObjectList::operator=(const ServerObjectList&b)
 	{
 		resetList();
 
+		m_sizeEvent=b.m_sizeEvent;
 		m_lockPolicy=b.m_lockPolicy;
 		switch(m_lockPolicy)
 		{
@@ -140,21 +144,23 @@ unsigned int ServerObjectList::GetWaitTime()
 	return m_waitTime;
 }
 
-void ServerObjectList::RemoveTerminated()
+
+bool ServerObjectList::Remove(const BaseServerObject* serverObj)
 {
 	epl::LockObj lock(m_listLock);
 	vector<BaseServerObject*>::iterator iter;
 	for(iter=m_objectList.begin();iter!=m_objectList.end();)
 	{
-		if((*iter)->GetStatus()==epl::Thread::THREAD_STATUS_TERMINATED)
+		if((*iter)==serverObj)
 		{
 			m_serverObjRemover.Push(*iter);
 			iter=m_objectList.erase(iter);
+			m_sizeEvent.SetEvent();
+			return true;
 		}
-		else
-			iter++;
-
 	}
+	return false;
+
 }
 
 void ServerObjectList::Clear()
@@ -166,9 +172,11 @@ void ServerObjectList::Clear()
 		if(*iter)
 		{
 			m_serverObjRemover.Push(*iter);
+			(*iter)->setContainer(NULL);
 		}
 	}
 	m_objectList.clear();
+	m_sizeEvent.SetEvent();
 }
 
 void ServerObjectList::Push(BaseServerObject* obj)
@@ -178,6 +186,7 @@ void ServerObjectList::Push(BaseServerObject* obj)
 	{
 		obj->RetainObj();
 		m_objectList.push_back(obj);
+		obj->setContainer(this);
 	}
 	
 }
@@ -186,4 +195,33 @@ vector<BaseServerObject*> ServerObjectList::GetList() const
 {
 	epl::LockObj lock(m_listLock);
 	return m_objectList;
+}
+
+unsigned int ServerObjectList::Count() const
+{
+	epl::LockObj lock(m_listLock);
+	return m_objectList.size();
+}
+
+void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int argCount,va_list args),unsigned int argCount,...)
+{
+	epl::LockObj lock(m_listLock);
+
+	void *argPtr=NULL;
+	va_list ap=NULL;
+	va_start (ap , argCount);         /* Initialize the argument list. */
+	vector<BaseServerObject*>::iterator iter;
+	for(iter=m_objectList.begin();iter!=m_objectList.end();iter++)
+	{
+		DoFunc(*iter,argCount,ap);
+	}
+
+	va_end (ap);                  /* Clean up. */
+
+	
+}
+
+void ServerObjectList::WaitForListSizeDecrease()
+{
+	m_sizeEvent.WaitForEvent();
 }

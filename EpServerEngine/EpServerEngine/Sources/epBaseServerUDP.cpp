@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace epse;
 
-BaseServerUDP::BaseServerUDP(const TCHAR *  port,SyncPolicy syncPolicy,unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType): BaseServerObject(waitTimeMilliSec,lockPolicyType)
+BaseServerUDP::BaseServerUDP(const TCHAR *  port,SyncPolicy syncPolicy, unsigned int maximumConnectionCount,unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType): BaseServerObject(waitTimeMilliSec,lockPolicyType)
 {
 	m_workerList=ServerObjectList(waitTimeMilliSec,lockPolicyType);
 	m_lockPolicy=lockPolicyType;
@@ -52,6 +52,7 @@ BaseServerUDP::BaseServerUDP(const TCHAR *  port,SyncPolicy syncPolicy,unsigned 
 	m_result=0;
 	m_maxPacketSize=0;
 	setSyncPolicy(syncPolicy);
+	m_maxConnectionCount=maximumConnectionCount;
 	m_parserList=NULL;
 
 }
@@ -89,6 +90,7 @@ BaseServerUDP::BaseServerUDP(const BaseServerUDP& b):BaseServerObject(b)
 	LockObj lock(b.m_baseServerLock);
 	m_maxPacketSize=b.m_maxPacketSize;
 	m_port=b.m_port;
+	m_maxConnectionCount=b.m_maxConnectionCount;
 	m_workerList=b.m_workerList;
 	m_parserList=b.m_parserList;
 	if(m_parserList)
@@ -137,6 +139,7 @@ BaseServerUDP & BaseServerUDP::operator=(const BaseServerUDP&b)
 		LockObj lock(b.m_baseServerLock);
 		m_maxPacketSize=b.m_maxPacketSize;
 		m_port=b.m_port;
+		m_maxConnectionCount=b.m_maxConnectionCount;
 		m_workerList=b.m_workerList;
 		m_parserList=b.m_parserList;
 		if(m_parserList)
@@ -200,6 +203,17 @@ epl::EpTString BaseServerUDP::GetPort() const
 }
 
 
+void BaseServerUDP::GetMaximumConnectionCount(unsigned int maxConnectionCount)
+{
+	epl::LockObj lock(m_baseServerLock);
+	m_maxConnectionCount=maxConnectionCount;
+
+}
+unsigned int BaseServerUDP::GetMaximumConnectionCount() const
+{
+	epl::LockObj lock(m_baseServerLock);
+	return m_maxConnectionCount;
+}
 
 unsigned int BaseServerUDP::GetMaxPacketByteSize() const
 {
@@ -287,9 +301,13 @@ void BaseServerUDP::execute()
 		m_workerList.Push(accWorker);
 		accWorker->ReleaseObj();
 		passPacket->ReleaseObj();
-
-		m_workerList.RemoveTerminated();
-
+		if(GetMaximumConnectionCount()!=CONNECTION_LIMIT_INFINITE)
+		{
+			while(m_workerList.Count()>=GetMaximumConnectionCount())
+			{
+				m_workerList.WaitForListSizeDecrease();
+			}
+		}
 	}
 	stopServer(true);
 } 
@@ -379,15 +397,23 @@ bool BaseServerUDP::StartServer(const TCHAR * port)
 
 }
 
+void BaseServerUDP::sendPacket(BaseServerObject *clientObj,unsigned int argCount,va_list args)
+{
+	void *argPtr=NULL;
+	EP_ASSERT(argCount);
+	argPtr = va_arg (args, void *);
+	Packet *packetPtr=(Packet*)argPtr;
+	((BaseServerWorkerUDP*)(clientObj))->Send(*packetPtr);
+}
+
+void BaseServerUDP::killConnection(BaseServerObject *clientObj,unsigned int argCount,va_list args)
+{
+	((BaseServerWorkerUDP*)(clientObj))->KillConnection();
+}
+
 void BaseServerUDP::Broadcast(const Packet& packet)
 {
-	m_workerList.RemoveTerminated();
-	vector<BaseServerObject*>::iterator iter;
-	vector<BaseServerObject*> clientList=m_workerList.GetList();
-	for(iter=clientList.begin();iter!=clientList.end();iter++)
-	{
-		((BaseServerWorkerUDP*)(*iter))->Send(packet);
-	}
+	m_workerList.Do(sendPacket,1,&packet);
 }
 
 
@@ -399,13 +425,7 @@ void BaseServerUDP::ShutdownAllClient()
 
 void BaseServerUDP::shutdownAllClient()
 {
-	m_workerList.RemoveTerminated();
-	vector<BaseServerObject*>::iterator iter;
-	vector<BaseServerObject*> clientList=m_workerList.GetList();
-	for(iter=clientList.begin();iter!=clientList.end();iter++)
-	{
-		((BaseServerWorkerUDP*)(*iter))->KillConnection();
-	}
+	m_workerList.Do(killConnection,0);
 	m_workerList.Clear();
 }
 bool BaseServerUDP::IsServerStarted() const
@@ -476,7 +496,6 @@ void BaseServerUDP::stopServer(bool fromInternal)
 	}
 	
 	cleanUpServer();
-
 	
 	m_disconnectLock->Unlock();
 }

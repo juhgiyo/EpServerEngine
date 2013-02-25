@@ -570,6 +570,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Sources\epBaseServerObject.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Sources\epPacket.cpp"
 				>
 			</File>

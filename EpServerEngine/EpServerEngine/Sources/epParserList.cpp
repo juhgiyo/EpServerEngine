@@ -70,6 +70,8 @@ void ParserList::execute()
 		}
 		BasePacketParser* parser=(BasePacketParser*)m_objectList.front();
 		m_objectList.erase(m_objectList.begin());
+		m_sizeEvent.SetEvent();
+		parser->setContainer(NULL);
 		m_listLock->Unlock();
 
 		parser->ParsePacket(*(parser->GetPacketReceived()));
@@ -77,12 +79,6 @@ void ParserList::execute()
 	}
 }
 
-void ParserList::RemoveTerminated()
-{
-	if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS)
-		ServerObjectList::RemoveTerminated();
-	return;
-}
 bool ParserList::StartParse()
 {
 	if(GetStatus()!=Thread::THREAD_STATUS_TERMINATED)
