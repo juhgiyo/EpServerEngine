@@ -183,6 +183,25 @@ namespace epse{
 		*/
 		void Broadcast(const Packet& packet);
 
+		/*!
+		Do the action given by input function for all workers
+		@param[in] DoFunc the action for each worker
+		@param[in] argCount the number of arguments
+		*/
+		void CommandWorkers(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,va_list),unsigned int argCount,...);
+
+		/*!
+		Find with given key by comparing worker with given function
+		@param[in] key the key to find
+		@param[in] EqualFunc the Compare Function
+		@return the found BaseServerObject
+		*/
+		template <typename T>
+		BaseServerObject  *FindWorker(T const & key, bool (__cdecl *EqualFunc)(T const &, const BaseServerObject *))
+		{
+			return m_workerList.Find(key,EqualFunc);
+		}
+
 	protected:
 		/*!
 		Return the new server worker.
@@ -245,19 +264,21 @@ namespace epse{
 		@param[in] args the argument list
 		*/
 		static void sendPacket(BaseServerObject *clientObj,unsigned int argCount,va_list args);
-	private:
+
 		/*!
 		Compare given clientSocket with BaseServerObject's socket
 		@param[in] clientSocket socket to compare
 		@param[in] obj the BaseServerObject pointer
 		@return true if same socket otherwise false
 		*/
-		static bool SocketCompare(sockaddr const & clientSocket, const BaseServerObject*obj );
+		static bool socketCompare(sockaddr const & clientSocket, const BaseServerObject*obj );
 
 		/*!
 		Reset Server
 		*/
 		void resetServer();
+
+	private:
 		/// port number
 		epl::EpString m_port;
 		/// listening socket

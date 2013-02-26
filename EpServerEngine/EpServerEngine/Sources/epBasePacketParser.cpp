@@ -117,7 +117,7 @@ void BasePacketParser::resetParser()
 		if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
 			Resume();
 		TerminateAfter(m_waitTime);
-		RemoveSelfFromContainer();
+		removeSelfFromContainer();
 	}
 
 	m_generalLock->Lock();
@@ -153,11 +153,16 @@ void BasePacketParser::execute()
 	{
 		m_threadStopEvent.ResetEvent();
 		ParsePacket(*m_packetReceived);
-		RemoveSelfFromContainer();
+		removeSelfFromContainer();
 	}
 }
 
-const Packet* BasePacketParser::GetPacketReceived()
+BaseServerSendObject *BasePacketParser::GetOwner() const
+{
+	return m_owner;
+}
+
+const Packet* BasePacketParser::GetPacketReceived() const
 {
 	return m_packetReceived;
 }

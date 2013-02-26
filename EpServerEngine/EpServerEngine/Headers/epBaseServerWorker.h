@@ -55,6 +55,8 @@ using namespace std;
 
 namespace epse
 {
+	class BaseServer;
+
 	/*! 
 	@class BaseServerWorker epBaseServerWorker.h
 	@brief A class for Base Server Worker.
@@ -135,6 +137,12 @@ namespace epse
 		*/
 		void KillConnection();
 
+		/*!
+		Get the owner object of this worker object.
+		@return the pointer to the owner object.
+		*/
+		BaseServer *GetOwner() const;
+
 	protected:
 		/*!
 		Return the new packet parser
@@ -154,9 +162,6 @@ namespace epse
 		*/
 		void setParserList(ParserList *parserList);
 	
-	
-	private:
-
 		/*!
 		Reset worker
 		*/
@@ -186,12 +191,20 @@ namespace epse
 		*/
 		void setClientSocket(const SOCKET& clientSocket );
 
+		/*!
+		Set the owner for the base server worker thread.
+		@param[in] owner The owner of this worker.
+		*/
+		void setOwner(BaseServer * owner );
+	
+	private:
 
+	
 		/// client socket
 		SOCKET m_clientSocket;
 
 		/// Owner
-		BaseServerSendObject *m_owner;
+		BaseServer *m_owner;
 
 		/// send lock
 		epl::BaseLock *m_sendLock;

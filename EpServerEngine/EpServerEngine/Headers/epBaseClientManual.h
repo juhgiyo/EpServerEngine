@@ -202,6 +202,7 @@ namespace epse{
 		*/
 		void disconnect(bool fromInternal);
 
+	private:
 		/// port
 		epl::EpString m_port;
 		/// hostname

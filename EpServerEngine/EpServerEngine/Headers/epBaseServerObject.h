@@ -92,6 +92,7 @@ namespace epse{
 	private:
 		friend class ServerObjectList;
 		friend class ParserList;
+		friend class BasePacketParser;
 
 		friend class BaseClient;
 		friend class BaseServer;
@@ -99,6 +100,7 @@ namespace epse{
 		friend class BaseClientUDP;
 		friend class BaseServerUDP;
 		friend class BaseServerWorkerUDP;
+
 
 		/*!
 		Set Synchronous Policy
@@ -112,12 +114,12 @@ namespace epse{
 		*/
 		void setContainer(ServerObjectList *container);
 
-	protected:
 		/*!
 		Remove self from the container
 		@return true if successfully removed otherwise false
 		*/
-		bool RemoveSelfFromContainer();
+		bool removeSelfFromContainer();
+	private:
 
 		/// Synchronous Policy
 		SyncPolicy m_syncPolicy;

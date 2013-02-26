@@ -252,6 +252,7 @@ void BaseServer::execute()
 			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 				accWorker->setParserList(m_parserList);
 			accWorker->setClientSocket(clientSocket);
+			accWorker->setOwner(this);
 			accWorker->Start();
 			m_workerList.Push(accWorker);
 			accWorker->ReleaseObj();
@@ -373,7 +374,14 @@ void BaseServer::Broadcast(const Packet& packet)
 {
 	m_workerList.Do(sendPacket,1,&packet);
 }
-
+void BaseServer::CommandWorkers(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,va_list),unsigned int argCount,...)
+{
+	void *argPtr=NULL;
+	va_list ap=NULL;
+	va_start (ap , argCount);         /* Initialize the argument list. */
+	m_workerList.Do(DoFunc,argCount,ap);
+	va_end (ap);                  /* Clean up. */
+}
 void BaseServer::ShutdownAllClient()
 {
 	epl::LockObj lock(m_baseServerLock);

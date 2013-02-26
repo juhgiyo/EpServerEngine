@@ -47,7 +47,7 @@ namespace epse{
 	*/
 	class EP_SERVER_ENGINE ServerObjectRemover:protected epl::Thread, protected SmartObject{
 
-	protected:
+	private:
 		friend class ServerObjectList;
 		friend class ParserList;
 		/*!
@@ -98,7 +98,7 @@ namespace epse{
 		*/
 		void Push(BaseServerObject* obj);
 
-	protected:
+	private:
 		/*!
 		Stop the Loop Function
 		*/
@@ -107,6 +107,7 @@ namespace epse{
 		Release Loop Function
 		*/
 		virtual void execute() ;
+	private:
 	
 		/// wait time in millisecond for terminating thread
 		unsigned int m_waitTime;

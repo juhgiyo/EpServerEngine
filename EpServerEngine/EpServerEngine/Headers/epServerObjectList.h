@@ -138,7 +138,15 @@ namespace epse{
 		@param[in] DoFunc the action for each element
 		@param[in] argCount the number of arguments
 		*/
-		void Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int argCount,va_list args),unsigned int argCount,...);
+		void Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,va_list),unsigned int argCount,...);
+
+		/*!
+		Do the action given by input function for all elements
+		@param[in] DoFunc the action for each element
+		@param[in] argCount the number of arguments
+		@param[in] args the argument list
+		*/
+		void Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,va_list),unsigned int argCount,va_list args);
 
 		/*!
 		Find with given key by comparing with given function

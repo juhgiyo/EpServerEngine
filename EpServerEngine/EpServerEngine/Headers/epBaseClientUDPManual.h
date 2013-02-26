@@ -208,6 +208,7 @@ namespace epse{
 		*/
 		void disconnect(bool fromInternal);
 
+	private:
 		/// Flag for connection
 		bool m_isConnected;
 		/// port

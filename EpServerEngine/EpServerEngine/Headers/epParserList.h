@@ -52,7 +52,7 @@ namespace epse{
 		friend class BaseServerWorker;
 		friend class BaseServerUDP;
 		friend class BaseServerWorkerUDP;
-	protected:
+	private:
 		/*!
 		Default Constructor
 
@@ -114,7 +114,6 @@ namespace epse{
 		virtual void execute() ;
 
 	private:
-
 
 		/// Synchronous Policy
 		SyncPolicy m_syncPolicy;

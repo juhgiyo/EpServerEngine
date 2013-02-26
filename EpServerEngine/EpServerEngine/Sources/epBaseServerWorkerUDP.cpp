@@ -243,6 +243,11 @@ bool BaseServerWorkerUDP::IsConnectionAlive() const
 	return (GetStatus()!=Thread::THREAD_STATUS_TERMINATED);
 }
 
+BaseServerUDP *BaseServerWorkerUDP::GetOwner() const
+{
+	return m_server;
+}
+
 void BaseServerWorkerUDP::KillConnection()
 {
 	epl::LockObj lock(m_baseWorkerLock);
@@ -269,7 +274,7 @@ void BaseServerWorkerUDP::killConnection(bool fromInternal)
 				Resume();
 			TerminateAfter(m_waitTime);
 		}
-		RemoveSelfFromContainer();
+		removeSelfFromContainer();
 		if(m_parserList)
 		{
 			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)

@@ -49,6 +49,7 @@ BaseServerWorker::BaseServerWorker(unsigned int maximumParserCount,unsigned int 
 	m_parserList=NULL;
 	m_maxParserCount=maximumParserCount;
 	m_clientSocket=INVALID_SOCKET;
+	m_owner=NULL;
 }
 BaseServerWorker::BaseServerWorker(const BaseServerWorker& b) : BaseServerSendObject(b)
 {
@@ -79,6 +80,7 @@ BaseServerWorker::BaseServerWorker(const BaseServerWorker& b) : BaseServerSendOb
 	m_maxParserCount=b.m_maxParserCount;
 	m_clientSocket=b.m_clientSocket;
 	m_recvSizePacket=b.m_recvSizePacket;
+	m_owner=b.m_owner;
 	m_parserList=b.m_parserList;
 	if(m_parserList)
 		m_parserList->RetainObj();
@@ -126,6 +128,7 @@ BaseServerWorker & BaseServerWorker::operator=(const BaseServerWorker&b)
 		}
 		m_maxParserCount=b.m_maxParserCount;
 		m_clientSocket=b.m_clientSocket;
+		m_owner=b.m_owner;
 		m_recvSizePacket=b.m_recvSizePacket;
 		m_parserList=b.m_parserList;
 		if(m_parserList)
@@ -151,6 +154,7 @@ void BaseServerWorker::resetWorker()
 	m_killConnectionLock=NULL;
 	m_baseWorkerLock=NULL;
 	m_parserList=NULL;
+	m_owner=NULL;
 }
 
 void BaseServerWorker::GetMaximumParserCount(unsigned int maxParserCount)
@@ -170,6 +174,12 @@ void BaseServerWorker::setClientSocket(const SOCKET& clientSocket )
 {
 	epl::LockObj lock(m_sendLock);
 	m_clientSocket=clientSocket;
+}
+
+void BaseServerWorker::setOwner(BaseServer * owner )
+{
+	epl::LockObj lock(m_sendLock);
+	m_owner=owner;
 }
 
 int BaseServerWorker::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
@@ -240,6 +250,11 @@ bool BaseServerWorker::IsConnectionAlive() const
 	return (GetStatus()==Thread::THREAD_STATUS_STARTED);
 }
 
+BaseServer *BaseServerWorker::GetOwner() const
+{
+	return m_owner;
+}
+
 void BaseServerWorker::KillConnection()
 {
 	epl::LockObj lock(m_sendLock);
@@ -249,6 +264,7 @@ void BaseServerWorker::KillConnection()
 	}
 	killConnection(false);
 }
+
 
 void BaseServerWorker::killConnection(bool fromInternal)
 {
@@ -278,7 +294,7 @@ void BaseServerWorker::killConnection(bool fromInternal)
 			closesocket(m_clientSocket);
 		m_clientSocket=INVALID_SOCKET;
 
-		RemoveSelfFromContainer();
+		removeSelfFromContainer();
 		if(m_parserList)
 		{
 			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)

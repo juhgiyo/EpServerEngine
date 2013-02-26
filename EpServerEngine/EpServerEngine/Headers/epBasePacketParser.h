@@ -84,37 +84,24 @@ namespace epse
 		int Send(const Packet &packet);
 
 		/*!
-		Get the owner object of this parser object.
-		@return the pointer to the owner object.
-		*/
-		BaseServerSendObject *GetOwnerObject() const
-		{
-			return m_owner;
-		}
-
-		/*!
 		Parse the given packet and do relevant operation
 		@remark  Subclasses must implement this
 		@param[in] packet the packet to parse
 		*/
 		virtual void ParsePacket(const Packet &packet)=0;
 
-		/*! 
-		@struct PacketPassUnit epBasePacketParser.h
-		@brief A class for Packet Passing Unit for Packet Parsing Thread.
+
+		/*!
+		Get the owner object of this parser object.
+		@return the pointer to the owner object.
 		*/
-		struct PacketPassUnit{
-			/// BaseServerWorkerEx Object
-			BaseServerSendObject *m_owner;
-			/// Packet to parse
-			Packet *m_packet;
-		};
+		BaseServerSendObject *GetOwner() const;
 
 		/*!
 		Return the packet received.
 		@return the packet received.
 		*/
-		const Packet* GetPacketReceived();
+		const Packet* GetPacketReceived() const;
 
 
 		
@@ -129,6 +116,18 @@ namespace epse
 		friend class BaseServerWorker;
 		friend class BaseClientUDP;
 		friend class BaseServerWorkerUDP;
+
+		/*! 
+		@struct PacketPassUnit epBasePacketParser.h
+		@brief A class for Packet Passing Unit for Packet Parsing Thread.
+		*/
+		struct PacketPassUnit{
+			/// BaseServerWorkerEx Object
+			BaseServerSendObject *m_owner;
+			/// Packet to parse
+			Packet *m_packet;
+		};
+
 		/*!
 		Set PacketPassUnit
 		@param[in] packetPassUnit PacketPassUnit to set
@@ -147,6 +146,7 @@ namespace epse
 		void resetParser();
 
 
+	private:
 
         /// Owner
 		BaseServerSendObject *m_owner;

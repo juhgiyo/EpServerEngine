@@ -203,7 +203,7 @@ unsigned int ServerObjectList::Count() const
 	return m_objectList.size();
 }
 
-void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int argCount,va_list args),unsigned int argCount,...)
+void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,va_list),unsigned int argCount,...)
 {
 	epl::LockObj lock(m_listLock);
 
@@ -217,8 +217,17 @@ void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int 
 	}
 
 	va_end (ap);                  /* Clean up. */
+}
 
-	
+void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,va_list),unsigned int argCount,va_list args)
+{
+	epl::LockObj lock(m_listLock);
+
+	vector<BaseServerObject*>::iterator iter;
+	for(iter=m_objectList.begin();iter!=m_objectList.end();iter++)
+	{
+		DoFunc(*iter,argCount,args);
+	}
 }
 
 

@@ -132,6 +132,13 @@ namespace epse
 		*/
 		void KillConnection();
 
+
+		/*!
+		Get the owner object of this worker object.
+		@return the pointer to the owner object.
+		*/
+		BaseServerUDP *GetOwner() const;
+
 		/*!
 		Get the maximum packet byte size
 		@return the maximum packet byte size
@@ -161,8 +168,6 @@ namespace epse
 		*/
 		void addPacket(Packet *packet);
 	
-	
-	private:
 		/*!
 		Reset worker
 		*/
@@ -200,6 +205,9 @@ namespace epse
 		@param[in] packetPassUnit PacketPassUnit to set
 		*/
 		void setPacketPassUnit(const PacketPassUnit& packetPassUnit);	
+
+	
+	private:
 	
 		/// client socket
 		sockaddr m_clientSocket;

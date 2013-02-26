@@ -257,7 +257,7 @@ vector<BaseServerObject*> BaseServerUDP::GetWorkerList() const
 	return m_workerList.GetList();
 }
 
-bool BaseServerUDP::SocketCompare(sockaddr const & clientSocket, const BaseServerObject*obj )
+bool BaseServerUDP::socketCompare(sockaddr const & clientSocket, const BaseServerObject*obj )
 {
 	BaseServerWorkerUDP *workerObj=(BaseServerWorkerUDP*)const_cast<BaseServerObject*>(obj);
 	if(clientSocket.sa_family==workerObj->m_clientSocket.sa_family)
@@ -295,7 +295,7 @@ void BaseServerUDP::execute()
 	{
 		int recvLength=recvfrom(m_listenSocket,packetData,length, 0,&clientSockAddr,&sockAddrSize);
 
-		BaseServerWorkerUDP *workerObj=(BaseServerWorkerUDP*)m_workerList.Find(clientSockAddr,SocketCompare);
+		BaseServerWorkerUDP *workerObj=(BaseServerWorkerUDP*)m_workerList.Find(clientSockAddr,socketCompare);
 		if(workerObj)
 		{
 			if(recvLength<=0)
@@ -445,7 +445,14 @@ void BaseServerUDP::Broadcast(const Packet& packet)
 {
 	m_workerList.Do(sendPacket,1,&packet);
 }
-
+void BaseServerUDP::CommandWorkers(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,va_list),unsigned int argCount,...)
+{
+	void *argPtr=NULL;
+	va_list ap=NULL;
+	va_start (ap , argCount);         /* Initialize the argument list. */
+	m_workerList.Do(DoFunc,argCount,ap);
+	va_end (ap);                  /* Clean up. */
+}
 
 void BaseServerUDP::ShutdownAllClient()
 {

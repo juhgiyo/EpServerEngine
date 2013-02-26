@@ -110,7 +110,7 @@ void BaseServerObject::setContainer(ServerObjectList *container)
 	LockObj lock(m_containerLock);
 	m_container=container;
 }
-bool BaseServerObject::RemoveSelfFromContainer()
+bool BaseServerObject::removeSelfFromContainer()
 {
 	LockObj lock(m_containerLock);
 	bool ret=false;

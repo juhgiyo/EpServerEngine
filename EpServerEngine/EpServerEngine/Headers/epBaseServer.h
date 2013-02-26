@@ -176,6 +176,35 @@ namespace epse{
 		*/
 		void Broadcast(const Packet& packet);
 
+		/*!
+		Do the action given by input function for all workers
+		@param[in] DoFunc the action for each worker
+		@param[in] argCount the number of arguments
+		*/
+		void CommandWorkers(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,va_list),unsigned int argCount,...);
+
+		/*!
+		Find with given key by comparing worker with given function
+		@param[in] key the key to find
+		@param[in] EqualFunc the Compare Function
+		@return the found BaseServerObject
+		*/
+		template <typename T>
+		BaseServerObject  *FindWorker(T const & key, bool (__cdecl *EqualFunc)(T const &, const BaseServerObject *))
+		{
+			return m_workerList.Find(key,EqualFunc);
+		}
+
+	protected:
+
+		/*!
+		Return the new server worker.
+		@remark Sub-class should implement this to create new worker.
+		@remark Server will automatically release this worker.
+		@return the new server worker
+		*/
+		virtual BaseServerWorker* createNewWorker()=0;
+
 	private:
 		/*!
 		Actually set the port for the server.
@@ -204,15 +233,6 @@ namespace epse{
 		@param[in] args the argument list
 		*/
 		static void sendPacket(BaseServerObject *clientObj,unsigned int argCount,va_list args);
-	protected:
-
-		/*!
-		Return the new server worker.
-		@remark Sub-class should implement this to create new worker.
-		@remark Server will automatically release this worker.
-		@return the new server worker
-		*/
-		virtual BaseServerWorker* createNewWorker()=0;
 
 		/*!
 		Clean up the server initialization.
@@ -230,12 +250,14 @@ namespace epse{
 		*/
 		void stopServer(bool fromInternal);
 
-	private:
-
 		/*!
 		Reset Server
 		*/
 		void resetServer();
+
+
+	private:
+
 
 		/// port number
 		epl::EpString m_port;
