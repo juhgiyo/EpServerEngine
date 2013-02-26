@@ -136,6 +136,7 @@ namespace epse{
 		/*!
 		Do the action given by input function for all elements
 		@param[in] DoFunc the action for each element
+		@param[in] argCount the number of arguments
 		*/
 		void Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int argCount,va_list args),unsigned int argCount,...);
 
