@@ -116,6 +116,12 @@ namespace epse
 		virtual int Send(const Packet &packet);
 
 		/*!
+		Get Packet Parser List
+		@return the list of the packet parser
+		*/
+		vector<BaseServerObject*> GetPacketParserList() const;
+
+		/*!
 		Check if the connection is alive
 		@return true if the connection is alive otherwise false
 		*/
@@ -148,6 +154,12 @@ namespace epse
 		@param[in] parserList the parser list to set
 		*/
 		void setParserList(ParserList *parserList);
+
+		/*!
+		Add new packet received from client
+		@param[in] packet the new packet received from client
+		*/
+		void addPacket(Packet *packet);
 	
 	
 	private:
@@ -168,8 +180,6 @@ namespace epse
 		struct PacketPassUnit{
 			/// BaseServerUDP Object
 			BaseServerUDP *m_server;
-			/// Packet to parse
-			Packet *m_packet;
 			/// client socket
 			sockaddr m_clientSocket;
 		};
@@ -197,8 +207,8 @@ namespace epse
 		/// server object
 		BaseServerUDP *m_server;
 
-		/// packet received
-		Packet *m_packet;
+		/// Packet List
+		vector<Packet*> m_packetList;
 
 		/// Maximum UDP Datagram byte size
 		unsigned int m_maxPacketSize;
@@ -209,17 +219,21 @@ namespace epse
 		/// kill connection lock
 		epl::BaseLock *m_killConnectionLock;
 
+		/// list lock 
+		epl::BaseLock *m_listLock;
+
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;
-		
-		/// Parser pointer
-		BasePacketParser *m_parser;
 
 		/// parser thread list
 		ParserList *m_parserList;
 
 		/// Maximum Parser Count
 		unsigned int m_maxParserCount;
+
+		/// Thread Stop Event
+		/// @remark if this is raised, the thread should quickly stop.
+		epl::EventEx m_threadStopEvent;
 	};
 
 }

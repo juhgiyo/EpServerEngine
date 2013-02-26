@@ -221,6 +221,7 @@ void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int 
 	
 }
 
+
 void ServerObjectList::WaitForListSizeDecrease()
 {
 	m_sizeEvent.WaitForEvent();

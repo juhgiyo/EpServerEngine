@@ -257,6 +257,16 @@ vector<BaseServerObject*> BaseServerUDP::GetWorkerList() const
 	return m_workerList.GetList();
 }
 
+bool BaseServerUDP::SocketCompare(sockaddr const & clientSocket, const BaseServerObject*obj )
+{
+	BaseServerWorkerUDP *workerObj=(BaseServerWorkerUDP*)const_cast<BaseServerObject*>(obj);
+	if(clientSocket.sa_family==workerObj->m_clientSocket.sa_family)
+	{
+		if(System::Memcmp((void*)clientSocket.sa_data,(void*)workerObj->m_clientSocket.sa_data,sizeof(clientSocket.sa_data))==0)
+			return true;
+	}
+	return false;
+}
 void BaseServerUDP::execute()
 {
 	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
@@ -284,30 +294,50 @@ void BaseServerUDP::execute()
 	while(m_listenSocket!=INVALID_SOCKET)
 	{
 		int recvLength=recvfrom(m_listenSocket,packetData,length, 0,&clientSockAddr,&sockAddrSize);
-		if(recvLength<=0)
-			continue;
-		/// Create Worker Thread
-		Packet *passPacket=EP_NEW Packet(packetData,recvLength);
-		BaseServerWorkerUDP *accWorker=createNewWorker();
-		accWorker->setSyncPolicy(m_syncPolicy);
-		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
-			accWorker->setParserList(m_parserList);
-		BaseServerWorkerUDP::PacketPassUnit unit;
-		unit.m_clientSocket=clientSockAddr;
-		unit.m_packet=passPacket;
-		unit.m_server=this;
-		accWorker->setPacketPassUnit(unit);
-		accWorker->Start();
-		m_workerList.Push(accWorker);
-		accWorker->ReleaseObj();
-		passPacket->ReleaseObj();
-		if(GetMaximumConnectionCount()!=CONNECTION_LIMIT_INFINITE)
+
+		BaseServerWorkerUDP *workerObj=(BaseServerWorkerUDP*)m_workerList.Find(clientSockAddr,SocketCompare);
+		if(workerObj)
 		{
-			while(m_workerList.Count()>=GetMaximumConnectionCount())
+			if(recvLength<=0)
 			{
-				m_workerList.WaitForListSizeDecrease();
-			}
+				Packet *passPacket=EP_NEW Packet(packetData,0);
+				workerObj->addPacket(passPacket);
+				passPacket->ReleaseObj();
+				continue;
+			}	
+			Packet *passPacket=EP_NEW Packet(packetData,recvLength);
+			workerObj->addPacket(passPacket);
+			passPacket->ReleaseObj();
 		}
+		else
+		{
+			if(recvLength<=0)
+				continue;
+			if(GetMaximumConnectionCount()!=CONNECTION_LIMIT_INFINITE)
+			{
+				if(m_workerList.Count()>=GetMaximumConnectionCount())
+				{
+					continue;
+				}
+			}
+			/// Create Worker Thread
+			Packet *passPacket=EP_NEW Packet(packetData,recvLength);
+			BaseServerWorkerUDP *accWorker=createNewWorker();
+			accWorker->setSyncPolicy(m_syncPolicy);
+			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+				accWorker->setParserList(m_parserList);
+			BaseServerWorkerUDP::PacketPassUnit unit;
+			unit.m_clientSocket=clientSockAddr;
+			unit.m_server=this;
+			accWorker->setPacketPassUnit(unit);
+			accWorker->Start();
+			workerObj->addPacket(passPacket);
+			m_workerList.Push(accWorker);
+			accWorker->ReleaseObj();
+			passPacket->ReleaseObj();
+			
+		}
+		
 	}
 	stopServer(true);
 } 

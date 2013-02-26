@@ -231,7 +231,9 @@ int BaseServerWorker::Send(const Packet &packet, unsigned int waitTimeInMilliSec
 }
 vector<BaseServerObject*> BaseServerWorker::GetPacketParserList() const
 {
-	return m_parserList->GetList();
+	if(m_parserList)
+		return m_parserList->GetList();
+	return vector<BaseServerObject*>();
 }
 bool BaseServerWorker::IsConnectionAlive() const
 {

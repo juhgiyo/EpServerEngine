@@ -246,6 +246,13 @@ namespace epse{
 		*/
 		static void sendPacket(BaseServerObject *clientObj,unsigned int argCount,va_list args);
 	private:
+		/*!
+		Compare given clientSocket with BaseServerObject's socket
+		@param[in] clientSocket socket to compare
+		@param[in] obj the BaseServerObject pointer
+		@return true if same socket otherwise false
+		*/
+		static bool SocketCompare(sockaddr const & clientSocket, const BaseServerObject*obj );
 
 		/*!
 		Reset Server

@@ -135,9 +135,30 @@ namespace epse{
 
 		/*!
 		Do the action given by input function for all elements
-		@param DoFunc the action for each element
+		@param[in] DoFunc the action for each element
 		*/
 		void Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int argCount,va_list args),unsigned int argCount,...);
+
+		/*!
+		Find with given key by comparing with given function
+		@param[in] key the key to find
+		@param[in] EqualFunc the Compare Function
+		@return the found BaseServerObject
+		*/
+		template <typename T>
+		BaseServerObject  *Find(T const & key, bool (__cdecl *EqualFunc)(T const &, const BaseServerObject *))
+		{
+			epl::LockObj lock(m_listLock);
+			vector<BaseServerObject*>::iterator iter;
+			for(iter=m_objectList.begin();iter!=m_objectList.end();iter++)
+			{
+				if(EqualFunc(key,*iter))
+				{
+					return *iter;
+				}
+			}
+			return NULL;
+		}
 
 		/*!
 		Wait infinitely for the list size to be decreased
