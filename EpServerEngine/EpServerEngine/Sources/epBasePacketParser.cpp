@@ -137,12 +137,12 @@ void BasePacketParser::resetParser()
 	m_containerLock=NULL;
 }
 
-int BasePacketParser::Send(const Packet &packet)
+int BasePacketParser::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 {
 	epl::LockObj lock(m_generalLock);
 	if(m_owner)
 	{
-		return m_owner->Send(packet);
+		return m_owner->Send(packet,waitTimeInMilliSec);
 	}
 	return 0;
 }

@@ -359,10 +359,12 @@ bool BaseServer::StartServer(const TCHAR * port)
 void BaseServer::sendPacket(BaseServerObject *clientObj,unsigned int argCount,va_list args)
 {
 	void *argPtr=NULL;
+	unsigned int waitTime=WAITTIME_INIFINITE;
 	EP_ASSERT(argCount);
 	argPtr = va_arg (args, void *);
+	waitTime=va_arg(args,unsigned int);
 	Packet *packetPtr=(Packet*)argPtr;
-	((BaseServerWorker*)(clientObj))->Send(*packetPtr);
+	((BaseServerWorker*)(clientObj))->Send(*packetPtr,waitTime);
 }
 
 void BaseServer::killConnection(BaseServerObject *clientObj,unsigned int argCount,va_list args)
@@ -370,9 +372,9 @@ void BaseServer::killConnection(BaseServerObject *clientObj,unsigned int argCoun
 	((BaseServerWorker*)(clientObj))->KillConnection();
 }
 
-void BaseServer::Broadcast(const Packet& packet)
+void BaseServer::Broadcast(const Packet& packet, unsigned int waitTimeInMilliSec)
 {
-	m_workerList.Do(sendPacket,1,&packet);
+	m_workerList.Do(sendPacket,2,&packet,waitTimeInMilliSec);
 }
 void BaseServer::CommandWorkers(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,va_list),unsigned int argCount,...)
 {

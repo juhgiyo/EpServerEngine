@@ -84,10 +84,12 @@ namespace epse{
 
 		/*!
 		Send the given packet to relevance
+		@param[in] packet the packet to be sent
+		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
+		@return sent byte size
 		@remark  Subclasses must implement this
-		@param[in] packet the packet to send
 		*/
-		virtual int Send(const Packet &packet)=0;
+		virtual int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE)=0;
 	};
 }
 

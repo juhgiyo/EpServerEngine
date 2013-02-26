@@ -222,12 +222,12 @@ void BaseServerWorkerUDP::setPacketPassUnit(const PacketPassUnit &packetPassUnit
 	m_maxPacketSize=m_server->GetMaxPacketByteSize();
 }
 
-int BaseServerWorkerUDP::Send(const Packet &packet)
+int BaseServerWorkerUDP::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 {
 	epl::LockObj lock(m_baseWorkerLock);
 	EP_ASSERT(packet.GetPacketByteSize()<=m_maxPacketSize);
 	if(m_server)
-		return m_server->send(packet,m_clientSocket);
+		return m_server->send(packet,m_clientSocket,waitTimeInMilliSec);
 	return 0;
 }
 

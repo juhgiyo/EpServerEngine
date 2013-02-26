@@ -275,11 +275,42 @@ unsigned int BaseClientUDP::GetMaxPacketByteSize() const
 	return m_maxPacketSize;
 }
 
-int BaseClientUDP::Send(const Packet &packet)
+int BaseClientUDP::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 {
 	epl::LockObj lock(m_sendLock);
 	if(!IsConnected())
 		return 0;
+
+	// select routine
+	TIMEVAL	timeOutVal;
+	fd_set	fdSet;
+	int		retfdNum = 0;
+
+	FD_ZERO(&fdSet);
+	FD_SET(m_connectSocket, &fdSet);
+	if(waitTimeInMilliSec!=WAITTIME_INIFINITE)
+	{
+		// socket select time out setting
+		timeOutVal.tv_sec = (long)(waitTimeInMilliSec/1000); // Convert to seconds
+		timeOutVal.tv_usec = (long)(waitTimeInMilliSec%1000)*1000; // Convert remainders to micro-seconds
+		// socket select
+		// socket read select
+		retfdNum = select(0, NULL, &fdSet, NULL, &timeOutVal);
+	}
+	else
+	{
+		retfdNum = select(0, NULL, &fdSet, NULL, NULL);
+	}
+	if (retfdNum == SOCKET_ERROR)	// select failed
+	{
+		return retfdNum;
+	}
+	else if (retfdNum == 0)		    // select time-out
+	{
+		return retfdNum;
+	}
+
+	// send routine
 	int sentLength=0;
 	const char *packetData=packet.GetPacket();
 	int length=packet.GetPacketByteSize();

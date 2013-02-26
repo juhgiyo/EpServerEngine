@@ -79,9 +79,11 @@ namespace epse
 		/*!
 		Send the packet to the client
 		@param[in] packet the packet to be sent
+		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
 		@return sent byte size
+		@remark return -1 if error occurred
 		*/
-		int Send(const Packet &packet);
+		int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
 
 		/*!
 		Parse the given packet and do relevant operation

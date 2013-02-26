@@ -173,8 +173,9 @@ namespace epse{
 		/*!
 		Broadcast the packet
 		@param[in] packet
+		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond for each connection
 		*/
-		void Broadcast(const Packet& packet);
+		void Broadcast(const Packet& packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
 
 		/*!
 		Do the action given by input function for all workers

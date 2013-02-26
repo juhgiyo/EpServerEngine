@@ -180,8 +180,9 @@ namespace epse{
 		/*!
 		Broadcast the packet
 		@param[in] packet
+		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond for each connection
 		*/
-		void Broadcast(const Packet& packet);
+		void Broadcast(const Packet& packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
 
 		/*!
 		Do the action given by input function for all workers
@@ -228,9 +229,11 @@ namespace epse{
 		Send the packet to the client
 		@param[in] packet the packet to be sent
 		@param[in] clientSockAddr the client socket address, which the packet will be delivered
+		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
 		@return sent byte size
+		@remark return -1 if error occurred
 		*/
-		int send(const Packet &packet,const sockaddr &clientSockAddr);
+		int send(const Packet &packet,const sockaddr &clientSockAddr, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
 
 		/*!
 		Clean up the server initialization.
