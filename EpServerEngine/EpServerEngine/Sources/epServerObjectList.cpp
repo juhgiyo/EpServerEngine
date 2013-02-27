@@ -148,13 +148,12 @@ unsigned int ServerObjectList::GetWaitTime()
 bool ServerObjectList::Remove(const BaseServerObject* serverObj)
 {
 	epl::LockObj lock(m_listLock);
-	vector<BaseServerObject*>::iterator iter;
-	for(iter=m_objectList.begin();iter!=m_objectList.end();)
+	for(int idx=m_objectList.size()-1;idx>=0;idx--)
 	{
-		if((*iter)==serverObj)
+		if((m_objectList.at(idx))==serverObj)
 		{
-			m_serverObjRemover.Push(*iter);
-			iter=m_objectList.erase(iter);
+			m_serverObjRemover.Push(m_objectList.at(idx));
+			m_objectList.erase(m_objectList.begin()+idx);
 			m_sizeEvent.SetEvent();
 			return true;
 		}
@@ -210,10 +209,9 @@ void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,
 	void *argPtr=NULL;
 	va_list ap=NULL;
 	va_start (ap , argCount);         /* Initialize the argument list. */
-	vector<BaseServerObject*>::iterator iter;
-	for(iter=m_objectList.begin();iter!=m_objectList.end();iter++)
+	for(int idx=m_objectList.size()-1;idx>=0;idx--)
 	{
-		DoFunc(*iter,argCount,ap);
+		DoFunc(m_objectList.at(idx),argCount,ap);
 	}
 
 	va_end (ap);                  /* Clean up. */
@@ -223,10 +221,9 @@ void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,
 {
 	epl::LockObj lock(m_listLock);
 
-	vector<BaseServerObject*>::iterator iter;
-	for(iter=m_objectList.begin();iter!=m_objectList.end();iter++)
+	for(int idx=m_objectList.size()-1;idx>=0;idx--)
 	{
-		DoFunc(*iter,argCount,args);
+		DoFunc(m_objectList.at(idx),argCount,args);
 	}
 }
 

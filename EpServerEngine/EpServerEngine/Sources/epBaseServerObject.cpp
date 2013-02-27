@@ -66,13 +66,22 @@ BaseServerObject::BaseServerObject(const BaseServerObject& b):SmartObject(b),Thr
 }
 BaseServerObject::~BaseServerObject()
 {
+	if(m_containerLock)
+		EP_DELETE m_containerLock;
+	m_containerLock=NULL;
 }
 BaseServerObject & BaseServerObject::operator=(const BaseServerObject&b)
 {
 	if(this!=&b)
 	{
+		if(m_containerLock)
+			EP_DELETE m_containerLock;
+		m_containerLock=NULL;
+
+
 		Thread::operator=(b);
 		SmartObject::operator =(b);
+		
 		m_waitTime=b.m_waitTime;
 		m_syncPolicy=b.m_syncPolicy;
 		m_container=b.m_container;
