@@ -203,9 +203,10 @@ void ServerObjectRemover::execute()
 		{
 			m_listLock->Unlock();
 			Suspend();
+			m_listLock->Lock();
 		}
 
-		m_listLock->Lock();
+
 		while(m_objectList.size())
 		{
 			BaseServerObject* serverObj=m_objectList.front();
