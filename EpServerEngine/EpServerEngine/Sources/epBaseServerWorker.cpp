@@ -252,7 +252,7 @@ BaseServer *BaseServerWorker::GetOwner() const
 
 void BaseServerWorker::KillConnection()
 {
-	epl::LockObj lock(m_sendLock);
+	epl::LockObj lock(m_baseWorkerLock);
 	if(!IsConnectionAlive())
 	{
 		return;
@@ -295,16 +295,16 @@ void BaseServerWorker::killConnection()
 	if(IsConnectionAlive())
 	{
 		// No longer need client socket
-		if(m_clientSocket!=INVALID_SOCKET)
-		{
-			int iResult;
-			iResult = shutdown(m_clientSocket, SD_SEND);
-			if (iResult == SOCKET_ERROR) {
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-			}
- 			closesocket(m_clientSocket);
-			m_clientSocket = INVALID_SOCKET;
-		}
+// 		if(m_clientSocket!=INVALID_SOCKET)
+// 		{
+// 			int iResult;
+// 			iResult = shutdown(m_clientSocket, SD_SEND);
+// 			if (iResult == SOCKET_ERROR) {
+// 				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+// 			}
+//  			closesocket(m_clientSocket);
+// 			m_clientSocket = INVALID_SOCKET;
+// 		}
 	
 		if(m_parserList)
 		{

@@ -443,11 +443,11 @@ void BaseServer::stopServer()
 	if(IsServerStarted())
 	{
 		// No longer need server socket
-		if(m_listenSocket!=INVALID_SOCKET)
-		{
-			closesocket(m_listenSocket);
-			m_listenSocket=INVALID_SOCKET;
-		}
+// 		if(m_listenSocket!=INVALID_SOCKET)
+// 		{
+// 			closesocket(m_listenSocket);
+// 			m_listenSocket=INVALID_SOCKET;
+// 		}
 		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 		{
 			if(m_parserList)

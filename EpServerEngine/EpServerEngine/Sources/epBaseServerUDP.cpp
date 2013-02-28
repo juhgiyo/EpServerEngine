@@ -554,16 +554,16 @@ void BaseServerUDP::stopServer()
 	if(IsServerStarted())
 	{
 		// No longer need server socket
-		if(m_listenSocket!=INVALID_SOCKET)
-		{
-			int iResult;
-			iResult = shutdown(m_listenSocket, SD_SEND);
-			if (iResult == SOCKET_ERROR) {
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-			}
-			closesocket(m_listenSocket);
-			m_listenSocket=INVALID_SOCKET;
-		}
+// 		if(m_listenSocket!=INVALID_SOCKET)
+// 		{
+// 			int iResult;
+// 			iResult = shutdown(m_listenSocket, SD_SEND);
+// 			if (iResult == SOCKET_ERROR) {
+// 				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+// 			}
+// 			closesocket(m_listenSocket);
+// 			m_listenSocket=INVALID_SOCKET;
+// 		}
 	
 		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 		{
