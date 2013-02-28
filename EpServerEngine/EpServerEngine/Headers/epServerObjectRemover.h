@@ -115,6 +115,9 @@ namespace epse{
 		/// list lock
 		epl::BaseLock *m_listLock;
 
+		/// stop lock
+		epl::BaseLock *m_stopLock;
+
 		/// parser thread list
 		queue<BaseServerObject*> m_objectList;
 

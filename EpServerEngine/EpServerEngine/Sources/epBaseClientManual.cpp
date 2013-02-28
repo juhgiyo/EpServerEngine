@@ -17,6 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "epBaseClientManual.h"
 
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+
 using namespace epse;
 
 BaseClientManual::BaseClientManual(const TCHAR * hostName, const TCHAR * port,epl::LockPolicy lockPolicyType) :BaseServerSendObject(WAITTIME_INIFINITE,lockPolicyType)
@@ -27,22 +33,18 @@ BaseClientManual::BaseClientManual(const TCHAR * hostName, const TCHAR * port,ep
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_generalLock=EP_NEW epl::CriticalSectionEx();
-		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
 		m_generalLock=EP_NEW epl::Mutex();
-		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
 		m_generalLock=EP_NEW epl::NoLock();
-		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
 		m_generalLock=NULL;
-		m_disconnectLock=NULL;
 		break;
 	}
 	m_recvSizePacket=Packet(NULL,4);
@@ -65,22 +67,18 @@ BaseClientManual::BaseClientManual(const BaseClientManual& b) :BaseServerSendObj
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_generalLock=EP_NEW epl::CriticalSectionEx();
-		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
 		m_generalLock=EP_NEW epl::Mutex();
-		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
 		m_generalLock=EP_NEW epl::NoLock();
-		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
 		m_generalLock=NULL;
-		m_disconnectLock=NULL;
 		break;
 	}
 	LockObj lock(b.m_generalLock);
@@ -114,22 +112,18 @@ BaseClientManual & BaseClientManual::operator=(const BaseClientManual&b)
 		case epl::LOCK_POLICY_CRITICALSECTION:
 			m_sendLock=EP_NEW epl::CriticalSectionEx();
 			m_generalLock=EP_NEW epl::CriticalSectionEx();
-			m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
 			m_sendLock=EP_NEW epl::Mutex();
 			m_generalLock=EP_NEW epl::Mutex();
-			m_disconnectLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
 			m_sendLock=EP_NEW epl::NoLock();
 			m_generalLock=EP_NEW epl::NoLock();
-			m_disconnectLock=EP_NEW epl::NoLock();
 			break;
 		default:
 			m_sendLock=NULL;
 			m_generalLock=NULL;
-			m_disconnectLock=NULL;
 			break;
 		}
 		LockObj lock(b.m_generalLock);
@@ -147,13 +141,11 @@ void BaseClientManual::resetClient()
 
 	if(m_sendLock)
 		EP_DELETE m_sendLock;
+	m_sendLock=NULL;
 	if(m_generalLock)
 		EP_DELETE m_generalLock;
-	if(m_disconnectLock)
-		EP_DELETE m_disconnectLock;
-	m_sendLock=NULL;
 	m_generalLock=NULL;
-	m_disconnectLock=NULL;
+	
 }
 
 void  BaseClientManual::SetHostName(const TCHAR * hostName)
@@ -313,7 +305,7 @@ Packet *BaseClientManual::Receive(unsigned int waitTimeInMilliSec)
 	}
 	if (retfdNum == SOCKET_ERROR)	// select failed
 	{
-		disconnect(true);
+		disconnect();
 		m_isConnected=false;
 		return NULL;
 	}
@@ -338,21 +330,21 @@ Packet *BaseClientManual::Receive(unsigned int waitTimeInMilliSec)
 		{
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Connection closing...\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			recvPacket->ReleaseObj();
-			disconnect(true);
+			disconnect();
 			m_isConnected=false;
 			return NULL;
 		}
 		else  {
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) recv failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			recvPacket->ReleaseObj();
-			disconnect(true);
+			disconnect();
 			m_isConnected=false;
 			return NULL;
 		}
 	}
 	else
 	{
-		disconnect(true);
+		disconnect();
 		m_isConnected=false;
 		return NULL;
 	}
@@ -485,14 +477,8 @@ void BaseClientManual::cleanUpClient()
 
 }
 
-void BaseClientManual::disconnect(bool fromInternal)
+void BaseClientManual::disconnect()
 {
-	if(!m_disconnectLock->TryLock())
-	{
-		return;
-	}
-
-	
 	if(m_connectSocket!=INVALID_SOCKET)
 	{
 		// shutdown the connection since no more data will be sent
@@ -500,14 +486,12 @@ void BaseClientManual::disconnect(bool fromInternal)
 		if (iResult == SOCKET_ERROR) {
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
 		}
-// 		closesocket(m_connectSocket);
-// 		m_connectSocket = INVALID_SOCKET;
+ 		closesocket(m_connectSocket);
+ 		m_connectSocket = INVALID_SOCKET;
 
 	}
-
 	cleanUpClient();
 	m_isConnected=false;	
-	m_disconnectLock->Unlock();
 }
 
 void BaseClientManual::Disconnect()
@@ -517,7 +501,7 @@ void BaseClientManual::Disconnect()
 	{
 		return;
 	}
-	disconnect(false);
+	disconnect();
 }
 
 

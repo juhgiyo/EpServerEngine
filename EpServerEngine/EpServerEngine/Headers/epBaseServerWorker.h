@@ -168,9 +168,8 @@ namespace epse
 		void resetWorker();
 		/*!
 		Actually Kill the connection
-		@param[in] fromInternal flag to check if the call is from internal or not
 		*/
-		void killConnection(bool fromInternal);
+		void killConnection();
 
 		/*!
 		thread loop function
@@ -208,9 +207,6 @@ namespace epse
 
 		/// send lock
 		epl::BaseLock *m_sendLock;
-
-		/// kill connection lock
-		epl::BaseLock *m_killConnectionLock;
 
 		/// general lock 
 		epl::BaseLock *m_baseWorkerLock;

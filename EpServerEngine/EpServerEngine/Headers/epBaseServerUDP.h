@@ -248,9 +248,8 @@ namespace epse{
 
 		/*!
 		Actually Stop the server
-		@param[in] fromInternal flag to check if the call is from internal or not
 		*/
-		void stopServer(bool fromInternal);
+		void stopServer();
 
 		/*!
 		Kill connection from the client
@@ -296,8 +295,7 @@ namespace epse{
 		epl::BaseLock *m_baseServerLock;
 		/// send lock
 		epl::BaseLock *m_sendLock;
-		/// disconnect lock
-		epl::BaseLock *m_disconnectLock;
+
 
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;

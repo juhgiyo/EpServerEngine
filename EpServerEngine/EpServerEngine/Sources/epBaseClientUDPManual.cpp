@@ -17,6 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "epBaseClientUDPManual.h"
 
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+
 
 using namespace epse;
 
@@ -28,22 +34,18 @@ BaseClientUDPManual::BaseClientUDPManual(const TCHAR * hostName, const TCHAR * p
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_generalLock=EP_NEW epl::CriticalSectionEx();
-		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
 		m_generalLock=EP_NEW epl::Mutex();
-		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
 		m_generalLock=EP_NEW epl::NoLock();
-		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
 		m_generalLock=NULL;
-		m_disconnectLock=NULL;
 		break;
 	}
 	SetHostName(hostName);
@@ -69,22 +71,18 @@ BaseClientUDPManual::BaseClientUDPManual(const BaseClientUDPManual& b):BaseServe
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_generalLock=EP_NEW epl::CriticalSectionEx();
-		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
 		m_generalLock=EP_NEW epl::Mutex();
-		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
 		m_generalLock=EP_NEW epl::NoLock();
-		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
 		m_generalLock=NULL;
-		m_disconnectLock=NULL;
 		break;
 	}
 
@@ -118,22 +116,18 @@ BaseClientUDPManual & BaseClientUDPManual::operator=(const BaseClientUDPManual&b
 		case epl::LOCK_POLICY_CRITICALSECTION:
 			m_sendLock=EP_NEW epl::CriticalSectionEx();
 			m_generalLock=EP_NEW epl::CriticalSectionEx();
-			m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
 			m_sendLock=EP_NEW epl::Mutex();
 			m_generalLock=EP_NEW epl::Mutex();
-			m_disconnectLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
 			m_sendLock=EP_NEW epl::NoLock();
 			m_generalLock=EP_NEW epl::NoLock();
-			m_disconnectLock=EP_NEW epl::NoLock();
 			break;
 		default:
 			m_sendLock=NULL;
 			m_generalLock=NULL;
-			m_disconnectLock=NULL;
 			break;
 		}
 
@@ -151,13 +145,10 @@ void BaseClientUDPManual::resetClient()
 
 	if(m_sendLock)
 		EP_DELETE m_sendLock;
+	m_sendLock=NULL;
 	if(m_generalLock)
 		EP_DELETE m_generalLock;
-	if(m_disconnectLock)
-		EP_DELETE m_disconnectLock;
-	m_sendLock=NULL;
 	m_generalLock=NULL;
-	m_disconnectLock=NULL;
 }
 
 void  BaseClientUDPManual::SetHostName(const TCHAR * hostName)
@@ -306,13 +297,13 @@ Packet *BaseClientUDPManual::Receive()
 	else if (iResult == 0)
 	{
 		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Connection closing...\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-		disconnect(true);
+		disconnect();
 		m_isConnected=false;
 		return NULL;
 	}
 	else  {
 		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) recv failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-		disconnect(true);
+		disconnect();
 		m_isConnected=false;
 		return NULL;
 	}
@@ -433,26 +424,19 @@ void BaseClientUDPManual::cleanUpClient()
 
 }
 
-void BaseClientUDPManual::disconnect(bool fromInternal)
+void BaseClientUDPManual::disconnect()
 {
-	if(!m_disconnectLock->TryLock())
-	{
-		return;
-	}
-
-
 	if(m_connectSocket!=INVALID_SOCKET)
 	{
 		int iResult = shutdown(m_connectSocket, SD_SEND);
 		if (iResult == SOCKET_ERROR)
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
-// 		closesocket(m_connectSocket);
-//		m_connectSocket = INVALID_SOCKET;
+ 		closesocket(m_connectSocket);
+		m_connectSocket = INVALID_SOCKET;
 	}
 
 	cleanUpClient();
 	m_isConnected=false;
-	m_disconnectLock->Unlock();
 }
 
 void BaseClientUDPManual::Disconnect()
@@ -462,7 +446,7 @@ void BaseClientUDPManual::Disconnect()
 	{
 		return;
 	}
-	disconnect(false);
+	disconnect();
 }
 
 

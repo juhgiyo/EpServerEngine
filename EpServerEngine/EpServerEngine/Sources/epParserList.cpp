@@ -17,27 +17,71 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "epParserList.h"
 
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+
 using namespace epse;
 
 ParserList::ParserList(SyncPolicy syncPolicy,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):ServerObjectList(waitTimeMilliSec,lockPolicyType),Thread(EP_THREAD_PRIORITY_NORMAL,lockPolicyType),SmartObject(lockPolicyType)
 {
 	m_syncPolicy=syncPolicy;
 	m_threadStopEvent=EventEx(false,false);
+	m_lockPolicy=lockPolicyType;
+	switch(lockPolicyType)
+	{
+	case epl::LOCK_POLICY_CRITICALSECTION:
+		m_stopLock=EP_NEW epl::CriticalSectionEx();
+		break;
+	case epl::LOCK_POLICY_MUTEX:
+		m_stopLock=EP_NEW epl::Mutex();
+		break;
+	case epl::LOCK_POLICY_NONE:
+		m_stopLock=EP_NEW epl::NoLock();
+		break;
+	default:
+		m_stopLock=NULL;
+		break;
+	}
 }
 ParserList::ParserList(const ParserList& b):ServerObjectList(b),Thread(b),SmartObject(b)
 {
 	m_syncPolicy=b.m_syncPolicy;
 	m_threadStopEvent=b.m_threadStopEvent;
+	m_lockPolicy=b.m_lockPolicy;
+	switch(m_lockPolicy)
+	{
+	case epl::LOCK_POLICY_CRITICALSECTION:
+		m_stopLock=EP_NEW epl::CriticalSectionEx();
+		break;
+	case epl::LOCK_POLICY_MUTEX:
+		m_stopLock=EP_NEW epl::Mutex();
+		break;
+	case epl::LOCK_POLICY_NONE:
+		m_stopLock=EP_NEW epl::NoLock();
+		break;
+	default:
+		m_stopLock=NULL;
+		break;
+	}
 }
 ParserList::~ParserList()
 {
 	StopParse();
+	if(m_stopLock)
+		EP_DELETE m_stopLock;
+	m_stopLock=NULL;
 }
 ParserList & ParserList::operator=(const ParserList&b)
 {
 	if(this!=&b)
 	{		
 		StopParse();
+		if(m_stopLock)
+			EP_DELETE m_stopLock;
+		m_stopLock=NULL;
 
 		ServerObjectList::operator =(b);
 		SmartObject::operator =(b);
@@ -45,6 +89,23 @@ ParserList & ParserList::operator=(const ParserList&b)
 
 		m_syncPolicy=b.m_syncPolicy;
 		m_threadStopEvent=b.m_threadStopEvent;
+
+		m_lockPolicy=b.m_lockPolicy;
+		switch(m_lockPolicy)
+		{
+		case epl::LOCK_POLICY_CRITICALSECTION:
+			m_stopLock=EP_NEW epl::CriticalSectionEx();
+			break;
+		case epl::LOCK_POLICY_MUTEX:
+			m_stopLock=EP_NEW epl::Mutex();
+			break;
+		case epl::LOCK_POLICY_NONE:
+			m_stopLock=EP_NEW epl::NoLock();
+			break;
+		default:
+			m_stopLock=NULL;
+			break;
+		}
 
 	}
 	return *this;
@@ -89,12 +150,22 @@ bool ParserList::StartParse()
 }
 void ParserList::StopParse()
 {
-	if(GetStatus()==Thread::THREAD_STATUS_TERMINATED)
+	if(!m_stopLock->TryLock())
+	{
+		WaitFor(m_waitTime);
 		return;
+	}
+
+	if(GetStatus()==Thread::THREAD_STATUS_TERMINATED)
+	{
+		m_stopLock->Unlock();
+		return;
+	}
 	m_threadStopEvent.SetEvent();
 	if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
 		Resume();
 	TerminateAfter(m_waitTime);
+	m_stopLock->Unlock();
 }
 
 void ParserList::Push(BaseServerObject* obj)

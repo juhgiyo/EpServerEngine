@@ -57,4 +57,12 @@ An Interface for EP Server Engine.
 #include "epl.h"
 using namespace epl;
 
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#ifndef _CRTDBG_MAP_ALLOC
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif // _CRTDBG_MAP_ALLOC
+#endif //defined(_DEBUG)
+
 #endif //__EP_SERVER_ENGINE_H__

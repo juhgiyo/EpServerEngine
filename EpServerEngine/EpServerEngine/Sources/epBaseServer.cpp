@@ -17,6 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "epBaseServer.h"
 
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+
 
 using namespace epse;
 
@@ -28,19 +34,15 @@ BaseServer::BaseServer(const TCHAR *  port,SyncPolicy syncPolicy, unsigned int m
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_baseServerLock=EP_NEW epl::CriticalSectionEx();
-		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_baseServerLock=EP_NEW epl::Mutex();
-		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_baseServerLock=EP_NEW epl::NoLock();
-		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_baseServerLock=NULL;
-		m_disconnectLock=NULL;
 		break;
 	}
 	SetPort(port);
@@ -61,19 +63,15 @@ BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_baseServerLock=EP_NEW epl::CriticalSectionEx();
-		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_baseServerLock=EP_NEW epl::Mutex();
-		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_baseServerLock=EP_NEW epl::NoLock();
-		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_baseServerLock=NULL;
-		m_disconnectLock=NULL;
 		break;
 	}
 
@@ -108,19 +106,15 @@ BaseServer & BaseServer::operator=(const BaseServer&b)
 		{
 		case epl::LOCK_POLICY_CRITICALSECTION:
 			m_baseServerLock=EP_NEW epl::CriticalSectionEx();
-			m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
 			m_baseServerLock=EP_NEW epl::Mutex();
-			m_disconnectLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
 			m_baseServerLock=EP_NEW epl::NoLock();
-			m_disconnectLock=EP_NEW epl::NoLock();
 			break;
 		default:
 			m_baseServerLock=NULL;
-			m_disconnectLock=NULL;
 			break;
 		}
 		
@@ -140,17 +134,13 @@ void BaseServer::resetServer()
 {
 	StopServer();
 
+	if(m_parserList)
+		m_parserList->ReleaseObj();
+	m_parserList=NULL;
+
 	if(m_baseServerLock)
 		EP_DELETE m_baseServerLock;
-	if(m_disconnectLock)
-		EP_DELETE m_disconnectLock;
-	if(m_parserList)
-	{
-		m_parserList->ReleaseObj();
-	}
 	m_baseServerLock=NULL;
-	m_disconnectLock=NULL;
-	m_parserList=NULL;
 }
 
 void  BaseServer::SetPort(const TCHAR *  port)
@@ -232,7 +222,7 @@ void BaseServer::execute()
 				if(m_parserList)
 					m_parserList->ReleaseObj();
 				m_parserList=NULL;
-				stopServer(true);
+				stopServer();
 				return;
 			}
 		}
@@ -253,8 +243,8 @@ void BaseServer::execute()
 				accWorker->setParserList(m_parserList);
 			accWorker->setClientSocket(clientSocket);
 			accWorker->setOwner(this);
-			accWorker->Start();
 			m_workerList.Push(accWorker);
+			accWorker->Start();
 			accWorker->ReleaseObj();
 			if(GetMaximumConnectionCount()!=CONNECTION_LIMIT_INFINITE)
 			{
@@ -266,7 +256,8 @@ void BaseServer::execute()
 			
 		}
 	}
-	stopServer(true);
+	
+	stopServer();
 } 
 
 
@@ -408,7 +399,25 @@ void BaseServer::StopServer()
 	{
 		return;
 	}
-	stopServer(false);
+	// No longer need server socket
+	if(m_listenSocket!=INVALID_SOCKET)
+	{
+		closesocket(m_listenSocket);
+		m_listenSocket=INVALID_SOCKET;
+	}
+	TerminateAfter(m_waitTime);
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		if(m_parserList)
+		{
+			m_parserList->StopParse();
+			m_parserList->Clear();
+			m_parserList->ReleaseObj();
+			m_parserList=NULL;
+		}
+	}		
+	shutdownAllClient();
+	cleanUpServer();
 }
 
 void BaseServer::cleanUpServer()
@@ -429,12 +438,8 @@ void BaseServer::cleanUpServer()
 
 }
 
-void BaseServer::stopServer(bool fromInternal)
+void BaseServer::stopServer()
 {
-	if(!m_disconnectLock->TryLock())
-	{
-		return;
-	}
 	if(IsServerStarted())
 	{
 		// No longer need server socket
@@ -443,8 +448,6 @@ void BaseServer::stopServer(bool fromInternal)
 			closesocket(m_listenSocket);
 			m_listenSocket=INVALID_SOCKET;
 		}
-		if(!fromInternal)
-			TerminateAfter(m_waitTime);
 		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 		{
 			if(m_parserList)
@@ -459,7 +462,5 @@ void BaseServer::stopServer(bool fromInternal)
 	}
 	
 	cleanUpServer();
-
-	m_disconnectLock->Unlock();
 }
 

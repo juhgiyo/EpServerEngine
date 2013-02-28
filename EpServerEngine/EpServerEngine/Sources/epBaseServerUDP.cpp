@@ -18,6 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "epBaseServerUDP.h"
 
 
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+
 using namespace epse;
 
 BaseServerUDP::BaseServerUDP(const TCHAR *  port,SyncPolicy syncPolicy, unsigned int maximumConnectionCount,unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType): BaseServerObject(waitTimeMilliSec,lockPolicyType)
@@ -29,22 +35,18 @@ BaseServerUDP::BaseServerUDP(const TCHAR *  port,SyncPolicy syncPolicy, unsigned
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_baseServerLock=EP_NEW epl::CriticalSectionEx();
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
-		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_baseServerLock=EP_NEW epl::Mutex();
 		m_sendLock=EP_NEW epl::Mutex();
-		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_baseServerLock=EP_NEW epl::NoLock();
 		m_sendLock=EP_NEW epl::NoLock();
-		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_baseServerLock=NULL;
 		m_sendLock=NULL;
-		m_disconnectLock=NULL;
 		break;
 	}
 	SetPort(port);
@@ -68,22 +70,18 @@ BaseServerUDP::BaseServerUDP(const BaseServerUDP& b):BaseServerObject(b)
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_baseServerLock=EP_NEW epl::CriticalSectionEx();
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
-		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_baseServerLock=EP_NEW epl::Mutex();
 		m_sendLock=EP_NEW epl::Mutex();
-		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_baseServerLock=EP_NEW epl::NoLock();
 		m_sendLock=EP_NEW epl::NoLock();
-		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_baseServerLock=NULL;
 		m_sendLock=NULL;
-		m_disconnectLock=NULL;
 		break;
 	}
 
@@ -117,22 +115,18 @@ BaseServerUDP & BaseServerUDP::operator=(const BaseServerUDP&b)
 		case epl::LOCK_POLICY_CRITICALSECTION:
 			m_baseServerLock=EP_NEW epl::CriticalSectionEx();
 			m_sendLock=EP_NEW epl::CriticalSectionEx();
-			m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
 			m_baseServerLock=EP_NEW epl::Mutex();
 			m_sendLock=EP_NEW epl::Mutex();
-			m_disconnectLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
 			m_baseServerLock=EP_NEW epl::NoLock();
 			m_sendLock=EP_NEW epl::NoLock();
-			m_disconnectLock=EP_NEW epl::NoLock();
 			break;
 		default:
 			m_baseServerLock=NULL;
 			m_sendLock=NULL;
-			m_disconnectLock=NULL;
 			break;
 		}
 
@@ -151,20 +145,19 @@ BaseServerUDP & BaseServerUDP::operator=(const BaseServerUDP&b)
 void BaseServerUDP::resetServer()
 {
 	StopServer();
-	if(m_baseServerLock)
-		EP_DELETE m_baseServerLock;
+
+	if(m_parserList)
+		m_parserList->ReleaseObj();
+	m_parserList=NULL;
+
 	if(m_sendLock)
 		EP_DELETE m_sendLock;
-	if(m_disconnectLock)
-		EP_DELETE m_disconnectLock;
-	if(m_parserList)
-	{
-		m_parserList->ReleaseObj();
-	}
-	m_baseServerLock=NULL;
 	m_sendLock=NULL;
-	m_disconnectLock=NULL;
-	m_parserList=NULL;
+
+	if(m_baseServerLock)
+		EP_DELETE m_baseServerLock;
+	m_baseServerLock=NULL;
+
 }
 
 void  BaseServerUDP::SetPort(const TCHAR *  port)
@@ -311,7 +304,7 @@ void BaseServerUDP::execute()
 				if(m_parserList)
 					m_parserList->ReleaseObj();
 				m_parserList=NULL;
-				stopServer(true);
+				stopServer();
 				return;
 			}
 		}
@@ -361,16 +354,17 @@ void BaseServerUDP::execute()
 			unit.m_clientSocket=clientSockAddr;
 			unit.m_server=this;
 			accWorker->setPacketPassUnit(unit);
-			accWorker->Start();
-			workerObj->addPacket(passPacket);
 			m_workerList.Push(accWorker);
+			accWorker->Start();
+			accWorker->addPacket(passPacket);
 			accWorker->ReleaseObj();
 			passPacket->ReleaseObj();
 			
 		}
 		
 	}
-	stopServer(true);
+
+	stopServer();
 } 
 
 
@@ -379,7 +373,7 @@ bool BaseServerUDP::StartServer(const TCHAR * port)
 	epl::LockObj lock(m_baseServerLock);
 	if(IsServerStarted())
 		return true;
-	
+
 	if(port)
 	{
 		setPort(port);
@@ -511,7 +505,30 @@ void BaseServerUDP::StopServer()
 	{
 		return;
 	}
-	stopServer(false);
+	if(m_listenSocket!=INVALID_SOCKET)
+	{
+		int iResult;
+		iResult = shutdown(m_listenSocket, SD_SEND);
+		if (iResult == SOCKET_ERROR) {
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+		}
+		closesocket(m_listenSocket);
+		m_listenSocket=INVALID_SOCKET;
+	}
+	TerminateAfter(m_waitTime);
+
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		if(m_parserList)
+		{
+			m_parserList->StopParse();
+			m_parserList->Clear();
+			m_parserList->ReleaseObj();
+			m_parserList=NULL;
+		}
+	}
+	shutdownAllClient();
+	cleanUpServer();
 }
 
 
@@ -532,12 +549,8 @@ void BaseServerUDP::cleanUpServer()
 
 }
 
-void BaseServerUDP::stopServer(bool fromInternal)
+void BaseServerUDP::stopServer()
 {
-	if(!m_disconnectLock->TryLock())
-	{
-		return;
-	}
 	if(IsServerStarted())
 	{
 		// No longer need server socket
@@ -551,8 +564,6 @@ void BaseServerUDP::stopServer(bool fromInternal)
 			closesocket(m_listenSocket);
 			m_listenSocket=INVALID_SOCKET;
 		}
-		if(!fromInternal)
-			TerminateAfter(m_waitTime);
 	
 		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 		{
@@ -569,6 +580,5 @@ void BaseServerUDP::stopServer(bool fromInternal)
 	
 	cleanUpServer();
 	
-	m_disconnectLock->Unlock();
 }
 

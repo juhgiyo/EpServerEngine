@@ -18,6 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "epBaseClientUDP.h"
 
 
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+
 using namespace epse;
 
 BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,SyncPolicy syncPolicy,unsigned int maximumParserCount,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
@@ -28,22 +34,18 @@ BaseClientUDP::BaseClientUDP(const TCHAR * hostName, const TCHAR * port,SyncPoli
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_generalLock=EP_NEW epl::CriticalSectionEx();
-		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
 		m_generalLock=EP_NEW epl::Mutex();
-		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
 		m_generalLock=EP_NEW epl::NoLock();
-		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
 		m_generalLock=NULL;
-		m_disconnectLock=NULL;
 		break;
 	}
 	SetHostName(hostName);
@@ -69,22 +71,18 @@ BaseClientUDP::BaseClientUDP(const BaseClientUDP& b):BaseServerSendObject(b)
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_generalLock=EP_NEW epl::CriticalSectionEx();
-		m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
 		m_generalLock=EP_NEW epl::Mutex();
-		m_disconnectLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
 		m_generalLock=EP_NEW epl::NoLock();
-		m_disconnectLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
 		m_generalLock=NULL;
-		m_disconnectLock=NULL;
 		break;
 	}
 	
@@ -120,22 +118,18 @@ BaseClientUDP & BaseClientUDP::operator=(const BaseClientUDP&b)
 		case epl::LOCK_POLICY_CRITICALSECTION:
 			m_sendLock=EP_NEW epl::CriticalSectionEx();
 			m_generalLock=EP_NEW epl::CriticalSectionEx();
-			m_disconnectLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
 			m_sendLock=EP_NEW epl::Mutex();
 			m_generalLock=EP_NEW epl::Mutex();
-			m_disconnectLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
 			m_sendLock=EP_NEW epl::NoLock();
 			m_generalLock=EP_NEW epl::NoLock();
-			m_disconnectLock=EP_NEW epl::NoLock();
 			break;
 		default:
 			m_sendLock=NULL;
 			m_generalLock=NULL;
-			m_disconnectLock=NULL;
 			break;
 		}
 
@@ -157,13 +151,11 @@ void BaseClientUDP::resetClient()
 
 	if(m_sendLock)
 		EP_DELETE m_sendLock;
+	m_sendLock=NULL;
 	if(m_generalLock)
 		EP_DELETE m_generalLock;
-	if(m_disconnectLock)
-		EP_DELETE m_disconnectLock;
-	m_sendLock=NULL;
 	m_generalLock=NULL;
-	m_disconnectLock=NULL;
+	
 }
 void  BaseClientUDP::SetHostName(const TCHAR * hostName)
 {
@@ -426,7 +418,7 @@ bool BaseClientUDP::Connect(const TCHAR * hostName, const TCHAR * port)
 			if(!m_parserList.StartParse())
 			{
 				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to start to Global Parser!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-				disconnect(false);
+				disconnect();
 				return false;
 			}
 		}
@@ -461,14 +453,8 @@ void BaseClientUDP::cleanUpClient()
 
 }
 
-void BaseClientUDP::disconnect(bool fromInternal)
+void BaseClientUDP::disconnect()
 {
-	if(!m_disconnectLock->TryLock())
-	{
-		return;
-	}
-
-
 	if(IsConnected())
 	{
 		if(m_connectSocket!=INVALID_SOCKET)
@@ -476,13 +462,10 @@ void BaseClientUDP::disconnect(bool fromInternal)
 			int iResult = shutdown(m_connectSocket, SD_SEND);
 			if (iResult == SOCKET_ERROR)
 				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
-//	 		closesocket(m_connectSocket);
-// 			m_connectSocket = INVALID_SOCKET;
+	 		closesocket(m_connectSocket);
+ 			m_connectSocket = INVALID_SOCKET;
 		}
 		
-		if(!fromInternal)
-			TerminateAfter(m_waitTime);
-
 		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 		{
 			m_parserList.StopParse();
@@ -491,7 +474,6 @@ void BaseClientUDP::disconnect(bool fromInternal)
 	}
 	cleanUpClient();
 	
-	m_disconnectLock->Unlock();
 }
 
 void BaseClientUDP::Disconnect()
@@ -501,7 +483,24 @@ void BaseClientUDP::Disconnect()
 	{
 		return;
 	}
-	disconnect(false);
+	if(m_connectSocket!=INVALID_SOCKET)
+	{
+		int iResult = shutdown(m_connectSocket, SD_SEND);
+		if (iResult == SOCKET_ERROR)
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
+		closesocket(m_connectSocket);
+		m_connectSocket = INVALID_SOCKET;
+	}
+
+	TerminateAfter(m_waitTime);
+
+	if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
+	{
+		m_parserList.StopParse();
+	}
+	m_parserList.Clear();
+	cleanUpClient();
+
 }
 
 
@@ -545,5 +544,6 @@ void BaseClientUDP::execute()
 		}
 
 	} while (iResult > 0);
-	disconnect(true);
+	
+	disconnect();
 }

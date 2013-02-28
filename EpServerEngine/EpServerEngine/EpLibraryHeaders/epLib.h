@@ -53,13 +53,15 @@ An Interface for EpLibrary.
 #endif  //EP_LIBRARY_DLL_EXPORT
 
 
-#ifdef _DEBUG
+#if defined(_DEBUG)
 #define EP_ENABLE_PROFILE
 #define EP_ENABLE_LOG
+#define EP_ENABLE_CRTDBG
 
 /// Limits the usage of the synchronization objects<br/>
 /// Uncomment below line and recompile if you really want this functinality
 // #define ENABLE_POSSIBLE_DEADLOCK_CHECK
+
 #endif //_DEBUG
 
 #define WIDEN2(x) L ## x
@@ -78,5 +80,14 @@ An Interface for EpLibrary.
 #define NULL 0
 #endif
 
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#ifndef _CRTDBG_MAP_ALLOC
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif // _CRTDBG_MAP_ALLOC
+#endif //defined(_DEBUG)
+
 #include "epPlatform.h"
+
 #endif //__EP_LIB_H__

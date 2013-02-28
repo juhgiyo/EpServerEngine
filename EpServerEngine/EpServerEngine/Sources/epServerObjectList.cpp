@@ -17,6 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "epServerObjectList.h"
 #include "epPacket.h"
+
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+
 using namespace epse;
 
 ServerObjectList::ServerObjectList(unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType)
@@ -67,7 +74,7 @@ ServerObjectList::ServerObjectList(const ServerObjectList& b)
 	unSafeB.m_listLock->Lock();
 	m_objectList=b.m_objectList;
 	vector<BaseServerObject*>::iterator iter;
-	for(iter=m_objectList.begin();iter!=m_objectList.end();)
+	for(iter=m_objectList.begin();iter!=m_objectList.end();iter++)
 	{
 		(*iter)->RetainObj();
 		(*iter)->setContainer(this);
@@ -120,9 +127,10 @@ ServerObjectList & ServerObjectList::operator=(const ServerObjectList&b)
 		unSafeB.m_listLock->Lock();
 		m_objectList=b.m_objectList;
 		vector<BaseServerObject*>::iterator iter;
-		for(iter=m_objectList.begin();iter!=m_objectList.end();)
+		for(iter=m_objectList.begin();iter!=m_objectList.end();iter++)
 		{
 			(*iter)->RetainObj();
+			(*iter)->setContainer(this);
 
 		}
 		unSafeB.m_listLock->Unlock();
@@ -159,7 +167,6 @@ bool ServerObjectList::Remove(const BaseServerObject* serverObj)
 		}
 	}
 	return false;
-
 }
 
 void ServerObjectList::Clear()
@@ -170,8 +177,9 @@ void ServerObjectList::Clear()
 	{
 		if(*iter)
 		{
-			m_serverObjRemover.Push(*iter);
 			(*iter)->setContainer(NULL);
+			m_serverObjRemover.Push(*iter);
+			
 		}
 	}
 	m_objectList.clear();
@@ -204,14 +212,16 @@ unsigned int ServerObjectList::Count() const
 
 void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,va_list),unsigned int argCount,...)
 {
-	epl::LockObj lock(m_listLock);
+	m_listLock->Lock();
+	vector<BaseServerObject*> objList=m_objectList;
+	m_listLock->Unlock();
 
 	void *argPtr=NULL;
 	va_list ap=NULL;
 	va_start (ap , argCount);         /* Initialize the argument list. */
-	for(int idx=m_objectList.size()-1;idx>=0;idx--)
+	for(int idx=objList.size()-1;idx>=0;idx--)
 	{
-		DoFunc(m_objectList.at(idx),argCount,ap);
+		DoFunc(objList.at(idx),argCount,ap);
 	}
 
 	va_end (ap);                  /* Clean up. */
@@ -219,11 +229,13 @@ void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,
 
 void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,va_list),unsigned int argCount,va_list args)
 {
-	epl::LockObj lock(m_listLock);
+	m_listLock->Lock();
+	vector<BaseServerObject*> objList=m_objectList;
+	m_listLock->Unlock();
 
-	for(int idx=m_objectList.size()-1;idx>=0;idx--)
+	for(int idx=objList.size()-1;idx>=0;idx--)
 	{
-		DoFunc(m_objectList.at(idx),argCount,args);
+		DoFunc(objList.at(idx),argCount,args);
 	}
 }
 

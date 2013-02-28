@@ -18,6 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "epBaseServerWorker.h"
 
 
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+
 using namespace epse;
 BaseServerWorker::BaseServerWorker(unsigned int maximumParserCount,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
 {
@@ -26,22 +32,18 @@ BaseServerWorker::BaseServerWorker(unsigned int maximumParserCount,unsigned int 
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
-		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 		m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
-		m_killConnectionLock=EP_NEW epl::Mutex();
 		m_baseWorkerLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
-		m_killConnectionLock=EP_NEW epl::NoLock();
 		m_baseWorkerLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
-		m_killConnectionLock=NULL;
 		m_baseWorkerLock=NULL;
 		break;
 	}
@@ -58,22 +60,18 @@ BaseServerWorker::BaseServerWorker(const BaseServerWorker& b) : BaseServerSendOb
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
-		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 		m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
-		m_killConnectionLock=EP_NEW epl::Mutex();
 		m_baseWorkerLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
-		m_killConnectionLock=EP_NEW epl::NoLock();
 		m_baseWorkerLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
-		m_killConnectionLock=NULL;
 		m_baseWorkerLock=NULL;
 		break;
 	}
@@ -107,22 +105,18 @@ BaseServerWorker & BaseServerWorker::operator=(const BaseServerWorker&b)
 		{
 		case epl::LOCK_POLICY_CRITICALSECTION:
 			m_sendLock=EP_NEW epl::CriticalSectionEx();
-			m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 			m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
 			m_sendLock=EP_NEW epl::Mutex();
-			m_killConnectionLock=EP_NEW epl::Mutex();
 			m_baseWorkerLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
 			m_sendLock=EP_NEW epl::NoLock();
-			m_killConnectionLock=EP_NEW epl::NoLock();
 			m_baseWorkerLock=EP_NEW epl::NoLock();
 			break;
 		default:
 			m_sendLock=NULL;
-			m_killConnectionLock=NULL;
 			m_baseWorkerLock=NULL;
 			break;
 		}
@@ -140,20 +134,21 @@ BaseServerWorker & BaseServerWorker::operator=(const BaseServerWorker&b)
 void BaseServerWorker::resetWorker()
 {
 	KillConnection();
-	if(m_sendLock)
-		EP_DELETE m_sendLock;
-	if(m_killConnectionLock)
-		EP_DELETE m_killConnectionLock;
-	if(m_baseWorkerLock)
-		EP_DELETE m_baseWorkerLock;
+
 	if(m_parserList)
 	{
 		m_parserList->ReleaseObj();
 	}
-	m_sendLock=NULL;
-	m_killConnectionLock=NULL;
-	m_baseWorkerLock=NULL;
 	m_parserList=NULL;
+
+	if(m_sendLock)
+		EP_DELETE m_sendLock;
+	m_sendLock=NULL;
+
+	if(m_baseWorkerLock)
+		EP_DELETE m_baseWorkerLock;
+	m_baseWorkerLock=NULL;
+	
 	m_owner=NULL;
 }
 
@@ -262,16 +257,41 @@ void BaseServerWorker::KillConnection()
 	{
 		return;
 	}
-	killConnection(false);
+	// No longer need client socket
+	if(m_clientSocket!=INVALID_SOCKET)
+	{
+		int iResult;
+		iResult = shutdown(m_clientSocket, SD_SEND);
+		if (iResult == SOCKET_ERROR) {
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+		}
+		closesocket(m_clientSocket);
+		m_clientSocket = INVALID_SOCKET;
+	}
+	TerminateAfter(m_waitTime);
+
+	if(m_parserList)
+	{
+		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
+		{
+			m_parserList->StopParse();
+		}
+
+		if(m_syncPolicy!=SYNC_POLICY_SYNCHRONOUS)
+		{
+			m_parserList->Clear();
+		}
+
+		m_parserList->ReleaseObj();
+		m_parserList=NULL;
+	}	
+
+	removeSelfFromContainer();
 }
 
 
-void BaseServerWorker::killConnection(bool fromInternal)
+void BaseServerWorker::killConnection()
 {
-	if(!m_killConnectionLock->TryLock())
-	{
-		return;
-	}
 	if(IsConnectionAlive())
 	{
 		// No longer need client socket
@@ -282,19 +302,10 @@ void BaseServerWorker::killConnection(bool fromInternal)
 			if (iResult == SOCKET_ERROR) {
 				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			}
-// 			closesocket(m_clientSocket);
-//			m_clientSocket = INVALID_SOCKET;
+ 			closesocket(m_clientSocket);
+			m_clientSocket = INVALID_SOCKET;
 		}
-		
-
-		if(!fromInternal)
-			TerminateAfter(m_waitTime);
-
-		if(m_clientSocket!=INVALID_SOCKET)
-			closesocket(m_clientSocket);
-		m_clientSocket=INVALID_SOCKET;
-
-		removeSelfFromContainer();
+	
 		if(m_parserList)
 		{
 			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
@@ -302,17 +313,18 @@ void BaseServerWorker::killConnection(bool fromInternal)
 				m_parserList->StopParse();
 			}
 
-			if(m_syncPolicy!=SYNC_POLICY_ASYNCHRONOUS)
+			if(m_syncPolicy!=SYNC_POLICY_SYNCHRONOUS)
 			{
 				m_parserList->Clear();
 			}
 
 			m_parserList->ReleaseObj();
 			m_parserList=NULL;
-		}		
-	}
+		}	
 
-	m_killConnectionLock->Unlock();
+		removeSelfFromContainer();
+	
+	}
 }
 
 
@@ -374,9 +386,9 @@ void BaseServerWorker::execute()
 				BasePacketParser *parser =createNewPacketParser();
 				parser->setSyncPolicy(m_syncPolicy);
 				parser->setPacketPassUnit(passUnit);
+				m_parserList->Push(parser);
 				if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS)
 					parser->Start();
-				m_parserList->Push(parser);
 				parser->ReleaseObj();
 				recvPacket->ReleaseObj();
 				if(GetMaximumParserCount()!=PARSER_LIMIT_INFINITE)
@@ -405,7 +417,8 @@ void BaseServerWorker::execute()
 		}
 
 	} while (iResult > 0);
-	killConnection(true);
+
+	killConnection();
 }
 
 

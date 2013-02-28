@@ -207,9 +207,8 @@ namespace epse{
 
 		/*!
 		Actually Disconnect from the server
-		@param[in] fromInternal flag to check if the call is from internal or not
 		*/
-		void disconnect(bool fromInternal);
+		void disconnect();
 
 	private:
 		/// Flag for connection
@@ -229,9 +228,6 @@ namespace epse{
 		epl::BaseLock *m_sendLock;
 		/// general lock
 		epl::BaseLock *m_generalLock;
-
-		/// disconnect lock
-		epl::BaseLock *m_disconnectLock;
 
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;

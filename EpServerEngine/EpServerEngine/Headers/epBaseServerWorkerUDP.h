@@ -176,9 +176,8 @@ namespace epse
 		void resetWorker();
 		/*!
 		Actually Kill the connection
-		@param[in] fromInternal flag to check if the call is from internal or not
 		*/
-		void killConnection(bool fromInternal);
+		void killConnection();
 
 		/*! 
 		@struct PacketPassUnit epBaseServerWorkerUDP.h
@@ -225,9 +224,6 @@ namespace epse
 
 		/// general lock 
 		epl::BaseLock *m_baseWorkerLock;
-
-		/// kill connection lock
-		epl::BaseLock *m_killConnectionLock;
 
 		/// list lock 
 		epl::BaseLock *m_listLock;

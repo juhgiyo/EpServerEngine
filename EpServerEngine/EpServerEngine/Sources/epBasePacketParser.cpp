@@ -17,6 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "epBasePacketParser.h"
 //#include "epServerObjectList.h"
+
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+
 using namespace epse;
 
 BasePacketParser::BasePacketParser(unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType):BaseServerObject(waitTimeMilliSec,lockPolicyType)
@@ -86,7 +93,7 @@ BasePacketParser & BasePacketParser::operator=(const BasePacketParser&b)
 		if(m_owner)
 			m_owner->RetainObj();
 		m_packetReceived=b.m_packetReceived;
-		if(m_owner)
+		if(m_packetReceived)
 			m_packetReceived->RetainObj();
 		m_lockPolicy=b.m_lockPolicy;
 		switch(m_lockPolicy)
@@ -125,16 +132,14 @@ void BasePacketParser::resetParser()
 		m_owner->ReleaseObj();
 	if(m_packetReceived)
 		m_packetReceived->ReleaseObj();
+	m_owner=NULL;
+	m_packetReceived=NULL;
 	m_generalLock->Unlock();
 
 	if(m_generalLock)
 		EP_DELETE m_generalLock;
-	if(m_containerLock)
-		EP_DELETE m_containerLock;
-	m_owner=NULL;
-	m_packetReceived=NULL;
+
 	m_generalLock=NULL;
-	m_containerLock=NULL;
 }
 
 int BasePacketParser::Send(const Packet &packet, unsigned int waitTimeInMilliSec)

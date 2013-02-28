@@ -17,6 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "epBaseServerWorkerUDP.h"
 #include "epBaseServerUDP.h"
+
+#if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
+
 using namespace epse;
 BaseServerWorkerUDP::BaseServerWorkerUDP(unsigned int maximumParserCount,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseServerSendObject(waitTimeMilliSec,lockPolicyType)
 {
@@ -27,22 +34,18 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(unsigned int maximumParserCount,unsigne
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
 		m_listLock=EP_NEW epl::CriticalSectionEx();
-		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_baseWorkerLock=EP_NEW epl::Mutex();
 		m_listLock=EP_NEW epl::Mutex();
-		m_killConnectionLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_baseWorkerLock=EP_NEW epl::NoLock();
 		m_listLock=EP_NEW epl::NoLock();
-		m_killConnectionLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_baseWorkerLock=NULL;
 		m_listLock=NULL;
-		m_killConnectionLock=NULL;
 		break;
 	}
 	m_server=NULL;
@@ -59,22 +62,18 @@ BaseServerWorkerUDP::BaseServerWorkerUDP(const BaseServerWorkerUDP& b) : BaseSer
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
 		m_listLock=EP_NEW epl::CriticalSectionEx();
-		m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_baseWorkerLock=EP_NEW epl::Mutex();
 		m_listLock=EP_NEW epl::Mutex();
-		m_killConnectionLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_baseWorkerLock=EP_NEW epl::NoLock();
 		m_listLock=EP_NEW epl::NoLock();
-		m_killConnectionLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_baseWorkerLock=NULL;
 		m_listLock=NULL;
-		m_killConnectionLock=NULL;
 		break;
 	}
 
@@ -119,22 +118,18 @@ BaseServerWorkerUDP & BaseServerWorkerUDP::operator=(const BaseServerWorkerUDP&b
 		case epl::LOCK_POLICY_CRITICALSECTION:
 			m_baseWorkerLock=EP_NEW epl::CriticalSectionEx();
 			m_listLock=EP_NEW epl::CriticalSectionEx();
-			m_killConnectionLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
 			m_baseWorkerLock=EP_NEW epl::Mutex();
 			m_listLock=EP_NEW epl::Mutex();
-			m_killConnectionLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
 			m_baseWorkerLock=EP_NEW epl::NoLock();
 			m_listLock=EP_NEW epl::NoLock();
-			m_killConnectionLock=EP_NEW epl::NoLock();
 			break;
 		default:
 			m_baseWorkerLock=NULL;
 			m_listLock=NULL;
-			m_killConnectionLock=NULL;
 			break;
 		}
 
@@ -169,21 +164,9 @@ void BaseServerWorkerUDP::resetWorker()
 
 	if(m_parserList)
 		m_parserList->ReleaseObj();
-	
-	if(m_baseWorkerLock)
-		EP_DELETE m_baseWorkerLock;
-
-	if(m_killConnectionLock)
-		EP_DELETE m_killConnectionLock;
-
-	if(m_listLock)
-		EP_DELETE m_listLock;
-
 	m_parserList=NULL;
-	m_baseWorkerLock=NULL;
-	m_killConnectionLock=NULL;
-	m_listLock=NULL;
 
+	m_listLock->Lock();
 	vector<Packet*>::iterator iter;
 	for(iter=m_packetList.begin();iter!=m_packetList.end();iter++)
 	{
@@ -191,6 +174,16 @@ void BaseServerWorkerUDP::resetWorker()
 			(*iter)->ReleaseObj();
 	}
 	m_packetList.clear();
+	m_listLock->Unlock();
+
+	if(m_listLock)
+		EP_DELETE m_listLock;
+	m_listLock=NULL;
+
+	if(m_baseWorkerLock)
+		EP_DELETE m_baseWorkerLock;
+	m_baseWorkerLock=NULL;
+
 
 	
 }
@@ -255,26 +248,47 @@ void BaseServerWorkerUDP::KillConnection()
 	{
 		return;
 	}
-	killConnection(false);
+	m_threadStopEvent.SetEvent();
+	if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
+		Resume();
+	TerminateAfter(m_waitTime);
+
+	if(m_parserList)
+	{
+		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
+		{
+			m_parserList->StopParse();
+		}
+
+		if(m_syncPolicy!=SYNC_POLICY_SYNCHRONOUS)
+		{
+			m_parserList->Clear();
+		}
+
+		m_parserList->ReleaseObj();
+		m_parserList=NULL;
+	}		
+
+	m_listLock->Lock();
+	vector<Packet*>::iterator iter;
+	for(iter=m_packetList.begin();iter!=m_packetList.end();iter++)
+	{
+		if(*iter)
+			(*iter)->ReleaseObj();
+	}
+	m_packetList.clear();
+	m_listLock->Unlock();
+
+	removeSelfFromContainer();
+
 }
 
 
-void BaseServerWorkerUDP::killConnection(bool fromInternal)
+void BaseServerWorkerUDP::killConnection()
 {
-	if(!m_killConnectionLock->TryLock())
-	{
-		return;
-	}
 	if(IsConnectionAlive())
 	{
-		if(!fromInternal)
-		{
-			m_threadStopEvent.SetEvent();
-			if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
-				Resume();
-			TerminateAfter(m_waitTime);
-		}
-		removeSelfFromContainer();
+	
 		if(m_parserList)
 		{
 			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS_BY_CLIENT)
@@ -282,7 +296,7 @@ void BaseServerWorkerUDP::killConnection(bool fromInternal)
 				m_parserList->StopParse();
 			}
 
-			if(m_syncPolicy!=SYNC_POLICY_ASYNCHRONOUS)
+			if(m_syncPolicy!=SYNC_POLICY_SYNCHRONOUS)
 			{
 				m_parserList->Clear();
 			}
@@ -290,8 +304,7 @@ void BaseServerWorkerUDP::killConnection(bool fromInternal)
 			m_parserList->ReleaseObj();
 			m_parserList=NULL;
 		}		
-
-		epl::LockObj lock(m_listLock);
+		m_listLock->Lock();
 		vector<Packet*>::iterator iter;
 		for(iter=m_packetList.begin();iter!=m_packetList.end();iter++)
 		{
@@ -299,9 +312,12 @@ void BaseServerWorkerUDP::killConnection(bool fromInternal)
 				(*iter)->ReleaseObj();
 		}
 		m_packetList.clear();
-	}
+		m_listLock->Unlock();
 
-	m_killConnectionLock->Unlock();
+		removeSelfFromContainer();
+
+
+	}
 }
 
 
@@ -364,9 +380,9 @@ void BaseServerWorkerUDP::execute()
 		BasePacketParser *parser =createNewPacketParser();
 		parser->setSyncPolicy(m_syncPolicy);
 		parser->setPacketPassUnit(passUnit);
+		m_parserList->Push(parser);
 		if(m_syncPolicy==SYNC_POLICY_ASYNCHRONOUS)
 			parser->Start();
-		m_parserList->Push(parser);
 		packet->ReleaseObj();
 		parser->ReleaseObj();
 		if(GetMaximumParserCount()!=PARSER_LIMIT_INFINITE)
@@ -376,8 +392,9 @@ void BaseServerWorkerUDP::execute()
 				m_parserList->WaitForListSizeDecrease();
 			}
 		}
-	}
-	killConnection(true);
+	}	
+	
+	killConnection();
 
 }
 

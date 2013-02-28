@@ -115,8 +115,12 @@ namespace epse{
 
 	private:
 
+		/// Stop Parse Lock
+		epl::BaseLock * m_stopLock;
 		/// Synchronous Policy
 		SyncPolicy m_syncPolicy;
+		/// Lock Policy
+		LockPolicy m_lockPolicy;
 
 		/// Thread Stop Event
 		/// @remark if this is raised, the thread should quickly stop.
