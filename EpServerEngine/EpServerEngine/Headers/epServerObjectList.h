@@ -131,7 +131,7 @@ namespace epse{
 		Returns the number of element in the list
 		@return the number of element in the list
 		*/
-		unsigned int Count() const;
+		size_t Count() const;
 
 		/*!
 		Do the action given by input function for all elements

@@ -156,7 +156,7 @@ unsigned int ServerObjectList::GetWaitTime()
 bool ServerObjectList::Remove(const BaseServerObject* serverObj)
 {
 	epl::LockObj lock(m_listLock);
-	for(int idx=m_objectList.size()-1;idx>=0;idx--)
+	for(ssize_t idx=static_cast<ssize_t>(m_objectList.size())-1;idx>=0;idx--)
 	{
 		if((m_objectList.at(idx))==serverObj)
 		{
@@ -204,7 +204,7 @@ vector<BaseServerObject*> ServerObjectList::GetList() const
 	return m_objectList;
 }
 
-unsigned int ServerObjectList::Count() const
+size_t ServerObjectList::Count() const
 {
 	epl::LockObj lock(m_listLock);
 	return m_objectList.size();
@@ -219,7 +219,7 @@ void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,
 	void *argPtr=NULL;
 	va_list ap=NULL;
 	va_start (ap , argCount);         /* Initialize the argument list. */
-	for(int idx=objList.size()-1;idx>=0;idx--)
+	for(ssize_t idx=static_cast<ssize_t>(objList.size())-1;idx>=0;idx--)
 	{
 		DoFunc(objList.at(idx),argCount,ap);
 	}
@@ -233,7 +233,7 @@ void ServerObjectList::Do(void (__cdecl *DoFunc)(BaseServerObject*,unsigned int,
 	vector<BaseServerObject*> objList=m_objectList;
 	m_listLock->Unlock();
 
-	for(int idx=objList.size()-1;idx>=0;idx--)
+	for(ssize_t idx=static_cast<ssize_t>(objList.size())-1;idx>=0;idx--)
 	{
 		DoFunc(objList.at(idx),argCount,args);
 	}
