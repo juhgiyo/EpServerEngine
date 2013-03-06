@@ -23,7 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 static char THIS_FILE[] = __FILE__;
 #endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
 
-
 using namespace epse;
 
 BaseServer::BaseServer(const TCHAR *  port,SyncPolicy syncPolicy, unsigned int maximumConnectionCount,unsigned int waitTimeMilliSec, epl::LockPolicy lockPolicyType):BaseServerObject(waitTimeMilliSec,lockPolicyType)
@@ -81,9 +80,7 @@ BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 	m_workerList=b.m_workerList;
 	m_parserList=b.m_parserList;
 	if(m_parserList)
-		m_parserList->RetainObj();
-	
-	
+		m_parserList->RetainObj();	
 }
 BaseServer::~BaseServer()
 {
@@ -125,7 +122,6 @@ BaseServer & BaseServer::operator=(const BaseServer&b)
 		m_parserList=b.m_parserList;
 		if(m_parserList)
 			m_parserList->RetainObj();
-
 	}
 	return *this;
 }
@@ -188,6 +184,7 @@ unsigned int BaseServer::GetMaximumConnectionCount() const
 	epl::LockObj lock(m_baseServerLock);
 	return m_maxConnectionCount;
 }
+
 bool BaseServer::SetSyncPolicy(SyncPolicy syncPolicy)
 {
 	if(IsServerStarted())
@@ -207,6 +204,7 @@ vector<BaseServerObject*> BaseServer::GetWorkerList() const
 {
 	return m_workerList.GetList();
 }
+
 void BaseServer::execute()
 {
 	SOCKET clientSocket;
@@ -354,6 +352,7 @@ void BaseServer::sendPacket(BaseServerObject *clientObj,unsigned int argCount,va
 	EP_ASSERT(argCount);
 	argPtr = va_arg (args, void *);
 	waitTime=va_arg(args,unsigned int);
+
 	Packet *packetPtr=(Packet*)argPtr;
 	((BaseServerWorker*)(clientObj))->Send(*packetPtr,waitTime);
 }
@@ -427,7 +426,6 @@ void BaseServer::cleanUpServer()
 		closesocket(m_listenSocket);
 		m_listenSocket=INVALID_SOCKET;
 	}
-
 	if(m_result)
 	{
 		freeaddrinfo(m_result);

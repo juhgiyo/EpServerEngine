@@ -165,7 +165,6 @@ namespace epse{
 		*/
 		void StopServer();
 
-
 		/*!
 		Check if the server is started
 		@return true if the server is started otherwise false
@@ -226,6 +225,22 @@ namespace epse{
 		virtual void execute() ;
 		
 		/*!
+		Kill connection from the client
+		@param[in] clientObj client object
+		@param[in] argCount the argument count
+		@param[in] args the argument list
+		*/
+		static void killConnection(BaseServerObject *clientObj,unsigned int argCount,va_list args);
+
+		/*!
+		Send packet to given client
+		@param[in] clientObj client object
+		@param[in] argCount the argument count
+		@param[in] args the argument list
+		*/
+		static void sendPacket(BaseServerObject *clientObj,unsigned int argCount,va_list args);
+
+		/*!
 		Send the packet to the client
 		@param[in] packet the packet to be sent
 		@param[in] clientSockAddr the client socket address, which the packet will be delivered
@@ -245,28 +260,15 @@ namespace epse{
 		*/
 		void shutdownAllClient();
 
-
 		/*!
 		Actually Stop the server
 		*/
 		void stopServer();
 
 		/*!
-		Kill connection from the client
-		@param[in] clientObj client object
-		@param[in] argCount the argument count
-		@param[in] args the argument list
+		Reset Server
 		*/
-		static void killConnection(BaseServerObject *clientObj,unsigned int argCount,va_list args);
-
-		/*!
-		Send packet to given client
-		@param[in] clientObj client object
-		@param[in] argCount the argument count
-		@param[in] args the argument list
-		*/
-		static void sendPacket(BaseServerObject *clientObj,unsigned int argCount,va_list args);
-
+		void resetServer();
 		/*!
 		Compare given clientSocket with BaseServerObject's socket
 		@param[in] clientSocket socket to compare
@@ -275,10 +277,7 @@ namespace epse{
 		*/
 		static bool socketCompare(sockaddr const & clientSocket, const BaseServerObject*obj );
 
-		/*!
-		Reset Server
-		*/
-		void resetServer();
+
 
 	private:
 		/// port number
@@ -291,11 +290,10 @@ namespace epse{
 		/// Maximum UDP Datagram byte size
 		unsigned int m_maxPacketSize;
 
-		/// general lock 
-		epl::BaseLock *m_baseServerLock;
 		/// send lock
 		epl::BaseLock *m_sendLock;
-
+		/// general lock 
+		epl::BaseLock *m_baseServerLock;
 
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;
@@ -308,7 +306,6 @@ namespace epse{
 
 		/// Maximum Connection Count
 		unsigned int m_maxConnectionCount;
-
 
 	};
 }

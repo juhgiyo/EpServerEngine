@@ -56,7 +56,6 @@ BaseServerUDP::BaseServerUDP(const TCHAR *  port,SyncPolicy syncPolicy, unsigned
 	setSyncPolicy(syncPolicy);
 	m_maxConnectionCount=maximumConnectionCount;
 	m_parserList=NULL;
-
 }
 
 BaseServerUDP::BaseServerUDP(const BaseServerUDP& b):BaseServerObject(b)
@@ -564,7 +563,6 @@ void BaseServerUDP::stopServer()
 // 			closesocket(m_listenSocket);
 // 			m_listenSocket=INVALID_SOCKET;
 // 		}
-	
 		if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 		{
 			if(m_parserList)
@@ -579,6 +577,5 @@ void BaseServerUDP::stopServer()
 	}
 	
 	cleanUpServer();
-	
 }
 

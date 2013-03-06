@@ -131,8 +131,6 @@ namespace epse{
 		*/
 		unsigned int GetMaximumConnectionCount() const;
 
-		
-
 		/*!
 		Set Synchronous Policy
 		@param[in] syncPolicy Synchronous Policy to set
@@ -142,11 +140,10 @@ namespace epse{
 		bool SetSyncPolicy(SyncPolicy syncPolicy);
 
 		/*!
-		Get current Server Synchronous Policy
-		@return Server Synchronous Policy
+		Get current Synchronous Policy
+		@return Synchronous Policy
 		*/
 		SyncPolicy GetSyncPolicy() const;
-
 
 		/*!
 		Start the server
@@ -197,7 +194,6 @@ namespace epse{
 		}
 
 	protected:
-
 		/*!
 		Return the new server worker.
 		@remark Sub-class should implement this to create new worker.
@@ -257,8 +253,6 @@ namespace epse{
 
 
 	private:
-
-
 		/// port number
 		epl::EpString m_port;
 		/// listening socket
