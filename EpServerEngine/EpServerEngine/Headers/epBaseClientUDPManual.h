@@ -28,8 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 An Interface for Base UDP Client Manual.
 
 */
-#ifndef __EP_BASE_CLIENT_UDP_H__
-#define __EP_BASE_CLIENT_UDP_H__
+#ifndef __EP_BASE_CLIENT_UDP_MANUAL_H__
+#define __EP_BASE_CLIENT_UDP_MANUAL_H__
 
 #include "epServerEngine.h"
 #include "epPacket.h"
@@ -239,4 +239,4 @@ namespace epse{
 }
 
 
-#endif //__EP_BASE_CLIENT_UDP_H__
+#endif //__EP_BASE_CLIENT_UDP_MANUAL_H__
