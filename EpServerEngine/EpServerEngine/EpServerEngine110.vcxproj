@@ -396,6 +396,7 @@
     <ClInclude Include="EpLibraryHeaders\epCmdLineOptions.h" />
     <ClInclude Include="EpLibraryHeaders\epEventEx.h" />
     <ClInclude Include="EpLibraryHeaders\epLib.h" />
+    <ClInclude Include="EpLibraryHeaders\epLogWriter.h" />
     <ClInclude Include="Headers\epBaseClientManual.h" />
     <ClInclude Include="Headers\epBaseClientUDPManual.h" />
     <ClInclude Include="Headers\epBasePacketParser.h" />

@@ -353,6 +353,9 @@
     <ClInclude Include="Headers\epServerObjectRemover.h">
       <Filter>Header Files\ServerObject List</Filter>
     </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epLogWriter.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LICENSE">

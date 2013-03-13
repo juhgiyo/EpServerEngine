@@ -899,6 +899,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EpLibraryHeaders\epLogWriter.h"
+				>
+			</File>
+			<File
 				RelativePath=".\EpLibraryHeaders\epMemory.h"
 				>
 			</File>
