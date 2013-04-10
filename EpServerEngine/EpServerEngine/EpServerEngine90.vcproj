@@ -807,6 +807,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EpLibraryHeaders\epBinaryFile.h"
+				>
+			</File>
+			<File
 				RelativePath=".\EpLibraryHeaders\epBinarySearch.h"
 				>
 			</File>

@@ -356,6 +356,9 @@
     <ClInclude Include="EpLibraryHeaders\epLogWriter.h">
       <Filter>EpLibraryHeaders</Filter>
     </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epBinaryFile.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LICENSE">

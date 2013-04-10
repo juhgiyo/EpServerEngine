@@ -393,6 +393,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EpLibraryHeaders\epBaseTextFile.h" />
+    <ClInclude Include="EpLibraryHeaders\epBinaryFile.h" />
     <ClInclude Include="EpLibraryHeaders\epCmdLineOptions.h" />
     <ClInclude Include="EpLibraryHeaders\epEventEx.h" />
     <ClInclude Include="EpLibraryHeaders\epLib.h" />
