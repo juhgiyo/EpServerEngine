@@ -125,7 +125,7 @@ namespace epse{
 		@param[in] maxConnectionCount The Maximum Connection Count to set.
 		@remark 0 means there is no limit
 		*/
-		void GetMaximumConnectionCount(unsigned int maxConnectionCount);
+		void SetMaximumConnectionCount(unsigned int maxConnectionCount);
 
 		/*!
 		Get the Maximum Connection Count of server

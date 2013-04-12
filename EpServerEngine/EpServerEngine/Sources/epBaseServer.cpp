@@ -173,7 +173,7 @@ epl::EpTString BaseServer::GetPort() const
 #endif //defined(_UNICODE) || defined(UNICODE)
 }
 
-void BaseServer::GetMaximumConnectionCount(unsigned int maxConnectionCount)
+void BaseServer::SetMaximumConnectionCount(unsigned int maxConnectionCount)
 {
 	epl::LockObj lock(m_baseServerLock);
 	m_maxConnectionCount=maxConnectionCount;

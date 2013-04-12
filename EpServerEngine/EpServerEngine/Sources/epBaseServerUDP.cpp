@@ -195,7 +195,7 @@ epl::EpTString BaseServerUDP::GetPort() const
 }
 
 
-void BaseServerUDP::GetMaximumConnectionCount(unsigned int maxConnectionCount)
+void BaseServerUDP::SetMaximumConnectionCount(unsigned int maxConnectionCount)
 {
 	epl::LockObj lock(m_baseServerLock);
 	m_maxConnectionCount=maxConnectionCount;
