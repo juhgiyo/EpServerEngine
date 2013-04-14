@@ -240,7 +240,10 @@ BaseServerUDP *BaseServerWorkerUDP::GetOwner() const
 {
 	return m_server;
 }
-
+unsigned int BaseServerWorkerUDP::GetMaxPacketByteSize() const
+{
+	return m_maxPacketSize;
+}
 void BaseServerWorkerUDP::KillConnection()
 {
 	epl::LockObj lock(m_baseWorkerLock);
