@@ -25,9 +25,10 @@ static char THIS_FILE[] = __FILE__;
 #endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
 
 using namespace epse;
-AsyncTcpSocket::AsyncTcpSocket(ServerCallbackInterface *callBackObj,unsigned int waitTimeMilliSec,unsigned int maximumProcessorCount,epl::LockPolicy lockPolicyType): BaseTcpSocket(callBackObj,waitTimeMilliSec,lockPolicyType)
+AsyncTcpSocket::AsyncTcpSocket(ServerCallbackInterface *callBackObj,bool isAsynchronousReceive,unsigned int waitTimeMilliSec,unsigned int maximumProcessorCount,epl::LockPolicy lockPolicyType): BaseTcpSocket(callBackObj,waitTimeMilliSec,lockPolicyType)
 {
 	m_maxProcessorCount=maximumProcessorCount;
+	m_isAsynchronousReceive=isAsynchronousReceive;
 }
 
 AsyncTcpSocket::~AsyncTcpSocket()
@@ -49,6 +50,14 @@ unsigned int AsyncTcpSocket::GetMaximumProcessorCount() const
 	epl::LockObj lock(m_baseSocketLock);
 	return m_maxProcessorCount;
 }
+bool AsyncTcpSocket::GetIsAsynchronousReceive() const
+{
+	return m_isAsynchronousReceive;
+}
+void AsyncTcpSocket::SetIsAsynchronousReceive(bool isASynchronousReceive)
+{
+	m_isAsynchronousReceive=isASynchronousReceive;
+}
 
 void AsyncTcpSocket::KillConnection()
 {
@@ -58,6 +67,7 @@ void AsyncTcpSocket::KillConnection()
 		return;
 	}
 	// No longer need client socket
+	m_sendLock->Lock();
 	if(m_clientSocket!=INVALID_SOCKET)
 	{
 		int iResult;
@@ -68,8 +78,11 @@ void AsyncTcpSocket::KillConnection()
 		closesocket(m_clientSocket);
 		m_clientSocket = INVALID_SOCKET;
 	}
+	m_sendLock->Unlock();
+
 	TerminateAfter(m_waitTime);
 	m_processorList.Clear();
+
 	removeSelfFromContainer();
 	m_callBackObj->OnDisconnect(this);
 }
@@ -80,6 +93,13 @@ void AsyncTcpSocket::killConnection()
 	if(IsConnectionAlive())
 	{
 		// No longer need client socket
+		m_sendLock->Lock();
+		if(m_clientSocket!=INVALID_SOCKET)
+		{
+			closesocket(m_clientSocket);
+			m_clientSocket = INVALID_SOCKET;
+		}
+		m_sendLock->Unlock();
 		m_processorList.Clear();
 		removeSelfFromContainer();
 		m_callBackObj->OnDisconnect(this);
@@ -102,22 +122,31 @@ void AsyncTcpSocket::execute()
 			iResult = receive(*recvPacket);
 
 			if (iResult == shouldReceive) {
-				ServerPacketProcessor::PacketPassUnit passUnit;
-				passUnit.m_packet=recvPacket;
-				passUnit.m_owner=this;
-				ServerPacketProcessor *parser =EP_NEW ServerPacketProcessor(m_callBackObj,m_waitTime,m_lockPolicy);
-				parser->setPacketPassUnit(passUnit);
-				m_processorList.Push(parser);
-				parser->Start();
-				parser->ReleaseObj();
-				recvPacket->ReleaseObj();
-				if(GetMaximumProcessorCount()!=PROCESSOR_LIMIT_INFINITE)
+				if(m_isAsynchronousReceive)
 				{
-					while(m_processorList.Count()>=GetMaximumProcessorCount())
+					ServerPacketProcessor::PacketPassUnit passUnit;
+					passUnit.m_packet=recvPacket;
+					passUnit.m_owner=this;
+					ServerPacketProcessor *parser =EP_NEW ServerPacketProcessor(m_callBackObj,m_waitTime,m_lockPolicy);
+					parser->setPacketPassUnit(passUnit);
+					m_processorList.Push(parser);
+					parser->Start();
+					parser->ReleaseObj();
+					recvPacket->ReleaseObj();
+					if(GetMaximumProcessorCount()!=PROCESSOR_LIMIT_INFINITE)
 					{
-						m_processorList.WaitForListSizeDecrease();
+						while(m_processorList.Count()>=GetMaximumProcessorCount())
+						{
+							m_processorList.WaitForListSizeDecrease();
+						}
 					}
 				}
+				else
+				{
+					m_callBackObj->OnReceived(this,&recvPacket);
+					recvPacket->ReleaseObj();
+				}
+				
 			}
 			else if (iResult == 0)
 			{

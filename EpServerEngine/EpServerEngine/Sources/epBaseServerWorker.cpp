@@ -258,6 +258,7 @@ void BaseServerWorker::KillConnection()
 		return;
 	}
 	// No longer need client socket
+	m_sendLock->Lock();
 	if(m_clientSocket!=INVALID_SOCKET)
 	{
 		int iResult;
@@ -268,6 +269,8 @@ void BaseServerWorker::KillConnection()
 		closesocket(m_clientSocket);
 		m_clientSocket = INVALID_SOCKET;
 	}
+	m_sendLock->Unlock();
+
 	TerminateAfter(m_waitTime);
 
 	if(m_parserList)
@@ -295,16 +298,13 @@ void BaseServerWorker::killConnection()
 	if(IsConnectionAlive())
 	{
 		// No longer need client socket
-// 		if(m_clientSocket!=INVALID_SOCKET)
-// 		{
-// 			int iResult;
-// 			iResult = shutdown(m_clientSocket, SD_SEND);
-// 			if (iResult == SOCKET_ERROR) {
-// 				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-// 			}
-//  			closesocket(m_clientSocket);
-// 			m_clientSocket = INVALID_SOCKET;
-// 		}
+		m_sendLock->Lock();
+		if(m_clientSocket!=INVALID_SOCKET)
+		{
+			closesocket(m_clientSocket);
+			m_clientSocket = INVALID_SOCKET;
+		}
+		m_sendLock->Unlock();
 	
 		if(m_parserList)
 		{

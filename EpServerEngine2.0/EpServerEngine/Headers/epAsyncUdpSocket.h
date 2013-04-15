@@ -50,11 +50,12 @@ namespace epse
 
 		Initializes the Socket
 		@param[in] callBackObj the callback object
+				@param[in] isAsynchronousReceive the flag for Asynchronous Receive
 		@param[in] waitTimeMilliSec wait time for Socket Thread to terminate
 		@param[in] maximumProcessorCount the maximum number of processor
 		@param[in] lockPolicyType The lock policy
 		*/
-		AsyncUdpSocket(ServerCallbackInterface *callBackObj,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,unsigned int maximumProcessorCount=PROCESSOR_LIMIT_INFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		AsyncUdpSocket(ServerCallbackInterface *callBackObj,bool isAsynchronousReceive=true,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,unsigned int maximumProcessorCount=PROCESSOR_LIMIT_INFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Destructor
@@ -84,6 +85,17 @@ namespace epse
 		*/
 		virtual unsigned int GetMaximumProcessorCount() const;
 
+		/*!
+		Get the asynchronous receive flag for the Socket.
+		@return The flag whether to receive asynchronously.
+		*/
+		virtual bool GetIsAsynchronousReceive() const;
+
+		/*!
+		Set the asynchronous receive flag for the Socket.
+		@param[in] isASynchronousReceive The flag whether to receive asynchronously.
+		*/
+		virtual void SetIsAsynchronousReceive(bool isASynchronousReceive);
 
 	private:	
 		friend class BaseServerUDP;
@@ -99,6 +111,12 @@ namespace epse
 		*/
 		virtual void execute();
 				
+		/*!
+		Add new packet received from client
+		@param[in] packet the new packet received from client
+		*/
+		virtual void addPacket(Packet *packet);
+
 	private:
 		/*!
 		Default Copy Constructor
@@ -118,12 +136,18 @@ namespace epse
 		AsyncUdpSocket & operator=(const AsyncUdpSocket&b){return *this;}
 	private:
 
+		/// Thread Stop Event
+		/// @remark if this is raised, the thread should quickly stop.
+		epl::EventEx m_threadStopEvent;
+
 		/// processor thread list
 		ServerObjectList m_processorList;
 
 		/// Maximum Processor Count
 		unsigned int m_maxProcessorCount;
 
+		/// Flag for Asynchronous Receive
+		bool m_isAsynchronousReceive;
 
 	};
 

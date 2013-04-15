@@ -68,9 +68,23 @@ namespace epse
 		*/
 		virtual void KillConnection();
 
-
+		/*!
+		Receive the packet from the client
+		@param[in] waitTimeInMilliSec wait time for receiving the packet in millisecond
+		@param[out] retStatus the pointer to ReceiveStatus enumerator to get receive status.
+		@return received packet
+		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
+		*/
+		virtual Packet *Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *retStatus=NULL);
+		
 	private:	
 		friend class BaseServerUDP;
+
+		/*!
+		Check if the connection is alive
+		@return true if the connection is alive otherwise false
+		*/
+		virtual bool IsConnectionAlive() const;
 
 		/*!
 		Actually Kill the connection
@@ -82,6 +96,12 @@ namespace epse
 		thread loop function
 		*/
 		virtual void execute();
+
+		/*!
+		Add new packet received from client
+		@param[in] packet the new packet received from client
+		*/
+		virtual void addPacket(Packet *packet);
 	
 	private:
 		/*!
@@ -100,6 +120,13 @@ namespace epse
 		@return the new copied object
 		*/
 		SyncUdpSocket & operator=(const SyncUdpSocket&b){return *this;}
+
+	private:
+		/// Packet Received Event
+		epl::EventEx m_packetReceivedEvent;
+
+		/// Connection status
+		bool m_isConnected;
 	};
 
 }

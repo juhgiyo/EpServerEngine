@@ -106,7 +106,7 @@ namespace epse
 		Add new packet received from client
 		@param[in] packet the new packet received from client
 		*/
-		void addPacket(Packet *packet);
+		virtual void addPacket(Packet *packet)=0;
 	
 		/*!
 		Set the maximum packet byte size
@@ -140,10 +140,6 @@ namespace epse
 
 		/// Packet List
 		queue<Packet*> m_packetList;
-
-		/// Thread Stop Event
-		/// @remark if this is raised, the thread should quickly stop.
-		epl::EventEx m_threadStopEvent;
 	};
 
 }

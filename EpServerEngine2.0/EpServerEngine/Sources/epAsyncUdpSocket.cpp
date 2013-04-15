@@ -25,9 +25,11 @@ static char THIS_FILE[] = __FILE__;
 #endif // defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
 
 using namespace epse;
-AsyncUdpSocket::AsyncUdpSocket(ServerCallbackInterface *callBackObj,unsigned int waitTimeMilliSec,unsigned int maximumProcessorCount,epl::LockPolicy lockPolicyType): BaseUdpSocket(callBackObj,waitTimeMilliSec,lockPolicyType)
+AsyncUdpSocket::AsyncUdpSocket(ServerCallbackInterface *callBackObj,bool isAsynchronousReceive,unsigned int waitTimeMilliSec,unsigned int maximumProcessorCount,epl::LockPolicy lockPolicyType): BaseUdpSocket(callBackObj,waitTimeMilliSec,lockPolicyType)
 {
+	m_threadStopEvent=EventEx(false,false);
 	m_maxProcessorCount=maximumProcessorCount;
+	m_isAsynchronousReceive=isAsynchronousReceive;
 }
 
 AsyncUdpSocket::~AsyncUdpSocket()
@@ -46,7 +48,14 @@ unsigned int AsyncUdpSocket::GetMaximumProcessorCount() const
 	return m_maxProcessorCount;
 }
 
-
+bool AsyncUdpSocket::GetIsAsynchronousReceive() const
+{
+	return m_isAsynchronousReceive;
+}
+void AsyncUdpSocket::SetIsAsynchronousReceive(bool isASynchronousReceive)
+{
+	m_isAsynchronousReceive=isASynchronousReceive;
+}
 void AsyncUdpSocket::KillConnection()
 {
 	epl::LockObj lock(m_baseSocketLock);
@@ -97,6 +106,17 @@ void AsyncUdpSocket::killConnection()
 
 	}
 }
+
+void AsyncUdpSocket::addPacket(Packet *packet)
+{
+	if(packet)
+		packet->RetainObj();
+	epl::LockObj lock(m_listLock);
+	m_packetList.push(packet);
+	if(GetStatus()==THREAD_STATUS_SUSPENDED)
+		Resume();
+}
+
 void AsyncUdpSocket::execute()
 {
 	unsigned int packetSize=0;
@@ -121,25 +141,35 @@ void AsyncUdpSocket::execute()
 			m_listLock->Unlock();
 			break;
 		}
+
 		m_packetList.pop();
 		m_listLock->Unlock();
 
-		ServerPacketProcessor::PacketPassUnit passUnit;
-		passUnit.m_owner=this;
-		passUnit.m_packet=packet;
-		ServerPacketProcessor *parser =EP_NEW ServerPacketProcessor(m_callBackObj,m_waitTime,m_lockPolicy);
-		parser->setPacketPassUnit(passUnit);
-		m_processorList.Push(parser);
-		parser->Start();
-		packet->ReleaseObj();
-		parser->ReleaseObj();
-		if(GetMaximumProcessorCount()!=PROCESSOR_LIMIT_INFINITE)
+		if(m_isAsynchronousReceive)
 		{
-			while(m_processorList.Count()>=GetMaximumProcessorCount())
+			ServerPacketProcessor::PacketPassUnit passUnit;
+			passUnit.m_owner=this;
+			passUnit.m_packet=packet;
+			ServerPacketProcessor *parser =EP_NEW ServerPacketProcessor(m_callBackObj,m_waitTime,m_lockPolicy);
+			parser->setPacketPassUnit(passUnit);
+			m_processorList.Push(parser);
+			parser->Start();
+			packet->ReleaseObj();
+			parser->ReleaseObj();
+			if(GetMaximumProcessorCount()!=PROCESSOR_LIMIT_INFINITE)
 			{
-				m_processorList.WaitForListSizeDecrease();
+				while(m_processorList.Count()>=GetMaximumProcessorCount())
+				{
+					m_processorList.WaitForListSizeDecrease();
+				}
 			}
 		}
+		else
+		{
+			m_callBackObj->OnReceived(this,*packet);
+			packet->ReleaseObj();
+		}
+
 	}	
 
 	killConnection();

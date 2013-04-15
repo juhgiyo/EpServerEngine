@@ -113,6 +113,26 @@ namespace epse{
 		{
 			return 0;
 		}
+
+		/*!
+		Get the asynchronous receive flag for the Socket.
+		@return The flag whether to receive asynchronously.
+		@remark for Asynchronous Server Use Only!
+		*/
+		virtual bool GetIsAsynchronousReceive() const
+		{
+			return false;
+		}
+
+		/*!
+		Set the asynchronous receive flag for the Socket.
+		@param[in] isASynchronousReceive The flag whether to receive asynchronously.
+		@remark for Asynchronous Server Use Only!
+		*/
+		virtual void SetIsAsynchronousReceive(bool isASynchronousReceive)
+		{
+			return;
+		}
 	};
 
 
@@ -131,6 +151,21 @@ namespace epse{
 		@remark return -1 if error occurred
 		*/
 		virtual int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE)=0;
+
+		/*!
+		Receive the packet from the client
+		@param[in] waitTimeInMilliSec wait time for receiving the packet in millisecond
+		@param[out] retStatus the pointer to ReceiveStatus enumerator to get receive status.
+		@return received packet
+		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
+		@remark For Synchronous Socket Use Only!
+		*/
+		virtual Packet *Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *retStatus=NULL)
+		{
+			if(retStatus)
+				*retStatus=RECEIVE_STATUS_FAIL_NOT_SUPPORTED;
+			return NULL;
+		}
 
 		/*!
 		Check if the connection is alive
@@ -197,11 +232,34 @@ namespace epse{
 		virtual unsigned int GetMaximumProcessorCount() const{return 0;}
 
 		/*!
+		Get the asynchronous receive flag for the Socket.
+		@return The flag whether to receive asynchronously.
+		@remark for Asynchronous Socket Use Only!
+		*/
+		virtual bool GetIsAsynchronousReceive() const
+		{
+			return false;
+		}
+
+		/*!
+		Set the asynchronous receive flag for the Socket.
+		@param[in] isASynchronousReceive The flag whether to receive asynchronously.
+		@remark for Asynchronous Socket Use Only!
+		*/
+		virtual void SetIsAsynchronousReceive(bool isASynchronousReceive)
+		{
+			return;
+		}
+
+		/*!
 		Get the maximum packet byte size
 		@return the maximum packet byte size
 		@remark for UDP Socket Use Only!
 		*/
 		virtual unsigned int GetMaxPacketByteSize() const{return 0;}
+
+		
+
 	};
 
 	/*! 
@@ -210,9 +268,33 @@ namespace epse{
 	*/
 	class EP_SERVER_ENGINE ServerCallbackInterface{
 	public:
+		/*!
+		When new client tries to connect.
+		@param[in] sockAddr the client's socket address which tries to connect
+		@return true to accept the connection otherwise false.		
+		*/
 		virtual bool OnAccept(sockaddr sockAddr){return true;}
+
+		/*!
+		When accepted client tries to make connection.
+		@param[in] socket the client socket
+		@remark When this function calls, it is right before making connection,<br/>
+		        so user can configure the socket before the connection is actually made.		
+		*/
 		virtual void OnNewConnection(const SocketInterface *socket){}
+
+		/*!
+		Received the packet from the client.
+		@param[in] socket the client socket which received the packet
+		@param[in] receivedPacket the received packet
+		@remark for Asynchronous Server Use Only!
+		*/
 		virtual void OnReceived(const SocketInterface *socket,const Packet&recievedPacket)=0;
+
+		/*!
+		The client is disconnected.
+		@param[in] socket the client socket, disconnected.
+		*/
 		virtual void OnDisconnect(const SocketInterface *socket){}
 	};
 

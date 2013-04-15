@@ -49,11 +49,12 @@ namespace epse
 
 		Initializes the Socket
 		@param[in] callBackObj the callback object
+		@param[in] isAsynchronousReceive the flag for Asynchronous Receive
 		@param[in] waitTimeMilliSec wait time for Socket Thread to terminate
-		@param[in] maximumParserCount the maximum number of processor
+		@param[in] maximumProcessorCount the maximum number of processor
 		@param[in] lockPolicyType The lock policy
 		*/
-		AsyncTcpSocket(ServerCallbackInterface *callBackObj,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,unsigned int maximumProcessorCount=PROCESSOR_LIMIT_INFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		AsyncTcpSocket(ServerCallbackInterface *callBackObj,bool isAsynchronousReceive=true,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,unsigned int maximumProcessorCount=PROCESSOR_LIMIT_INFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Destructor
@@ -80,6 +81,18 @@ namespace epse
 		@remark 0 means there is no limit
 		*/
 		virtual unsigned int GetMaximumProcessorCount() const;
+
+		/*!
+		Get the asynchronous receive flag for the Socket.
+		@return The flag whether to receive asynchronously.
+		*/
+		virtual bool GetIsAsynchronousReceive() const;
+
+		/*!
+		Set the asynchronous receive flag for the Socket.
+		@param[in] isASynchronousReceive The flag whether to receive asynchronously.
+		*/
+		virtual void SetIsAsynchronousReceive(bool isASynchronousReceive);
 
 	private:	
 		friend class AsyncTcpServer;
@@ -122,6 +135,9 @@ namespace epse
 
 		/// Maximum Processor Count
 		unsigned int m_maxProcessorCount;
+
+		/// Flag for Asynchronous Receive
+		bool m_isAsynchronousReceive;
 
 	};
 

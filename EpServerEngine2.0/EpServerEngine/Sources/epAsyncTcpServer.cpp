@@ -26,8 +26,9 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-AsyncTcpServer::AsyncTcpServer(ServerCallbackInterface *callBackObj,const TCHAR * port,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType):BaseTcpServer(callBackObj,port,waitTimeMilliSec,maximumConnectionCount,lockPolicyType)
+AsyncTcpServer::AsyncTcpServer(ServerCallbackInterface *callBackObj,const TCHAR * port,bool isAsynchronousReceive,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType):BaseTcpServer(callBackObj,port,waitTimeMilliSec,maximumConnectionCount,lockPolicyType)
 {
+	m_isAsynchronousReceive=isAsynchronousReceive;
 }
 
 AsyncTcpServer::AsyncTcpServer(const AsyncTcpServer& b):BaseTcpServer(b)
@@ -46,6 +47,14 @@ AsyncTcpServer & AsyncTcpServer::operator=(const AsyncTcpServer&b)
 	return *this;
 }
 
+bool AsyncTcpServer::GetIsAsynchronousReceive() const
+{
+	return m_isAsynchronousReceive;
+}
+void AsyncTcpServer::SetIsAsynchronousReceive(bool isASynchronousReceive)
+{
+	m_isAsynchronousReceive=isASynchronousReceive;
+}
 
 void AsyncTcpServer::execute()
 {
@@ -62,13 +71,16 @@ void AsyncTcpServer::execute()
 		else
 		{
 			if(!m_callBackObj->OnAccept(sockAddr))
+			{
+				closesocket(clientSocket);
 				continue;
-			AsyncTcpSocket *accWorker=EP_NEW AsyncTcpSocket(m_callBackObj,m_waitTime,PROCESSOR_LIMIT_INFINITE,m_lockPolicy);
+			}
+			AsyncTcpSocket *accWorker=EP_NEW AsyncTcpSocket(m_callBackObj,m_isAsynchronousReceive,m_waitTime,PROCESSOR_LIMIT_INFINITE,m_lockPolicy);
 			accWorker->setClientSocket(clientSocket);
 			accWorker->setOwner(this);
 			accWorker->setSockAddr(sockAddr);
 			m_callBackObj->OnNewConnection(accWorker);
-			m_socketList.Push(accWorker);			
+			m_socketList.Push(accWorker);	
 			accWorker->Start();
 			accWorker->ReleaseObj();
 			if(GetMaximumConnectionCount()!=CONNECTION_LIMIT_INFINITE)

@@ -50,11 +50,12 @@ namespace epse{
 		Initializes the Server
 		@param[in] callBackObj the callback object
 		@param[in] port the port string
-		@param[in] maximumConnectionCount the maximum number of connection
+		@param[in] isAsynchronousReceive the flag for Asynchronous Receive
 		@param[in] waitTimeMilliSec wait time for Server Thread to terminate
+		@param[in] maximumConnectionCount the maximum number of connection
 		@param[in] lockPolicyType The lock policy
 		*/
-		AsyncTcpServer(ServerCallbackInterface *callBackObj,const TCHAR * port=_T(DEFAULT_PORT),unsigned int waitTimeMilliSec=WAITTIME_INIFINITE, unsigned int maximumConnectionCount=CONNECTION_LIMIT_INFINITE, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		AsyncTcpServer(ServerCallbackInterface *callBackObj,const TCHAR * port=_T(DEFAULT_PORT),bool isAsynchronousReceive=true,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE, unsigned int maximumConnectionCount=CONNECTION_LIMIT_INFINITE, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -76,6 +77,18 @@ namespace epse{
 		@return the new copied object
 		*/
 		AsyncTcpServer & operator=(const AsyncTcpServer&b);
+
+		/*!
+		Get the asynchronous receive flag for the Socket.
+		@return The flag whether to receive asynchronously.
+		*/
+		virtual bool GetIsAsynchronousReceive() const;
+
+		/*!
+		Set the asynchronous receive flag for the Socket.
+		@param[in] isASynchronousReceive The flag whether to receive asynchronously.
+		*/
+		virtual void SetIsAsynchronousReceive(bool isASynchronousReceive);
 	
 	private:
 
@@ -83,6 +96,10 @@ namespace epse{
 		Listening Loop Function
 		*/
 		virtual void execute() ;
+
+		/// Flag for Asynchronous Receive
+		bool m_isAsynchronousReceive;
+
 
 	};
 }

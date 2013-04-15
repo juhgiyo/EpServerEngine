@@ -584,22 +584,30 @@
 						RelativePath=".\Sources\epBaseSocket.cpp"
 						>
 					</File>
-					<File
-						RelativePath=".\Sources\epBaseTcpServer.cpp"
+					<Filter
+						Name="TCP"
 						>
-					</File>
-					<File
-						RelativePath=".\Sources\epBaseTcpSocket.cpp"
+						<File
+							RelativePath=".\Sources\epBaseTcpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epBaseTcpSocket.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
 						>
-					</File>
-					<File
-						RelativePath=".\Sources\epBaseUdpServer.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\Sources\epBaseUdpSocket.cpp"
-						>
-					</File>
+						<File
+							RelativePath=".\Sources\epBaseUdpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epBaseUdpSocket.cpp"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="Asynchronous"
@@ -818,22 +826,30 @@
 						RelativePath=".\Headers\epBaseSocket.h"
 						>
 					</File>
-					<File
-						RelativePath=".\Headers\epBaseTcpServer.h"
+					<Filter
+						Name="TCP"
 						>
-					</File>
-					<File
-						RelativePath=".\Headers\epBaseTcpSocket.h"
+						<File
+							RelativePath=".\Headers\epBaseTcpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epBaseTcpSocket.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
 						>
-					</File>
-					<File
-						RelativePath=".\Headers\epBaseUdpServer.h"
-						>
-					</File>
-					<File
-						RelativePath=".\Headers\epBaseUdpSocket.h"
-						>
-					</File>
+						<File
+							RelativePath=".\Headers\epBaseUdpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epBaseUdpSocket.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="Asynchronous"

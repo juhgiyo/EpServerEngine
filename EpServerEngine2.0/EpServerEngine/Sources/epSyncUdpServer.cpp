@@ -82,7 +82,9 @@ void SyncUdpServer::execute()
 				}
 			}
 			if(!m_callBackObj->OnAccept(clientSockAddr))
+			{
 				continue;
+			}
 			/// Create Worker Thread
 			Packet *passPacket=EP_NEW Packet(packetData,recvLength);
 			SyncUdpSocket *accWorker=EP_NEW SyncUdpSocket(m_callBackObj,m_waitTime,m_lockPolicy);
@@ -91,7 +93,6 @@ void SyncUdpServer::execute()
 			accWorker->setMaxPacketByteSize(m_maxPacketSize);
 			m_callBackObj->OnNewConnection(accWorker);
 			m_socketList.Push(accWorker);
-			accWorker->Start();
 			accWorker->addPacket(passPacket);
 			accWorker->ReleaseObj();
 			passPacket->ReleaseObj();

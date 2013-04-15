@@ -27,7 +27,7 @@ static char THIS_FILE[] = __FILE__;
 using namespace epse;
 BaseUdpSocket::BaseUdpSocket(ServerCallbackInterface *callBackObj,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseSocket(callBackObj,waitTimeMilliSec,lockPolicyType)
 {
-	m_threadStopEvent=EventEx(false,false);
+	
 	switch(lockPolicyType)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
@@ -66,15 +66,6 @@ BaseUdpSocket::~BaseUdpSocket()
 	m_listLock=NULL;
 }
 
-void BaseUdpSocket::addPacket(Packet *packet)
-{
-	if(packet)
-		packet->RetainObj();
-	epl::LockObj lock(m_listLock);
-	m_packetList.push(packet);
-	if(GetStatus()==THREAD_STATUS_SUSPENDED)
-		Resume();
-}
 void BaseUdpSocket::setMaxPacketByteSize(unsigned int maxPacketSize)
 {
 	m_maxPacketSize=maxPacketSize;

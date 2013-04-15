@@ -61,14 +61,16 @@ void SyncTcpServer::execute()
 		else
 		{
 			if(!m_callBackObj->OnAccept(sockAddr))
+			{
+				closesocket(clientSocket);
 				continue;
+			}
 			SyncTcpSocket *accWorker=EP_NEW SyncTcpSocket(m_callBackObj,m_waitTime,m_lockPolicy);
 			accWorker->setClientSocket(clientSocket);
 			accWorker->setOwner(this);
 			accWorker->setSockAddr(sockAddr);
 			m_callBackObj->OnNewConnection(accWorker);
 			m_socketList.Push(accWorker);			
-			accWorker->Start();
 			accWorker->ReleaseObj();
 			if(GetMaximumConnectionCount()!=CONNECTION_LIMIT_INFINITE)
 			{

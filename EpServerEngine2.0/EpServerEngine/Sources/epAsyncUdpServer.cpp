@@ -26,8 +26,9 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-AsyncUdpServer::AsyncUdpServer(ServerCallbackInterface *callBackObj,const TCHAR *  port,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType): BaseUdpServer(callBackObj,port,waitTimeMilliSec,maximumConnectionCount,lockPolicyType)
+AsyncUdpServer::AsyncUdpServer(ServerCallbackInterface *callBackObj,const TCHAR *  port,bool isAsynchronousReceive,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType): BaseUdpServer(callBackObj,port,waitTimeMilliSec,maximumConnectionCount,lockPolicyType)
 {
+	m_isAsynchronousReceive=isAsynchronousReceive;
 }
 
 AsyncUdpServer::AsyncUdpServer(const AsyncUdpServer& b):BaseUdpServer(b)
@@ -45,6 +46,16 @@ AsyncUdpServer & AsyncUdpServer::operator=(const AsyncUdpServer&b)
 	}
 	return *this;
 }
+
+bool AsyncUdpServer::GetIsAsynchronousReceive() const
+{
+	return m_isAsynchronousReceive;
+}
+void AsyncUdpServer::SetIsAsynchronousReceive(bool isASynchronousReceive)
+{
+	m_isAsynchronousReceive=isASynchronousReceive;
+}
+
 void AsyncUdpServer::execute()
 {
 	Packet recvPacket(NULL,m_maxPacketSize);
@@ -82,10 +93,12 @@ void AsyncUdpServer::execute()
 				}
 			}
 			if(!m_callBackObj->OnAccept(clientSockAddr))
+			{
 				continue;
+			}
 			/// Create Worker Thread
 			Packet *passPacket=EP_NEW Packet(packetData,recvLength);
-			AsyncUdpSocket *accWorker=EP_NEW AsyncUdpSocket(m_callBackObj,m_waitTime,PROCESSOR_LIMIT_INFINITE,m_lockPolicy);
+			AsyncUdpSocket *accWorker=EP_NEW AsyncUdpSocket(m_callBackObj,m_isAsynchronousReceive,m_waitTime,PROCESSOR_LIMIT_INFINITE,m_lockPolicy);
 			accWorker->setSockAddr(clientSockAddr);
 			accWorker->setOwner(this);
 			accWorker->setMaxPacketByteSize(m_maxPacketSize);

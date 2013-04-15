@@ -27,6 +27,8 @@ static char THIS_FILE[] = __FILE__;
 using namespace epse;
 SyncUdpSocket::SyncUdpSocket(ServerCallbackInterface *callBackObj,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseUdpSocket(callBackObj,waitTimeMilliSec,lockPolicyType)
 {
+	m_packetReceivedEvent=EventEx(false,false);
+	m_isConnected=true;
 }
 
 SyncUdpSocket::~SyncUdpSocket()
@@ -34,7 +36,10 @@ SyncUdpSocket::~SyncUdpSocket()
 	KillConnection();
 }
 
-
+bool SyncUdpSocket::IsConnectionAlive() const
+{
+	return m_isConnected;
+}
 
 void SyncUdpSocket::KillConnection()
 {
@@ -43,10 +48,6 @@ void SyncUdpSocket::KillConnection()
 	{
 		return;
 	}
-	m_threadStopEvent.SetEvent();
-	if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
-		Resume();
-	TerminateAfter(m_waitTime);
 
 	m_listLock->Lock();
 	Packet *removeElem=NULL;
@@ -59,6 +60,7 @@ void SyncUdpSocket::KillConnection()
 	}
 	m_listLock->Unlock();
 
+	m_isConnected=false;
 	removeSelfFromContainer();
 	m_callBackObj->OnDisconnect(this);
 }
@@ -68,7 +70,6 @@ void SyncUdpSocket::killConnection()
 {
 	if(IsConnectionAlive())
 	{
-
 		m_listLock->Lock();
 		Packet *removeElem=NULL;
 		while(!m_packetList.empty())
@@ -80,43 +81,64 @@ void SyncUdpSocket::killConnection()
 		}
 		m_listLock->Unlock();
 
+		m_isConnected=false;
 		removeSelfFromContainer();
 		m_callBackObj->OnDisconnect(this);
 
 	}
 }
 
-void SyncUdpSocket::execute()
+void SyncUdpSocket::addPacket(Packet *packet)
 {
+	if(packet)
+		packet->RetainObj();
+	epl::LockObj lock(m_listLock);
+	m_packetList.push(packet);
+	m_packetReceivedEvent.SetEvent();
+}
+
+Packet *SyncUdpSocket::Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *retStatus)
+{
+	if(!IsConnectionAlive())
+	{
+		if(retStatus)
+			*retStatus=RECEIVE_STATUS_FAIL_NOT_CONNECTED;
+		return NULL;
+	}
+
+	// receive routine
 	unsigned int packetSize=0;
 
-	while(1)
+	m_listLock->Lock();
+	if(m_packetList.size()==0)
 	{
-		if(m_threadStopEvent.WaitForEvent(WAITTIME_IGNORE))
-		{
-			break;
-		}
-		m_listLock->Lock();
-		if(m_packetList.size()==0)
-		{
-			m_listLock->Unlock();
-			Suspend();
-			continue;
-		}
-		Packet *packet= m_packetList.front();
-		packetSize=packet->GetPacketByteSize();
-		if(packetSize==0)
-		{
-			m_listLock->Unlock();
-			break;
-		}
-		m_packetList.pop();
 		m_listLock->Unlock();
-		m_callBackObj->OnReceived(this,*packet);
-		packet->ReleaseObj();
-	}	
+		if(!m_packetReceivedEvent.WaitForEvent(waitTimeInMilliSec))
+		{
+			if(retStatus)
+				*retStatus=RECEIVE_STATUS_FAIL_TIME_OUT;
+			return NULL;
+		}
 
-	killConnection();
+	}
+	Packet *packet= m_packetList.front();
+	packetSize=packet->GetPacketByteSize();
+	if(packetSize==0)
+	{
+		m_listLock->Unlock();
+		killConnection();
+		if(retStatus)
+			*retStatus=RECEIVE_STATUS_FAIL_CONNECTION_CLOSING;
+		return NULL;
+	}
+	m_packetList.pop();
+	m_listLock->Unlock();
+	if(retStatus)
+		*retStatus=RECEIVE_STATUS_SUCCESS;
+	return packet;
+}
 
+void SyncUdpSocket::execute()
+{
 }
 

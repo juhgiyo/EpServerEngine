@@ -61,11 +61,25 @@ namespace epse
 		*/
 		virtual ~SyncTcpSocket();
 
+		/*!
+		Check if the connection is alive
+		@return true if the connection is alive otherwise false
+		*/
+		virtual bool IsConnectionAlive() const;
 
 		/*!
 		Kill the connection
 		*/
 		virtual void KillConnection();
+
+		/*!
+		Receive the packet from the client
+		@param[in] waitTimeInMilliSec wait time for receiving the packet in millisecond
+		@param[out] retStatus the pointer to ReceiveStatus enumerator to get receive status.
+		@return received packet
+		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
+		*/
+		virtual Packet *Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *retStatus=NULL);
 		
 	
 	private:	
@@ -101,6 +115,10 @@ namespace epse
 		*/
 		SyncTcpSocket & operator=(const SyncTcpSocket&b){return *this;}
 	
+	private:
+
+		/// Connection status
+		bool m_isConnected;
 	};
 
 }

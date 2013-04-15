@@ -27,6 +27,7 @@ static char THIS_FILE[] = __FILE__;
 using namespace epse;
 SyncTcpSocket::SyncTcpSocket(ServerCallbackInterface *callBackObj,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseTcpSocket(callBackObj,waitTimeMilliSec,lockPolicyType)
 {
+	m_isConnected=true;
 }
 
 SyncTcpSocket::~SyncTcpSocket()
@@ -34,7 +35,10 @@ SyncTcpSocket::~SyncTcpSocket()
 	KillConnection();
 }
 
-
+bool SyncTcpSocket::IsConnectionAlive() const
+{
+	return m_isConnected;
+}
 
 void SyncTcpSocket::KillConnection()
 {
@@ -44,6 +48,7 @@ void SyncTcpSocket::KillConnection()
 		return;
 	}
 	// No longer need client socket
+	m_sendLock->Lock();
 	if(m_clientSocket!=INVALID_SOCKET)
 	{
 		int iResult;
@@ -54,7 +59,9 @@ void SyncTcpSocket::KillConnection()
 		closesocket(m_clientSocket);
 		m_clientSocket = INVALID_SOCKET;
 	}
-	TerminateAfter(m_waitTime);
+	m_sendLock->Unlock();
+
+	m_isConnected=false;
 	removeSelfFromContainer();
 	m_callBackObj->OnDisconnect(this);
 }
@@ -65,49 +72,105 @@ void SyncTcpSocket::killConnection()
 	if(IsConnectionAlive())
 	{
 		// No longer need client socket
+		m_sendLock->Lock();
+		if(m_clientSocket!=INVALID_SOCKET)
+		{
+			closesocket(m_clientSocket);
+			m_clientSocket = INVALID_SOCKET;
+		}
+		m_sendLock->Unlock();
+
+		m_isConnected=false;
 		removeSelfFromContainer();
 		m_callBackObj->OnDisconnect(this);
 	}
 }
 
+Packet *SyncTcpSocket::Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *retStatus)
+{
+	if(!IsConnectionAlive())
+	{
+		if(retStatus)
+			*retStatus=RECEIVE_STATUS_FAIL_NOT_CONNECTED;
+		return NULL;
+	}
 
+	// select routine
+	TIMEVAL	timeOutVal;
+	fd_set	fdSet;
+	int		retfdNum = 0;
+
+	FD_ZERO(&fdSet);
+	FD_SET(m_clientSocket, &fdSet);
+	if(waitTimeInMilliSec!=WAITTIME_INIFINITE)
+	{
+		// socket select time out setting
+		timeOutVal.tv_sec = (long)(waitTimeInMilliSec/1000); // Convert to seconds
+		timeOutVal.tv_usec = (long)(waitTimeInMilliSec%1000)*1000; // Convert remainders to micro-seconds
+		// socket select
+		// socket read select
+		retfdNum = select(0,&fdSet, NULL, NULL, &timeOutVal);
+	}
+	else
+	{
+		retfdNum = select(0, &fdSet,NULL, NULL, NULL);
+	}
+	if (retfdNum == SOCKET_ERROR)	// select failed
+	{
+		killConnection();
+		if(retStatus)
+			*retStatus=RECEIVE_STATUS_FAIL_SOCKET_ERROR;
+		return NULL;
+	}
+	else if (retfdNum == 0)		    // select time-out
+	{
+		if(retStatus)
+			*retStatus=RECEIVE_STATUS_FAIL_TIME_OUT;
+		return NULL;
+	}
+
+	// receive routine
+	int iResult =receive(m_recvSizePacket);
+	if(iResult>0)
+	{
+		unsigned int shouldReceive=(reinterpret_cast<unsigned int*>(const_cast<char*>(m_recvSizePacket.GetPacket())))[0];
+		Packet *recvPacket=EP_NEW Packet(NULL,shouldReceive);
+		iResult = receive(*recvPacket);
+
+		if (iResult == shouldReceive) {
+			if(retStatus)
+				*retStatus=RECEIVE_STATUS_SUCCESS;
+			return recvPacket;
+		}
+		else if (iResult == 0)
+		{
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Connection closing...\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+			recvPacket->ReleaseObj();
+			killConnection();
+			if(retStatus)
+				*retStatus=RECEIVE_STATUS_FAIL_CONNECTION_CLOSING;
+			return NULL;
+		}
+		else  {
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) recv failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+			recvPacket->ReleaseObj();
+			killConnection();
+			if(retStatus)
+				*retStatus=RECEIVE_STATUS_FAIL_RECEIVE_FAILED;
+			return NULL;
+		}
+	}
+	else
+	{
+		killConnection();
+		if(retStatus)
+			*retStatus=RECEIVE_STATUS_FAIL_CONNECTION_CLOSING;
+		return NULL;
+	}
+
+}
 void SyncTcpSocket::execute()
 {
-	int iResult=0;
-
-	// Receive until the peer shuts down the connection
-	do {
-		iResult =receive(m_recvSizePacket);
-		if(iResult>0)
-		{
-			unsigned int shouldReceive=(reinterpret_cast<unsigned int*>(const_cast<char*>(m_recvSizePacket.GetPacket())))[0];
-			Packet *recvPacket=EP_NEW Packet(NULL,shouldReceive);
-			iResult = receive(*recvPacket);
-
-			if (iResult == shouldReceive) {
-				m_callBackObj->OnReceived(this,&recvPacket);
-				recvPacket->ReleaseObj();
-			}
-			else if (iResult == 0)
-			{
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Connection closing...\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-				recvPacket->ReleaseObj();
-				break;
-			}
-			else  {
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) recv failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-				recvPacket->ReleaseObj();
-				break;
-			}
-		}
-		else
-		{
-			break;
-		}
-
-	} while (iResult > 0);
-
-	killConnection();
 }
 
 
