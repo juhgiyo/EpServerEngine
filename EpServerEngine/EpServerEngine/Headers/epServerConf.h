@@ -50,21 +50,6 @@ namespace epse{
 	*/
 	#define DEFAULT_PORT "80808"
 
-	/*!
-	@def WAITTIME_SKIP
-	@brief skip the waiting and terminate
-
-	Macro skip the waiting and terminate.
-	*/
-	#define WAITTIME_SKIP    0xFFFFFFFE  // skip Terminate
-
-	/*!
-	@def DEFAULT_WAITTIME
-	@brief default wait time
-
-	Macro for the default wait time in millisec.
-	*/
-	#define DEFAULT_WAITTIME WAITTIME_INIFINITE
 
 	/// Synchronous Policy
 	typedef enum _syncPolicy{
