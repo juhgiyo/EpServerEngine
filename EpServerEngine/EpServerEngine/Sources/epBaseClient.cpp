@@ -191,7 +191,7 @@ void BaseClient::setPort(const TCHAR *port)
 	}
 }
 
-void BaseClient::GetMaximumParserCount(unsigned int maxParserCount)
+void BaseClient::SetMaximumParserCount(unsigned int maxParserCount)
 {
 	epl::LockObj lock(m_generalLock);
 	m_maxParserCount=maxParserCount;

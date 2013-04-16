@@ -281,7 +281,7 @@ namespace epse{
 		@remark When this function calls, it is right before making connection,<br/>
 		        so user can configure the socket before the connection is actually made.		
 		*/
-		virtual void OnNewConnection(const SocketInterface *socket){}
+		virtual void OnNewConnection(SocketInterface *socket){}
 
 		/*!
 		Received the packet from the client.
@@ -289,13 +289,13 @@ namespace epse{
 		@param[in] receivedPacket the received packet
 		@remark for Asynchronous Server Use Only!
 		*/
-		virtual void OnReceived(const SocketInterface *socket,const Packet&recievedPacket)=0;
+		virtual void OnReceived(SocketInterface *socket,const Packet&recievedPacket)=0;
 
 		/*!
 		The client is disconnected.
 		@param[in] socket the client socket, disconnected.
 		*/
-		virtual void OnDisconnect(const SocketInterface *socket){}
+		virtual void OnDisconnect(SocketInterface *socket){}
 	};
 
 }

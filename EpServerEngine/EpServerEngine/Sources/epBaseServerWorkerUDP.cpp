@@ -187,7 +187,7 @@ void BaseServerWorkerUDP::resetWorker()
 
 	
 }
-void BaseServerWorkerUDP::GetMaximumParserCount(unsigned int maxParserCount)
+void BaseServerWorkerUDP::SetMaximumParserCount(unsigned int maxParserCount)
 {
 	epl::LockObj lock(m_baseWorkerLock);
 	m_maxParserCount=maxParserCount;

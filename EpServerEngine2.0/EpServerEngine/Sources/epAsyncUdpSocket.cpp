@@ -27,6 +27,7 @@ static char THIS_FILE[] = __FILE__;
 using namespace epse;
 AsyncUdpSocket::AsyncUdpSocket(ServerCallbackInterface *callBackObj,bool isAsynchronousReceive,unsigned int waitTimeMilliSec,unsigned int maximumProcessorCount,epl::LockPolicy lockPolicyType): BaseUdpSocket(callBackObj,waitTimeMilliSec,lockPolicyType)
 {
+	m_processorList=ServerObjectList(waitTimeMilliSec,lockPolicyType);
 	m_threadStopEvent=EventEx(false,false);
 	m_maxProcessorCount=maximumProcessorCount;
 	m_isAsynchronousReceive=isAsynchronousReceive;
@@ -56,6 +57,13 @@ void AsyncUdpSocket::SetIsAsynchronousReceive(bool isASynchronousReceive)
 {
 	m_isAsynchronousReceive=isASynchronousReceive;
 }
+
+void AsyncUdpSocket::SetWaitTime(unsigned int milliSec)
+{
+	m_waitTime=milliSec;
+	m_processorList.SetWaitTime(milliSec);
+}
+
 void AsyncUdpSocket::KillConnection()
 {
 	epl::LockObj lock(m_baseSocketLock);

@@ -130,6 +130,12 @@ namespace epse{
 		virtual void SetCallbackObject(ServerCallbackInterface *callBackObj);
 
 		/*!
+		Set the wait time for the thread termination
+		@param[in] milliSec the time for waiting in millisecond
+		*/
+		virtual void SetWaitTime(unsigned int milliSec);
+
+		/*!
 		Get the Callback Object of server
 		@return the current Callback Object
 		*/

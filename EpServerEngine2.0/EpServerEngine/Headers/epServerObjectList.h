@@ -50,7 +50,8 @@ namespace epse{
 
 	protected:
 		friend class BaseClient;
-		friend class BaseClientUDP;
+		
+		friend class AsyncTcpClient;
 		
 		friend class BaseServer;
 		friend class BaseSocket;

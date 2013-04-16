@@ -27,6 +27,7 @@ static char THIS_FILE[] = __FILE__;
 using namespace epse;
 AsyncTcpSocket::AsyncTcpSocket(ServerCallbackInterface *callBackObj,bool isAsynchronousReceive,unsigned int waitTimeMilliSec,unsigned int maximumProcessorCount,epl::LockPolicy lockPolicyType): BaseTcpSocket(callBackObj,waitTimeMilliSec,lockPolicyType)
 {
+	m_processorList=ServerObjectList(waitTimeMilliSec,lockPolicyType);
 	m_maxProcessorCount=maximumProcessorCount;
 	m_isAsynchronousReceive=isAsynchronousReceive;
 }
@@ -57,6 +58,12 @@ bool AsyncTcpSocket::GetIsAsynchronousReceive() const
 void AsyncTcpSocket::SetIsAsynchronousReceive(bool isASynchronousReceive)
 {
 	m_isAsynchronousReceive=isASynchronousReceive;
+}
+
+void AsyncTcpSocket::SetWaitTime(unsigned int milliSec)
+{
+	m_waitTime=milliSec;
+	m_processorList.SetWaitTime(milliSec);
 }
 
 void AsyncTcpSocket::KillConnection()

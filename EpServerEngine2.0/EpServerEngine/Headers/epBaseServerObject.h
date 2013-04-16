@@ -98,6 +98,8 @@ namespace epse{
 
 		friend class BaseClient;
 
+		friend class AsyncTcpClient;
+
 		friend class BaseServer;
 		friend class BaseTcpServer;
 		friend class BaseUdpServer;

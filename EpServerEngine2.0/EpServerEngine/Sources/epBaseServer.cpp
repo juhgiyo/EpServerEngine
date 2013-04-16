@@ -187,6 +187,11 @@ ServerCallbackInterface *BaseServer::GetCallbackObject()
 	return m_callBackObj;
 }
 
+void BaseServer::SetWaitTime(unsigned int milliSec)
+{
+	m_waitTime=milliSec;
+	m_socketList.SetWaitTime(milliSec);
+}
 
 bool BaseServer::StartServer(const TCHAR * port)
 {

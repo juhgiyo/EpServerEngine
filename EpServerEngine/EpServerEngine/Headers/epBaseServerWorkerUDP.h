@@ -99,7 +99,7 @@ namespace epse
 		@param[in] maxParserCount The Maximum Parser Count to set.
 		@remark 0 means there is no limit
 		*/
-		void GetMaximumParserCount(unsigned int maxParserCount);
+		void SetMaximumParserCount(unsigned int maxParserCount);
 
 		/*!
 		Get the Maximum Parser Parser of server

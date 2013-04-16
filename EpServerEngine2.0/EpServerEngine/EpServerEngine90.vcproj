@@ -681,6 +681,18 @@
 					RelativePath=".\Sources\epClientPacketProcessor.cpp"
 					>
 				</File>
+				<Filter
+					Name="Asynchronous"
+					>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epAsyncTcpClient.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="General"

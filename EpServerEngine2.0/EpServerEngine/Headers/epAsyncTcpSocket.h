@@ -94,6 +94,12 @@ namespace epse
 		*/
 		virtual void SetIsAsynchronousReceive(bool isASynchronousReceive);
 
+		/*!
+		Set the wait time for the thread termination
+		@param[in] milliSec the time for waiting in millisecond
+		*/
+		virtual void SetWaitTime(unsigned int milliSec);
+
 	private:	
 		friend class AsyncTcpServer;
 	
