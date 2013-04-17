@@ -33,6 +33,13 @@ AsyncUdpClient::AsyncUdpClient(ClientCallbackInterface *callBackObj,const TCHAR 
 	m_isAsynchronousReceive=isAsynchronousReceive;
 }
 
+AsyncUdpClient::AsyncUdpClient(const ClientOps &ops):BaseUdpClient(ops)
+{
+	m_processorList=ServerObjectList(ops.waitTimeMilliSec,ops.lockPolicyType);
+	m_maxProcessorCount=ops.maximumProcessorCount;
+	m_isAsynchronousReceive=ops.isAsynchronousReceive;
+}
+
 AsyncUdpClient::AsyncUdpClient(const AsyncUdpClient& b):BaseUdpClient(b)
 {
 	LockObj lock(b.m_generalLock);

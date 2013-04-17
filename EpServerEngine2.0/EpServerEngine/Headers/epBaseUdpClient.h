@@ -59,6 +59,14 @@ namespace epse{
 		BaseUdpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
+		Default Constructor
+
+		Initializes the Client
+		@param[in] ops the client options
+		*/
+		BaseUdpClient(const ClientOps &ops);
+
+		/*!
 		Default Copy Constructor
 
 		Initializes the Client

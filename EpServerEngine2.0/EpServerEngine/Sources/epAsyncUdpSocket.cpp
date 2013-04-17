@@ -127,8 +127,9 @@ void AsyncUdpSocket::addPacket(Packet *packet)
 
 void AsyncUdpSocket::execute()
 {
-	unsigned int packetSize=0;
+	m_callBackObj->OnNewConnection(this);
 
+	unsigned int packetSize=0;
 	while(1)
 	{
 		if(m_threadStopEvent.WaitForEvent(WAITTIME_IGNORE))

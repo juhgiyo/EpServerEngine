@@ -30,6 +30,11 @@ SyncTcpClient::SyncTcpClient(ClientCallbackInterface *callBackObj,const TCHAR * 
 	m_isConnected=false;
 }
 
+SyncTcpClient::SyncTcpClient(const ClientOps &ops):BaseTcpClient(ops)
+{
+
+}
+
 SyncTcpClient::SyncTcpClient(const SyncTcpClient& b) :BaseTcpClient(b)
 {
 	LockObj lock(b.m_generalLock);

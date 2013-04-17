@@ -31,6 +31,11 @@ AsyncUdpServer::AsyncUdpServer(ServerCallbackInterface *callBackObj,const TCHAR 
 	m_isAsynchronousReceive=isAsynchronousReceive;
 }
 
+AsyncUdpServer::AsyncUdpServer(const ServerOps &ops):BaseUdpServer(ops)
+{
+	m_isAsynchronousReceive=ops.isAsynchronousReceive;
+}
+
 AsyncUdpServer::AsyncUdpServer(const AsyncUdpServer& b):BaseUdpServer(b)
 {
 	LockObj lock(b.m_baseServerLock);
@@ -106,7 +111,6 @@ void AsyncUdpServer::execute()
 			accWorker->setSockAddr(clientSockAddr);
 			accWorker->setOwner(this);
 			accWorker->setMaxPacketByteSize(m_maxPacketSize);
-			m_callBackObj->OnNewConnection(accWorker);
 			m_socketList.Push(accWorker);
 			accWorker->Start();
 			accWorker->addPacket(passPacket);

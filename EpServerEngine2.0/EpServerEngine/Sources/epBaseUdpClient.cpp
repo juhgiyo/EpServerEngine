@@ -33,6 +33,11 @@ BaseUdpClient::BaseUdpClient(ClientCallbackInterface *callBackObj,const TCHAR * 
 	m_maxPacketSize=0;
 }
 
+BaseUdpClient::BaseUdpClient(const ClientOps &ops):BaseClient(ops)
+{
+
+}
+
 BaseUdpClient::BaseUdpClient(const BaseUdpClient& b):BaseClient(b)
 {
 	LockObj lock(b.m_generalLock);

@@ -30,6 +30,11 @@ BaseTcpServer::BaseTcpServer(ServerCallbackInterface *callBackObj,const TCHAR * 
 {
 }
 
+BaseTcpServer::BaseTcpServer(const ServerOps &ops):BaseServer(ops)
+{
+
+}
+
 BaseTcpServer::BaseTcpServer(const BaseTcpServer& b):BaseServer(b)
 {}
 

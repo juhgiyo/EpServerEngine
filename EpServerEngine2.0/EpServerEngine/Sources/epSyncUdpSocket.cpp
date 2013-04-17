@@ -140,5 +140,6 @@ Packet *SyncUdpSocket::Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *re
 
 void SyncUdpSocket::execute()
 {
+	m_callBackObj->OnNewConnection(this);
 }
 

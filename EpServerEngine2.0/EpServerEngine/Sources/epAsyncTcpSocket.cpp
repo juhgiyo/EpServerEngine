@@ -115,10 +115,9 @@ void AsyncTcpSocket::killConnection()
 
 void AsyncTcpSocket::execute()
 {
+	m_callBackObj->OnNewConnection(this);
+
 	int iResult=0;
-
-	
-
 	// Receive until the peer shuts down the connection
 	do {
 		iResult =receive(m_recvSizePacket);

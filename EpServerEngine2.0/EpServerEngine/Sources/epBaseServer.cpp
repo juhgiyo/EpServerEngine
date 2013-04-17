@@ -51,6 +51,32 @@ BaseServer::BaseServer(ServerCallbackInterface *callBackObj,const TCHAR * port,u
 	m_maxConnectionCount=maximumConnectionCount;
 	m_callBackObj=callBackObj;
 }
+BaseServer::BaseServer(const ServerOps &ops):BaseServerObject(ops.waitTimeMilliSec,ops.lockPolicyType)
+{
+	EP_ASSERT(ops.callBackObj);
+	m_socketList=ServerObjectList(ops.waitTimeMilliSec,ops.lockPolicyType);
+	m_lockPolicy=ops.lockPolicyType;
+	switch(ops.lockPolicyType)
+	{
+	case epl::LOCK_POLICY_CRITICALSECTION:
+		m_baseServerLock=EP_NEW epl::CriticalSectionEx();
+		break;
+	case epl::LOCK_POLICY_MUTEX:
+		m_baseServerLock=EP_NEW epl::Mutex();
+		break;
+	case epl::LOCK_POLICY_NONE:
+		m_baseServerLock=EP_NEW epl::NoLock();
+		break;
+	default:
+		m_baseServerLock=NULL;
+		break;
+	}
+	SetPort(ops.port);
+	m_listenSocket=INVALID_SOCKET;
+	m_result=0;
+	m_maxConnectionCount=ops.maximumConnectionCount;
+	m_callBackObj=ops.callBackObj;
+}
 
 BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 {

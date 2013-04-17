@@ -54,6 +54,7 @@ An Interface for Base Server.
 
 namespace epse{
 
+	
 
 	/*! 
 	@class BaseServer epBaseServer.h
@@ -73,6 +74,14 @@ namespace epse{
 		@param[in] lockPolicyType The lock policy
 		*/
 		BaseServer(ServerCallbackInterface *callBackObj,const TCHAR * port=_T(DEFAULT_PORT),unsigned int waitTimeMilliSec=WAITTIME_INIFINITE, unsigned int maximumConnectionCount=CONNECTION_LIMIT_INFINITE, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+
+		/*!
+		Default Constructor
+
+		Initializes the Server
+		@param[in] ops the server options
+		*/
+		BaseServer(const ServerOps &ops);
 
 		/*!
 		Default Copy Constructor

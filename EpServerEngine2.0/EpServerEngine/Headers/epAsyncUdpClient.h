@@ -61,6 +61,14 @@ namespace epse{
 		AsyncUdpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),bool isAsynchronousReceive=true,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,unsigned int maximumProcessorCount=PROCESSOR_LIMIT_INFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
+		Default Constructor
+
+		Initializes the Client
+		@param[in] ops the client options
+		*/
+		AsyncUdpClient(const ClientOps &ops);
+
+		/*!
 		Default Copy Constructor
 
 		Initializes the Client

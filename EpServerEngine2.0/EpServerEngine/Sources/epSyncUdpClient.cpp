@@ -32,6 +32,11 @@ SyncUdpClient::SyncUdpClient(ClientCallbackInterface *callBackObj,const TCHAR * 
 
 }
 
+SyncUdpClient::SyncUdpClient(const ClientOps &ops):BaseUdpClient(ops)
+{
+
+}
+
 SyncUdpClient::SyncUdpClient(const SyncUdpClient& b):BaseUdpClient(b)
 {
 	LockObj lock(b.m_generalLock);

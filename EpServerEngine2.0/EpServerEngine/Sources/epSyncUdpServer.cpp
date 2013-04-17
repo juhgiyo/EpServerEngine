@@ -30,6 +30,11 @@ SyncUdpServer::SyncUdpServer(ServerCallbackInterface *callBackObj,const TCHAR * 
 {
 }
 
+SyncUdpServer::SyncUdpServer(const ServerOps &ops):BaseUdpServer(ops)
+{
+
+}
+
 SyncUdpServer::SyncUdpServer(const SyncUdpServer& b):BaseUdpServer(b)
 {
 }
@@ -91,8 +96,8 @@ void SyncUdpServer::execute()
 			accWorker->setSockAddr(clientSockAddr);
 			accWorker->setOwner(this);
 			accWorker->setMaxPacketByteSize(m_maxPacketSize);
-			m_callBackObj->OnNewConnection(accWorker);
 			m_socketList.Push(accWorker);
+			accWorker->Start();
 			accWorker->addPacket(passPacket);
 			accWorker->ReleaseObj();
 			passPacket->ReleaseObj();

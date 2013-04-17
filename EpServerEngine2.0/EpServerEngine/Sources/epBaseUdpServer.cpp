@@ -45,6 +45,26 @@ BaseUdpServer::BaseUdpServer(ServerCallbackInterface *callBackObj,const TCHAR * 
 	m_maxPacketSize=0;
 }
 
+BaseUdpServer::BaseUdpServer(const ServerOps &ops):BaseServer(ops)
+{
+	switch(ops.lockPolicyType)
+	{
+	case epl::LOCK_POLICY_CRITICALSECTION:
+		m_sendLock=EP_NEW epl::CriticalSectionEx();
+		break;
+	case epl::LOCK_POLICY_MUTEX:
+		m_sendLock=EP_NEW epl::Mutex();
+		break;
+	case epl::LOCK_POLICY_NONE:
+		m_sendLock=EP_NEW epl::NoLock();
+		break;
+	default:
+		m_sendLock=NULL;
+		break;
+	}
+	m_maxPacketSize=0;
+}
+
 BaseUdpServer::BaseUdpServer(const BaseUdpServer& b):BaseServer(b)
 {
 	switch(m_lockPolicy)

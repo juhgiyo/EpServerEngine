@@ -31,6 +31,11 @@ AsyncTcpServer::AsyncTcpServer(ServerCallbackInterface *callBackObj,const TCHAR 
 	m_isAsynchronousReceive=isAsynchronousReceive;
 }
 
+AsyncTcpServer::AsyncTcpServer(const ServerOps &ops):BaseTcpServer(ops)
+{
+	m_isAsynchronousReceive=ops.isAsynchronousReceive;
+}
+
 AsyncTcpServer::AsyncTcpServer(const AsyncTcpServer& b):BaseTcpServer(b)
 {
 	LockObj lock(b.m_baseServerLock);
@@ -84,7 +89,6 @@ void AsyncTcpServer::execute()
 			accWorker->setClientSocket(clientSocket);
 			accWorker->setOwner(this);
 			accWorker->setSockAddr(sockAddr);
-			m_callBackObj->OnNewConnection(accWorker);
 			m_socketList.Push(accWorker);	
 			accWorker->Start();
 			accWorker->ReleaseObj();

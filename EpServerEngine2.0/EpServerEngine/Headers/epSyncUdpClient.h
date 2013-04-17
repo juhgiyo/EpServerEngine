@@ -55,6 +55,14 @@ namespace epse{
 		SyncUdpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
+		Default Constructor
+
+		Initializes the Client
+		@param[in] ops the client options
+		*/
+		SyncUdpClient(const ClientOps &ops);
+
+		/*!
 		Default Copy Constructor
 
 		Initializes the Client

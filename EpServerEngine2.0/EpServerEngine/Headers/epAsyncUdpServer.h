@@ -59,6 +59,14 @@ namespace epse{
 		AsyncUdpServer(ServerCallbackInterface *callBackObj,const TCHAR * port=_T(DEFAULT_PORT),bool isAsynchronousReceive=true,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE, unsigned int maximumConnectionCount=CONNECTION_LIMIT_INFINITE, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
+		Default Constructor
+
+		Initializes the Server
+		@param[in] ops the server options
+		*/
+		AsyncUdpServer(const ServerOps &ops);
+
+		/*!
 		Default Copy Constructor
 
 		Initializes the Server

@@ -57,7 +57,38 @@ BaseClient::BaseClient(ClientCallbackInterface *callBackObj,const TCHAR * hostNa
 
 	m_callBackObj=callBackObj;
 }
+BaseClient::BaseClient(const ClientOps &ops):BaseServerObject(ops.waitTimeMilliSec,ops.lockPolicyType)
+{
+	EP_ASSERT(ops.callBackObj);
 
+	m_lockPolicy=ops.lockPolicyType;
+	switch(ops.lockPolicyType)
+	{
+	case epl::LOCK_POLICY_CRITICALSECTION:
+		m_sendLock=EP_NEW epl::CriticalSectionEx();
+		m_generalLock=EP_NEW epl::CriticalSectionEx();
+		break;
+	case epl::LOCK_POLICY_MUTEX:
+		m_sendLock=EP_NEW epl::Mutex();
+		m_generalLock=EP_NEW epl::Mutex();
+		break;
+	case epl::LOCK_POLICY_NONE:
+		m_sendLock=EP_NEW epl::NoLock();
+		m_generalLock=EP_NEW epl::NoLock();
+		break;
+	default:
+		m_sendLock=NULL;
+		m_generalLock=NULL;
+		break;
+	}
+
+	SetHostName(ops.hostName);
+	SetPort(ops.port);
+	m_connectSocket=INVALID_SOCKET;
+	m_result=0;
+
+	m_callBackObj=ops.callBackObj;
+}
 BaseClient::BaseClient(const BaseClient& b) :BaseServerObject(b)
 {
 	m_connectSocket=INVALID_SOCKET;

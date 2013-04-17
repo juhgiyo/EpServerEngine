@@ -171,6 +171,7 @@ Packet *SyncTcpSocket::Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *re
 }
 void SyncTcpSocket::execute()
 {
+	m_callBackObj->OnNewConnection(this);
 }
 
 

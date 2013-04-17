@@ -29,6 +29,10 @@ using namespace epse;
 SyncTcpServer::SyncTcpServer(ServerCallbackInterface *callBackObj,const TCHAR * port,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType):BaseTcpServer(callBackObj,port,waitTimeMilliSec,maximumConnectionCount,lockPolicyType)
 {
 }
+SyncTcpServer::SyncTcpServer(const ServerOps &ops):BaseTcpServer(ops)
+{
+
+}
 
 SyncTcpServer::SyncTcpServer(const SyncTcpServer& b):BaseTcpServer(b)
 {
@@ -69,8 +73,8 @@ void SyncTcpServer::execute()
 			accWorker->setClientSocket(clientSocket);
 			accWorker->setOwner(this);
 			accWorker->setSockAddr(sockAddr);
-			m_callBackObj->OnNewConnection(accWorker);
-			m_socketList.Push(accWorker);			
+			m_socketList.Push(accWorker);	
+			accWorker->Start();
 			accWorker->ReleaseObj();
 			if(GetMaximumConnectionCount()!=CONNECTION_LIMIT_INFINITE)
 			{

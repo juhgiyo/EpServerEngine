@@ -39,6 +39,43 @@ namespace epse{
 	class ServerCallbackInterface;
 
 	/*! 
+	@struct ServerOps epServerInterfaces.h
+	@brief A class for Server Options.
+	*/
+	struct EP_SERVER_ENGINE ServerOps{
+		/// Callback Object
+		ServerCallbackInterface *callBackObj;
+		/// Port
+		const TCHAR *port;
+		/*!
+		The flag for asynchronous receive.
+		@remark For Asynchronous Client Use Only!
+		*/
+		bool isAsynchronousReceive;
+		/// Wait time in millisecond for client threads
+		unsigned int waitTimeMilliSec;
+		///The maximum possible number of client connection
+		unsigned int maximumConnectionCount;
+		/// Lock Policy
+		epl::LockPolicy lockPolicyType;
+
+		/*!
+		Default Constructor
+
+		Initializes the Server Options
+		*/
+		ServerOps()
+		{
+			callBackObj=NULL;
+			port=_T(DEFAULT_PORT);
+			isAsynchronousReceive=true;
+			waitTimeMilliSec=WAITTIME_INIFINITE;
+			maximumConnectionCount=CONNECTION_LIMIT_INFINITE;
+			lockPolicyType=epl::EP_LOCK_POLICY;
+		}
+	};
+
+	/*! 
 	@class ServerInterface epServerInterfaces.h
 	@brief A class for Server Interface.
 	*/

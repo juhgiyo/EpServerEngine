@@ -39,6 +39,50 @@ An Interface for Client Interfaces.
 namespace epse{
 	class ClientCallbackInterface;
 
+	
+	/*! 
+	@struct ClientOps epClientInterfaces.h
+	@brief A class for Client Options.
+	*/
+	struct EP_SERVER_ENGINE ClientOps{
+		/// Callback Object
+		ClientCallbackInterface *callBackObj;
+		/// Hostname
+		const TCHAR *hostName;
+		/// Port
+		const TCHAR *port;
+		/*!
+		The flag for asynchronous receive.
+		@remark For Asynchronous Client Use Only!
+		*/
+		bool isAsynchronousReceive;
+		/// Wait time in millisecond for client threads
+		unsigned int waitTimeMilliSec;
+		/*!
+		The maximum possible number of packet processor
+		@remark For Asynchronous Client Use Only!
+		*/
+		unsigned int maximumProcessorCount;
+		/// Lock Policy
+		epl::LockPolicy lockPolicyType;
+
+		/*!
+		Default Constructor
+
+		Initializes the Client Options
+		*/
+		ClientOps()
+		{
+			callBackObj=NULL;
+			hostName=_T(DEFAULT_HOSTNAME);
+			port=_T(DEFAULT_PORT);
+			isAsynchronousReceive=true;
+			waitTimeMilliSec=WAITTIME_INIFINITE;
+			maximumProcessorCount=PROCESSOR_LIMIT_INFINITE;
+			lockPolicyType=epl::EP_LOCK_POLICY;
+		}
+	};
+
 	/*! 
 	@class ClientInterface epClientInterfaces.h
 	@brief A class for Client Interface.

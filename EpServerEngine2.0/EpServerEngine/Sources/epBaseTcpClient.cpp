@@ -30,6 +30,11 @@ BaseTcpClient::BaseTcpClient(ClientCallbackInterface *callBackObj,const TCHAR * 
 	m_recvSizePacket=Packet(NULL,4);
 }
 
+BaseTcpClient::BaseTcpClient(const ClientOps &ops):BaseClient(ops)
+{
+
+}
+
 BaseTcpClient::BaseTcpClient(const BaseTcpClient& b) :BaseClient(b)
 {
 	LockObj lock(b.m_generalLock);

@@ -31,6 +31,12 @@ AsyncTcpClient::AsyncTcpClient(ClientCallbackInterface *callBackObj,const TCHAR 
 	m_maxProcessorCount=maximumProcessorCount;
 	m_isAsynchronousReceive=isAsynchronousReceive;
 }
+AsyncTcpClient::AsyncTcpClient(const ClientOps &ops):BaseTcpClient(ops)
+{
+	m_processorList=ServerObjectList(ops.waitTimeMilliSec,ops.lockPolicyType);
+	m_maxProcessorCount=ops.maximumProcessorCount;
+	m_isAsynchronousReceive=ops.isAsynchronousReceive;
+}
 
 AsyncTcpClient::AsyncTcpClient(const AsyncTcpClient& b) :BaseTcpClient(b)
 {
