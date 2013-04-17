@@ -65,7 +65,7 @@ namespace epse
 		/*!
 		Default Copy Constructor
 
-		Initializes the ServerPacketProcessor
+		Initializes the Processor
 		@param[in] b the second object
 		@remark Copy Constructor prohibited
 		*/

@@ -56,7 +56,7 @@ namespace epse{
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseClientManual
+		Initializes the Client
 		@param[in] b the second object
 		*/
 		SyncTcpClient(const SyncTcpClient& b);
@@ -96,6 +96,7 @@ namespace epse{
 		/*!
 		Receive the packet from the server
 		@param[in] waitTimeInMilliSec wait time for receiving the packet in millisecond
+		@param[out] retStatus the status of receive
 		@return received packet
 		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
 		*/

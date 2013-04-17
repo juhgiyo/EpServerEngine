@@ -50,7 +50,7 @@ namespace epse
 
 		Initializes the Socket
 		@param[in] callBackObj the callback object
-				@param[in] isAsynchronousReceive the flag for Asynchronous Receive
+		@param[in] isAsynchronousReceive the flag for Asynchronous Receive
 		@param[in] waitTimeMilliSec wait time for Socket Thread to terminate
 		@param[in] maximumProcessorCount the maximum number of processor
 		@param[in] lockPolicyType The lock policy

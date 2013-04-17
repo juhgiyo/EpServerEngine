@@ -61,7 +61,7 @@ namespace epse{
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseClientUDP
+		Initializes the Client
 		@param[in] b the second object
 		*/
 		BaseUdpClient(const BaseUdpClient& b);

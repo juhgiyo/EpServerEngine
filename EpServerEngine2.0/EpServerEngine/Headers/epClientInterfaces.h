@@ -76,7 +76,7 @@ namespace epse{
 		Set the Maximum Processor Count for the Socket.
 		@param[in] maxProcessorCount The Maximum Processor Count to set.
 		@remark 0 means there is no limit
-		@remark For Asynchronous Socket Use Only!
+		@remark For Asynchronous Client Use Only!
 		*/
 		virtual void SetMaximumProcessorCount(unsigned int maxProcessorCount){}
 
@@ -84,7 +84,7 @@ namespace epse{
 		Get the Maximum Processor Count of the Socket
 		@return The Maximum Processor Count
 		@remark 0 means there is no limit
-		@remark For Asynchronous Socket Use Only!
+		@remark For Asynchronous Client Use Only!
 		*/
 		virtual unsigned int GetMaximumProcessorCount() const{return 0;}
 
@@ -134,7 +134,7 @@ namespace epse{
 		@param[out] retStatus the pointer to ReceiveStatus enumerator to get receive status.
 		@return received packet
 		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
-		@remark For Synchronous Socket Use Only!
+		@remark For Synchronous Client Use Only!
 		*/
 		virtual Packet *Receive(unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE,ReceiveStatus *retStatus=NULL)
 		{
@@ -159,7 +159,7 @@ namespace epse{
 		/*!
 		Get the asynchronous receive flag for the Socket.
 		@return The flag whether to receive asynchronously.
-		@remark for Asynchronous Socket Use Only!
+		@remark for Asynchronous Client Use Only!
 		*/
 		virtual bool GetIsAsynchronousReceive() const
 		{
@@ -169,7 +169,7 @@ namespace epse{
 		/*!
 		Set the asynchronous receive flag for the Socket.
 		@param[in] isASynchronousReceive The flag whether to receive asynchronously.
-		@remark for Asynchronous Socket Use Only!
+		@remark for Asynchronous Client Use Only!
 		*/
 		virtual void SetIsAsynchronousReceive(bool isASynchronousReceive)
 		{
@@ -179,7 +179,7 @@ namespace epse{
 		/*!
 		Get the maximum packet byte size
 		@return the maximum packet byte size
-		@remark for UDP Socket Use Only!
+		@remark for UDP Client Use Only!
 		*/
 		virtual unsigned int GetMaxPacketByteSize() const{return 0;}
 
@@ -193,7 +193,18 @@ namespace epse{
 	*/
 	class EP_SERVER_ENGINE ClientCallbackInterface{
 	public:
-		virtual void OnReceived(ClientInterface *client,const Packet&recievedPacket)=0;
+		/*!
+		Received the packet from the server.
+		@param[in] client the client which received the packet
+		@param[in] receivedPacket the received packet
+		@remark for Asynchronous Client Use Only!
+		*/
+		virtual void OnReceived(ClientInterface *client,const Packet&receivedPacket)=0;
+
+		/*!
+		The client is disconnected.
+		@param[in] client the client, disconnected.
+		*/
 		virtual void OnDisconnect(ClientInterface *client){}
 	};
 }

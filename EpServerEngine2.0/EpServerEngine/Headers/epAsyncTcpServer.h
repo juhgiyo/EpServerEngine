@@ -60,7 +60,7 @@ namespace epse{
 		/*!
 		Default Copy Constructor
 
-		Initializes the AsyncTcpServer
+		Initializes the Server
 		@param[in] b the second object
 		*/
 		AsyncTcpServer(const AsyncTcpServer& b);

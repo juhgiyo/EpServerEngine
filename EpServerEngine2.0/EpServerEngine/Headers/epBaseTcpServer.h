@@ -60,7 +60,7 @@ namespace epse{
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseTcpServer
+		Initializes the Server
 		@param[in] b the second object
 		*/
 		BaseTcpServer(const BaseTcpServer& b);

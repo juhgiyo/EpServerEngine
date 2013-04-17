@@ -57,7 +57,7 @@ namespace epse{
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseClient
+		Initializes the Client
 		@param[in] b the second object
 		*/
 		BaseTcpClient(const BaseTcpClient& b);

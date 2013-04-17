@@ -61,7 +61,7 @@ namespace epse{
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseServer
+		Initializes the Server
 		@param[in] b the second object
 		*/
 		AsyncUdpServer(const AsyncUdpServer& b);

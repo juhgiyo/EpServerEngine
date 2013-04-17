@@ -60,7 +60,7 @@ namespace epse{
 		/*!
 		Default Copy Constructor
 
-		Initializes the SyncTcpServer
+		Initializes the Server
 		@param[in] b the second object
 		*/
 		SyncTcpServer(const SyncTcpServer& b);

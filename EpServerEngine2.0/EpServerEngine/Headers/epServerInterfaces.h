@@ -289,7 +289,7 @@ namespace epse{
 		@param[in] receivedPacket the received packet
 		@remark for Asynchronous Server Use Only!
 		*/
-		virtual void OnReceived(SocketInterface *socket,const Packet&recievedPacket)=0;
+		virtual void OnReceived(SocketInterface *socket,const Packet&receivedPacket)=0;
 
 		/*!
 		The client is disconnected.

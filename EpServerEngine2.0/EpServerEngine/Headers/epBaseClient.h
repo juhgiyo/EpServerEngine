@@ -68,11 +68,11 @@ namespace epse{
 		/*!
 		Default Constructor
 
-		Initializes the Server
+		Initializes the Client
 		@param[in] callBackObj the callback object
 		@param[in] hostName the hostname string
 		@param[in] port the port string
-		@param[in] waitTimeMilliSec wait time for Server Thread to terminate
+		@param[in] waitTimeMilliSec wait time for Client Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
 		BaseClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName=_T(DEFAULT_HOSTNAME),const TCHAR * port=_T(DEFAULT_PORT),unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,  epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
@@ -80,14 +80,14 @@ namespace epse{
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseTcpServer
+		Initializes the Client
 		@param[in] b the second object
 		*/
 		BaseClient(const BaseClient& b);
 		/*!
 		Default Destructor
 
-		Destroy the Server
+		Destroy the Client
 		*/
 		virtual ~BaseClient();
 

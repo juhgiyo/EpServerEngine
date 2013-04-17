@@ -63,7 +63,7 @@ namespace epse{
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseClientUDP
+		Initializes the Client
 		@param[in] b the second object
 		*/
 		AsyncUdpClient(const AsyncUdpClient& b);
@@ -119,7 +119,7 @@ namespace epse{
 		/*!
 		Get the asynchronous receive flag for the Socket.
 		@return The flag whether to receive asynchronously.
-		@remark for Asynchronous Socket Use Only!
+		@remark for Asynchronous Client Use Only!
 		*/
 		bool GetIsAsynchronousReceive() const;
 		
@@ -127,7 +127,7 @@ namespace epse{
 		/*!
 		Set the asynchronous receive flag for the Socket.
 		@param[in] isASynchronousReceive The flag whether to receive asynchronously.
-		@remark for Asynchronous Socket Use Only!
+		@remark for Asynchronous Client Use Only!
 		*/
 		void SetIsAsynchronousReceive(bool isASynchronousReceive);
 
