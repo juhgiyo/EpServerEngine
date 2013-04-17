@@ -83,13 +83,13 @@ namespace epse{
 		Get the asynchronous receive flag for the Socket.
 		@return The flag whether to receive asynchronously.
 		*/
-		virtual bool GetIsAsynchronousReceive() const;
+		bool GetIsAsynchronousReceive() const;
 
 		/*!
 		Set the asynchronous receive flag for the Socket.
 		@param[in] isASynchronousReceive The flag whether to receive asynchronously.
 		*/
-		virtual void SetIsAsynchronousReceive(bool isASynchronousReceive);
+		void SetIsAsynchronousReceive(bool isASynchronousReceive);
 	
 	private:
 	

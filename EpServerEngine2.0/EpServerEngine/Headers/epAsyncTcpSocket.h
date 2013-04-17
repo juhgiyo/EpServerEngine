@@ -66,39 +66,39 @@ namespace epse
 		/*!
 		Kill the connection
 		*/
-		virtual void KillConnection();
+		void KillConnection();
 		
 		/*!
 		Set the Maximum Processor Count for the Socket.
 		@param[in] maxProcessorCount The Maximum Processor Count to set.
 		@remark 0 means there is no limit
 		*/
-		virtual void SetMaximumProcessorCount(unsigned int maxProcessorCount);
+		void SetMaximumProcessorCount(unsigned int maxProcessorCount);
 
 		/*!
 		Get the Maximum Processor Count of the Socket
 		@return The Maximum Processor Count
 		@remark 0 means there is no limit
 		*/
-		virtual unsigned int GetMaximumProcessorCount() const;
+		unsigned int GetMaximumProcessorCount() const;
 
 		/*!
 		Get the asynchronous receive flag for the Socket.
 		@return The flag whether to receive asynchronously.
 		*/
-		virtual bool GetIsAsynchronousReceive() const;
+		bool GetIsAsynchronousReceive() const;
 
 		/*!
 		Set the asynchronous receive flag for the Socket.
 		@param[in] isASynchronousReceive The flag whether to receive asynchronously.
 		*/
-		virtual void SetIsAsynchronousReceive(bool isASynchronousReceive);
+		void SetIsAsynchronousReceive(bool isASynchronousReceive);
 
 		/*!
 		Set the wait time for the thread termination
 		@param[in] milliSec the time for waiting in millisecond
 		*/
-		virtual void SetWaitTime(unsigned int milliSec);
+		void SetWaitTime(unsigned int milliSec);
 
 	private:	
 		friend class AsyncTcpServer;

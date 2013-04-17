@@ -101,13 +101,13 @@ namespace epse{
 		@remark Cannot be changed while connected to server
 		@param[in] port The port to set.
 		*/
-		virtual void SetPort(const TCHAR *  port);
+		void SetPort(const TCHAR *  port);
 
 		/*!
 		Get the port number of server
 		@return the port number in string
 		*/
-		virtual epl::EpTString GetPort() const;
+		epl::EpTString GetPort() const;
 
 		/*!
 		Set the Maximum Connection Count for the server.
@@ -121,25 +121,26 @@ namespace epse{
 		@return the Maximum Connection Count
 		@remark 0 means there is no limit
 		*/
-		virtual unsigned int GetMaximumConnectionCount() const;
+		unsigned int GetMaximumConnectionCount() const;
 
 		/*!
 		Set the Callback Object for the server.
 		@param[in] callBackObj The Callback Object to set.
 		*/
-		virtual void SetCallbackObject(ServerCallbackInterface *callBackObj);
+		void SetCallbackObject(ServerCallbackInterface *callBackObj);
+		
+		/*!
+		Get the Callback Object of server
+		@return the current Callback Object
+		*/
+		ServerCallbackInterface *GetCallbackObject();
 
 		/*!
 		Set the wait time for the thread termination
 		@param[in] milliSec the time for waiting in millisecond
 		*/
-		virtual void SetWaitTime(unsigned int milliSec);
+		void SetWaitTime(unsigned int milliSec);
 
-		/*!
-		Get the Callback Object of server
-		@return the current Callback Object
-		*/
-		virtual ServerCallbackInterface *GetCallbackObject();
 
 		/*!
 		Start the server
@@ -161,7 +162,7 @@ namespace epse{
 		/*!
 		Terminate all clients' socket connected.
 		*/
-		virtual void ShutdownAllClient();
+		void ShutdownAllClient();
 
 	protected:
 		/*!

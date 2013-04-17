@@ -33,6 +33,8 @@ AsyncUdpServer::AsyncUdpServer(ServerCallbackInterface *callBackObj,const TCHAR 
 
 AsyncUdpServer::AsyncUdpServer(const AsyncUdpServer& b):BaseUdpServer(b)
 {
+	LockObj lock(b.m_baseServerLock);
+	m_isAsynchronousReceive=b.m_isAsynchronousReceive;
 }
 AsyncUdpServer::~AsyncUdpServer()
 {
@@ -43,6 +45,8 @@ AsyncUdpServer & AsyncUdpServer::operator=(const AsyncUdpServer&b)
 	{
 	
 		BaseUdpServer::operator =(b);
+		LockObj lock(b.m_baseServerLock);
+		m_isAsynchronousReceive=b.m_isAsynchronousReceive;
 	}
 	return *this;
 }

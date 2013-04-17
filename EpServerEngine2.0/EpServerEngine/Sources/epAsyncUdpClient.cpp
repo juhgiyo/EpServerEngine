@@ -1,5 +1,5 @@
 /*! 
-AsyncTcpClient for the EpServerEngine
+AsyncUdpClient for the EpServerEngine
 Copyright (C) 2012  Woong Gyu La <juhgiyo@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,7 +15,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "epAsyncTcpClient.h"
+#include "epAsyncUdpClient.h"
+
 
 #if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
 #define new DEBUG_NEW
@@ -25,125 +26,116 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-AsyncTcpClient::AsyncTcpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName, const TCHAR * port,bool isAsynchronousReceive,unsigned int waitTimeMilliSec,unsigned int maximumProcessorCount,epl::LockPolicy lockPolicyType) :BaseTcpClient(callBackObj,hostName,port,waitTimeMilliSec,lockPolicyType)
+AsyncUdpClient::AsyncUdpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName, const TCHAR * port,bool isAsynchronousReceive,unsigned int waitTimeMilliSec,unsigned int maximumProcessorCount,epl::LockPolicy lockPolicyType): BaseUdpClient(callBackObj,hostName,port,waitTimeMilliSec,lockPolicyType)
 {
 	m_processorList=ServerObjectList(waitTimeMilliSec,lockPolicyType);
 	m_maxProcessorCount=maximumProcessorCount;
 	m_isAsynchronousReceive=isAsynchronousReceive;
 }
 
-AsyncTcpClient::AsyncTcpClient(const AsyncTcpClient& b) :BaseTcpClient(b)
+AsyncUdpClient::AsyncUdpClient(const AsyncUdpClient& b):BaseUdpClient(b)
 {
 	LockObj lock(b.m_generalLock);
-	
+
 	m_processorList=b.m_processorList;
 	m_maxProcessorCount=b.m_maxProcessorCount;
 	m_isAsynchronousReceive=b.m_isAsynchronousReceive;
+}
+AsyncUdpClient::~AsyncUdpClient()
+{
 	
 }
-AsyncTcpClient::~AsyncTcpClient()
-{
-}
 
-AsyncTcpClient & AsyncTcpClient::operator=(const AsyncTcpClient&b)
+AsyncUdpClient & AsyncUdpClient::operator=(const AsyncUdpClient&b)
 {
 	if(this!=&b)
-	{
+	{				
 
-		BaseTcpClient::operator =(b);
-
+		BaseUdpClient::operator =(b);
 		LockObj lock(b.m_generalLock);
+
 		m_processorList=b.m_processorList;
 		m_maxProcessorCount=b.m_maxProcessorCount;
 		m_isAsynchronousReceive=b.m_isAsynchronousReceive;
+
 	}
 	return *this;
 }
 
 
-
-
-void AsyncTcpClient::SetMaximumProcessorCount(unsigned int maxProcessorCount)
+void AsyncUdpClient::SetMaximumProcessorCount(unsigned int maxProcessorCount)
 {
 	epl::LockObj lock(m_generalLock);
 	m_maxProcessorCount=maxProcessorCount;
 
 }
-unsigned int AsyncTcpClient::GetMaximumProcessorCount() const
+unsigned int AsyncUdpClient::GetMaximumProcessorCount() const
 {
 	epl::LockObj lock(m_generalLock);
 	return m_maxProcessorCount;
 }
 
-void AsyncTcpClient::SetWaitTime(unsigned int milliSec)
+
+
+void AsyncUdpClient::SetWaitTime(unsigned int milliSec)
 {
 	m_waitTime=milliSec;
 	m_processorList.SetWaitTime(milliSec);
 }
 
-bool AsyncTcpClient::GetIsAsynchronousReceive() const
+bool AsyncUdpClient::GetIsAsynchronousReceive() const
 {
 	return m_isAsynchronousReceive;
 }
-void AsyncTcpClient::SetIsAsynchronousReceive(bool isASynchronousReceive)
+void AsyncUdpClient::SetIsAsynchronousReceive(bool isASynchronousReceive)
 {
 	m_isAsynchronousReceive=isASynchronousReceive;
 }
 
-void AsyncTcpClient::execute() 
+void AsyncUdpClient::execute() 
 {
-	int iResult;
+	int iResult=0;
 	// Receive until the peer shuts down the connection
+	Packet recvPacket(NULL,m_maxPacketSize);
 	do {
-		int size =receive(m_recvSizePacket);
-		if(size>0)
-		{
-			unsigned int shouldReceive=(reinterpret_cast<unsigned int*>(const_cast<char*>(m_recvSizePacket.GetPacket())))[0];
-			Packet *recvPacket=EP_NEW Packet(NULL,shouldReceive);
-			iResult = receive(*recvPacket);
+		iResult = receive(recvPacket);
 
-			if (iResult == shouldReceive) {
-				if(m_isAsynchronousReceive)
+		if (iResult > 0) {
+			Packet *passPacket=EP_NEW Packet(recvPacket.GetPacket(),iResult);
+			if(m_isAsynchronousReceive)
+			{
+				ClientPacketProcessor::PacketPassUnit passUnit;
+
+				passUnit.m_packet=passPacket;
+				passUnit.m_owner=this;
+				ClientPacketProcessor *parser=EP_NEW ClientPacketProcessor(m_callBackObj,m_waitTime,m_lockPolicy);
+				parser->setPacketPassUnit(passUnit);
+				m_processorList.Push(parser);
+				parser->Start();
+				parser->ReleaseObj();
+				passPacket->ReleaseObj();
+				if(GetMaximumProcessorCount()!=PROCESSOR_LIMIT_INFINITE)
 				{
-					ClientPacketProcessor::PacketPassUnit passUnit;
-					passUnit.m_packet=recvPacket;
-					passUnit.m_owner=this;
-					ClientPacketProcessor *parser =EP_NEW ClientPacketProcessor(m_callBackObj,m_waitTime,m_lockPolicy);
-					EP_ASSERT(parser);
-					parser->setPacketPassUnit(passUnit);
-					m_processorList.Push(parser);
-					parser->Start();
-					parser->ReleaseObj();
-					recvPacket->ReleaseObj();
-					if(GetMaximumProcessorCount()!=PROCESSOR_LIMIT_INFINITE)
+					while(m_processorList.Count()>=GetMaximumProcessorCount())
 					{
-						while(m_processorList.Count()>=GetMaximumProcessorCount())
-						{
-							m_processorList.WaitForListSizeDecrease();
-						}
+						m_processorList.WaitForListSizeDecrease();
 					}
 				}
-				else
-				{
-					m_callBackObj->OnReceived(reinterpret_cast<ClientInterface*>(this),*recvPacket);
-					recvPacket->ReleaseObj();
-				}
-				
 			}
-			else if (iResult == 0)
+			else
 			{
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Connection closing...\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-				recvPacket->ReleaseObj();
-				break;
+				m_callBackObj->OnReceived(reinterpret_cast<ClientInterface*>(this),*passPacket);
+				passPacket->ReleaseObj();
 			}
-			else  {
-				epl::System::OutputDebugString(_T("%s::%s(%d)(%x) recv failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-				recvPacket->ReleaseObj();
-				break;
-			}
+
 		}
-		else
+		else if (iResult == 0)
 		{
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Connection closing...\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
+			break;
+		}
+		else  {
+			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) recv failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			break;
 		}
 
@@ -152,10 +144,9 @@ void AsyncTcpClient::execute()
 	disconnect();
 }
 
-
-bool AsyncTcpClient::Connect(const TCHAR * hostName, const TCHAR * port)
+bool AsyncUdpClient::Connect(const TCHAR * hostName, const TCHAR * port)
 {
-	LockObj lock(m_generalLock);
+	epl::LockObj lock(m_generalLock);
 	if(IsConnectionAlive())
 		return true;
 
@@ -181,6 +172,7 @@ bool AsyncTcpClient::Connect(const TCHAR * hostName, const TCHAR * port)
 
 	WSADATA wsaData;
 	m_connectSocket = INVALID_SOCKET;
+	m_maxPacketSize=0;
 	struct addrinfo hints;
 	int iResult;
 
@@ -193,8 +185,8 @@ bool AsyncTcpClient::Connect(const TCHAR * hostName, const TCHAR * port)
 
 	ZeroMemory( &hints, sizeof(hints) );
 	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_protocol = IPPROTO_UDP;
 
 	// Resolve the server address and port
 	iResult = getaddrinfo(m_hostName.c_str(), m_port.c_str(), &hints, &m_result);
@@ -204,25 +196,16 @@ bool AsyncTcpClient::Connect(const TCHAR * hostName, const TCHAR * port)
 		return false;
 	}
 
-	struct addrinfo *iPtr=0;
 	// Attempt to connect to an address until one succeeds
-	for(iPtr=m_result; iPtr != NULL ;iPtr=iPtr->ai_next) {
+	for(m_ptr=m_result; m_ptr != NULL ;m_ptr=m_ptr->ai_next) {
 
 		// Create a SOCKET for connecting to server
-		m_connectSocket = socket(iPtr->ai_family, iPtr->ai_socktype, 
-			iPtr->ai_protocol);
+		m_connectSocket = socket(m_ptr->ai_family, m_ptr->ai_socktype, 
+			m_ptr->ai_protocol);
 		if (m_connectSocket == INVALID_SOCKET) {
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Socket failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			cleanUpClient();
 			return false;
-		}
-
-		// Connect to server.
-		iResult = connect( m_connectSocket, iPtr->ai_addr, static_cast<int>(iPtr->ai_addrlen));
-		if (iResult == SOCKET_ERROR) {
-			closesocket(m_connectSocket);
-			m_connectSocket = INVALID_SOCKET;
-			continue;
 		}
 		break;
 	}
@@ -231,6 +214,10 @@ bool AsyncTcpClient::Connect(const TCHAR * hostName, const TCHAR * port)
 		cleanUpClient();
 		return false;
 	}
+
+	int nTmp = sizeof(int);
+	getsockopt(m_connectSocket, SOL_SOCKET,SO_MAX_MSG_SIZE, (char *)&m_maxPacketSize,&nTmp);
+
 	if(Start())
 	{
 		return true;
@@ -240,27 +227,26 @@ bool AsyncTcpClient::Connect(const TCHAR * hostName, const TCHAR * port)
 }
 
 
-void AsyncTcpClient::disconnect()
+void AsyncUdpClient::disconnect()
 {
 	if(IsConnectionAlive())
 	{
 		m_sendLock->Lock();
 		if(m_connectSocket!=INVALID_SOCKET)
 		{
- 			closesocket(m_connectSocket);
- 			m_connectSocket = INVALID_SOCKET;
+			closesocket(m_connectSocket);
+			m_connectSocket = INVALID_SOCKET;
 
 		}
 		m_sendLock->Unlock();
 
 		m_processorList.Clear();
 	}
-
 	cleanUpClient();
 	m_callBackObj->OnDisconnect(reinterpret_cast<ClientInterface*>(this));
 }
 
-void AsyncTcpClient::Disconnect()
+void AsyncUdpClient::Disconnect()
 {
 	epl::LockObj lock(m_generalLock);
 	if(!IsConnectionAlive())
@@ -269,22 +255,19 @@ void AsyncTcpClient::Disconnect()
 	}
 	if(m_connectSocket!=INVALID_SOCKET)
 	{
-		// shutdown the connection since no more data will be sent
 		int iResult = shutdown(m_connectSocket, SD_SEND);
-		if (iResult == SOCKET_ERROR) {
+		if (iResult == SOCKET_ERROR)
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
-		}
 		closesocket(m_connectSocket);
 		m_connectSocket = INVALID_SOCKET;
-
 	}
-	TerminateAfter(m_waitTime);
 
+	TerminateAfter(m_waitTime);
+	
 	m_processorList.Clear();
 	cleanUpClient();
 	m_callBackObj->OnDisconnect(reinterpret_cast<ClientInterface*>(this));
 
 }
-
 
 

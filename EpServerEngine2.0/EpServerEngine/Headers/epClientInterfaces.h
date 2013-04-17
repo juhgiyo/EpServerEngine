@@ -106,7 +106,7 @@ namespace epse{
 		@param[in] port the port string
 		@remark if argument is NULL then previously setting value is used
 		*/
-		bool Connect(const TCHAR * hostName=NULL, const TCHAR * port=NULL);
+		virtual bool Connect(const TCHAR * hostName=NULL, const TCHAR * port=NULL)=0;
 
 		/*!
 		Disconnect from the server
@@ -117,7 +117,7 @@ namespace epse{
 		Check if the connection is alive
 		@return true if the connection is alive otherwise false
 		*/
-		virtual bool IsConnected() const=0;
+		virtual bool IsConnectionAlive() const=0;
 
 		/*!
 		Send the packet to the client
@@ -136,7 +136,7 @@ namespace epse{
 		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
 		@remark For Synchronous Socket Use Only!
 		*/
-		virtual Packet *Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *retStatus=NULL)
+		virtual Packet *Receive(unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE,ReceiveStatus *retStatus=NULL)
 		{
 			if(retStatus)
 				*retStatus=RECEIVE_STATUS_FAIL_NOT_SUPPORTED;

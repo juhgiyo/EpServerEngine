@@ -83,6 +83,7 @@ namespace epse
 	private:	
 		friend class AsyncTcpClient;
 	
+		friend class AsyncUdpClient;
 	
 		/*!
 		thread loop function

@@ -84,11 +84,11 @@ namespace epse{
 		@param[in] port the port string
 		@remark if argument is NULL then previously setting value is used
 		*/
-		virtual bool StartServer(const TCHAR * port=NULL);
+		bool StartServer(const TCHAR * port=NULL);
 		/*!
 		Stop the server
 		*/
-		virtual void StopServer();
+		void StopServer();
 
 	private:
 

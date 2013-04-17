@@ -674,10 +674,6 @@
 				Name="Client Side"
 				>
 				<File
-					RelativePath=".\Sources\epBaseTcpClient.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\Sources\epClientPacketProcessor.cpp"
 					>
 				</File>
@@ -689,6 +685,58 @@
 						>
 						<File
 							RelativePath=".\Sources\epAsyncTcpClient.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epAsyncUdpClient.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Synchronous"
+					>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epSyncUdpClient.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epSyncTcpClient.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Templates"
+					>
+					<File
+						RelativePath=".\Sources\epBaseClient.cpp"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epBaseTcpClient.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epBaseUdpClient.cpp"
 							>
 						</File>
 					</Filter>
@@ -742,6 +790,22 @@
 						RelativePath=".\Headers\epBaseClient.h"
 						>
 					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Headers\epBaseTcpClient.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Headers\epBaseUdpClient.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="Asynchronous"

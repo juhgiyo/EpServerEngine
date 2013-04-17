@@ -65,12 +65,12 @@ namespace epse
 		Check if the connection is alive
 		@return true if the connection is alive otherwise false
 		*/
-		virtual bool IsConnectionAlive() const;
+		bool IsConnectionAlive() const;
 
 		/*!
 		Kill the connection
 		*/
-		virtual void KillConnection();
+		void KillConnection();
 
 		/*!
 		Receive the packet from the client
@@ -79,7 +79,7 @@ namespace epse
 		@return received packet
 		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
 		*/
-		virtual Packet *Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *retStatus=NULL);
+		Packet *Receive(unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE,ReceiveStatus *retStatus=NULL);
 		
 	
 	private:	

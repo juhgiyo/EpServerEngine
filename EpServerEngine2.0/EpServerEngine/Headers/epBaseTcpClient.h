@@ -1,9 +1,9 @@
 /*! 
-@file epSyncUdpClient.h
+@file epBaseTcpClient.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/epserverengine>
-@date July 18, 2012
-@brief Synchronous UDP Client Interface
+@date February 13, 2012
+@brief Base TCP Client Interface
 @version 1.0
 
 @section LICENSE
@@ -25,23 +25,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for Synchronous UDP Client.
+An Interface for Base TCP Client.
 
 */
-#ifndef __EP_SYNC_UDP_CLIENT_H__
-#define __EP_SYNC_UDP_CLIENT_H__
+#ifndef __EP_BASE_TCP_CLIENT_H__
+#define __EP_BASE_TCP_CLIENT_H__
 
 #include "epServerEngine.h"
-#include "epBaseUdpClient.h"
+#include "epBaseClient.h"
 
 namespace epse{
 
 	/*! 
-	@class SyncUdpClient epSyncUdpClient.h
-	@brief A class for Synchronous UDP Client.
+	@class BaseTcpClient epBaseTcpClient.h
+	@brief A class for Base TCP Client.
 	*/
-	class EP_SERVER_ENGINE SyncUdpClient:public BaseUdpClient{
-
+	class EP_SERVER_ENGINE BaseTcpClient:public BaseClient{
 	public:
 		/*!
 		Default Constructor
@@ -50,32 +49,31 @@ namespace epse{
 		@param[in] callBackObj the call back object
 		@param[in] hostName the hostname string
 		@param[in] port the port string
+		@param[in] waitTimeMilliSec wait time for Client Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		SyncUdpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseTcpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
 
-		Initializes the BaseClientUDPManual
+		Initializes the BaseClient
 		@param[in] b the second object
 		*/
-		SyncUdpClient(const SyncUdpClient& b);
+		BaseTcpClient(const BaseTcpClient& b);
 		/*!
 		Default Destructor
 
 		Destroy the Client
 		*/
-		virtual ~SyncUdpClient();
+		virtual ~BaseTcpClient();
 
 		/*!
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		SyncUdpClient & operator=(const SyncUdpClient&b);
-
-
+		BaseTcpClient & operator=(const BaseTcpClient&b);
 	
 		/*!
 		Connect to the server
@@ -83,46 +81,53 @@ namespace epse{
 		@param[in] port the port string
 		@remark if argument is NULL then previously setting value is used
 		*/
-		bool Connect(const TCHAR * hostName=NULL, const TCHAR * port=NULL);
+		virtual bool Connect(const TCHAR * hostName=NULL, const TCHAR * port=NULL)=0;
 
 		/*!
 		Disconnect from the server
 		*/
-		void Disconnect();
+		virtual void Disconnect()=0;
+
 
 		/*!
-		Check if the connection is established
-		@return true if the connection is established otherwise false
+		Send the packet to the server
+		@param[in] packet the packet to be sent
+		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
+		@return sent byte size
+		@remark return -1 if error occurred
 		*/
-		bool IsConnectionAlive() const;
+		int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
+
+	protected:
 
 	
+
 		/*!
 		Receive the packet from the server
-		@param[in] waitTimeInMilliSec wait time for receiving the packet in millisecond
-		@return received packet
-		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
+		@param[out] packet the packet received
+		@return received byte size
 		*/
-		Packet *Receive(unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE,ReceiveStatus *retStatus=NULL);
-	
-	private:
+		int receive(Packet &packet);
+
 		/*!
 		Actually processing the client thread
 		*/
-		virtual void execute();
+		virtual void execute()=0;
 
 		/*!
 		Actually Disconnect from the server
 		*/
-		void disconnect();
+		virtual void disconnect()=0;
 
-	private:
 
-		/// Flag for connection
-		bool m_isConnected;
+	protected:
+
+		/// Temp Packet;
+		Packet m_recvSizePacket;
+
 
 	};
 }
 
 
-#endif //__EP_SYNC_UDP_CLIENT_H__
+#endif //__EP_BASE_TCP_CLIENT_H__

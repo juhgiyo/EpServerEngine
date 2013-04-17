@@ -102,14 +102,14 @@ namespace epse
 		Get the sockaddr of this socket object.
 		@return the sockaddr of this socket object.
 		*/
-		virtual sockaddr GetSockAddress() const;
+		sockaddr GetSockAddress() const;
 
 		
 		/*!
 		Get the owner object of this socket object.
 		@return the pointer to the owner object.
 		*/
-		virtual BaseServerObject *GetOwner();
+		BaseServerObject *GetOwner();
 
 
 		/*!
@@ -122,19 +122,19 @@ namespace epse
 		Get the wait time for the parser thread termination
 		@return the current time for waiting in millisecond
 		*/
-		virtual unsigned int GetWaitTime();
+		unsigned int GetWaitTime();
 
 		/*!
 		Set the Callback Object for the Socket.
 		@param[in] callBackObj The Callback Object to set.
 		*/
-		virtual void SetCallbackObject(ServerCallbackInterface *callBackObj);
+		void SetCallbackObject(ServerCallbackInterface *callBackObj);
 
 		/*!
 		Get the Callback Object of the Socket
 		@return the current Callback Object
 		*/
-		virtual ServerCallbackInterface *GetCallbackObject();
+		ServerCallbackInterface *GetCallbackObject();
 
 
 	protected:	

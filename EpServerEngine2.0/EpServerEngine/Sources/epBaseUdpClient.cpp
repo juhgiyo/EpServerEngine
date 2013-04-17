@@ -1,5 +1,5 @@
 /*! 
-BaseTcpClient for the EpServerEngine
+BaseUdpClient for the EpServerEngine
 Copyright (C) 2012  Woong Gyu La <juhgiyo@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,7 +15,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "epBaseTcpClient.h"
+#include "epBaseUdpClient.h"
+
 
 #if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
 #define new DEBUG_NEW
@@ -25,36 +26,49 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-BaseTcpClient::BaseTcpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName, const TCHAR * port,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType) :BaseClient(callBackObj,hostName,port,waitTimeMilliSec,lockPolicyType)
+BaseUdpClient::BaseUdpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName, const TCHAR * port,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseClient(callBackObj,hostName,port,waitTimeMilliSec,lockPolicyType)
 {
-	m_recvSizePacket=Packet(NULL,4);
+
+	m_ptr=0;
+	m_maxPacketSize=0;
 }
 
-BaseTcpClient::BaseTcpClient(const BaseTcpClient& b) :BaseClient(b)
+BaseUdpClient::BaseUdpClient(const BaseUdpClient& b):BaseClient(b)
 {
 	LockObj lock(b.m_generalLock);
-	m_recvSizePacket=b.m_recvSizePacket;
+	m_ptr=0;
+	m_maxPacketSize=b.m_maxPacketSize;
+
 
 }
-BaseTcpClient::~BaseTcpClient()
+BaseUdpClient::~BaseUdpClient()
 {
+
 }
 
-BaseTcpClient & BaseTcpClient::operator=(const BaseTcpClient&b)
+BaseUdpClient & BaseUdpClient::operator=(const BaseUdpClient&b)
 {
 	if(this!=&b)
-	{
+	{				
 
 		BaseClient::operator =(b);
 
 		LockObj lock(b.m_generalLock);
-		m_recvSizePacket=b.m_recvSizePacket;
+
+		m_ptr=0;
+		m_maxPacketSize=b.m_maxPacketSize;
+
+
 	}
 	return *this;
 }
 
+unsigned int BaseUdpClient::GetMaxPacketByteSize() const
+{
+	return m_maxPacketSize;
+}
 
-int BaseTcpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
+int BaseUdpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 {
 	epl::LockObj lock(m_sendLock);
 	if(!IsConnectionAlive())
@@ -90,46 +104,40 @@ int BaseTcpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 	}
 
 	// send routine
-	int writeLength=0;
+	int sentLength=0;
 	const char *packetData=packet.GetPacket();
 	int length=packet.GetPacketByteSize();
-
+	EP_ASSERT(length<=m_maxPacketSize);
 	if(length>0)
 	{
-		int sentLength=send(m_connectSocket,reinterpret_cast<char*>(&length),4,0);
-		if(sentLength<=0)
-			return sentLength;
-	}
-	while(length>0)
-	{
-		int sentLength=send(m_connectSocket,packetData,length,0);
-		writeLength+=sentLength;
+		//int sentLength=send(m_connectSocket,packetData,length,0);
+		sentLength=sendto(m_connectSocket,packetData,length,0,m_ptr->ai_addr,sizeof(sockaddr));
 		if(sentLength<=0)
 		{
-			return writeLength;
+			return sentLength;
 		}
-		length-=sentLength;
-		packetData+=sentLength;
 	}
-	return writeLength;
+	return sentLength;
 }
 
-int BaseTcpClient::receive(Packet &packet)
+
+
+int BaseUdpClient::receive(Packet &packet)
 {
 
-	int readLength=0;
 	int length=packet.GetPacketByteSize();
 	char *packetData=const_cast<char*>(packet.GetPacket());
-	while(length>0)
-	{
-		int recvLength=recv(m_connectSocket,packetData, length, 0);
-		readLength+=recvLength;
-		if(recvLength<=0)
-			break;
-		length-=recvLength;
-		packetData+=recvLength;
-	}
-	return readLength;
+	sockaddr tmpInfo;
+	int tmpInfoSize=sizeof(sockaddr);
+	int recvLength = recvfrom(m_connectSocket,packetData,length,0,&tmpInfo,&tmpInfoSize);
+	return recvLength;
+}
+
+
+void BaseUdpClient::cleanUpClient()
+{
+	BaseClient::cleanUpClient();
+	m_maxPacketSize=0;
 }
 
 

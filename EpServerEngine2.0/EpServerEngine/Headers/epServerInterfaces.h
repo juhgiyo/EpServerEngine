@@ -160,7 +160,7 @@ namespace epse{
 		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
 		@remark For Synchronous Socket Use Only!
 		*/
-		virtual Packet *Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *retStatus=NULL)
+		virtual Packet *Receive(unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE,ReceiveStatus *retStatus=NULL)
 		{
 			if(retStatus)
 				*retStatus=RECEIVE_STATUS_FAIL_NOT_SUPPORTED;

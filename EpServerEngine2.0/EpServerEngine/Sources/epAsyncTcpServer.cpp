@@ -32,7 +32,10 @@ AsyncTcpServer::AsyncTcpServer(ServerCallbackInterface *callBackObj,const TCHAR 
 }
 
 AsyncTcpServer::AsyncTcpServer(const AsyncTcpServer& b):BaseTcpServer(b)
-{}
+{
+	LockObj lock(b.m_baseServerLock);
+	m_isAsynchronousReceive=b.m_isAsynchronousReceive;
+}
 
 AsyncTcpServer::~AsyncTcpServer()
 {
@@ -43,6 +46,8 @@ AsyncTcpServer & AsyncTcpServer::operator=(const AsyncTcpServer&b)
 	if(this!=&b)
 	{
 		BaseTcpServer::operator =(b);
+		LockObj lock(b.m_baseServerLock);
+		m_isAsynchronousReceive=b.m_isAsynchronousReceive;
 	}
 	return *this;
 }

@@ -82,6 +82,7 @@ namespace epse
 
 	protected:	
 		friend class AsyncTcpClient;
+		friend class AsyncUdpClient;
 
 		friend class BaseSocket;
 		friend class AsyncTcpSocket;

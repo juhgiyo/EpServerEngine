@@ -68,13 +68,13 @@ namespace epse
 		@return sent byte size
 		@remark return -1 if error occurred
 		*/
-		virtual int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
+		int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
 		
 
 		/*!
 		Kill the connection
 		*/
-		virtual void KillConnection()=0;
+		void KillConnection()=0;
 		
 	
 	protected:	
