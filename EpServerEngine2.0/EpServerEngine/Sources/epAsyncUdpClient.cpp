@@ -26,19 +26,13 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-AsyncUdpClient::AsyncUdpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName, const TCHAR * port,bool isAsynchronousReceive,unsigned int waitTimeMilliSec,unsigned int maximumProcessorCount,epl::LockPolicy lockPolicyType): BaseUdpClient(callBackObj,hostName,port,waitTimeMilliSec,lockPolicyType)
+AsyncUdpClient::AsyncUdpClient(epl::LockPolicy lockPolicyType): BaseUdpClient(lockPolicyType)
 {
-	m_processorList=ServerObjectList(waitTimeMilliSec,lockPolicyType);
-	m_maxProcessorCount=maximumProcessorCount;
-	m_isAsynchronousReceive=isAsynchronousReceive;
+	m_processorList=ServerObjectList(WAITTIME_INIFINITE,lockPolicyType);
+	m_maxProcessorCount=PROCESSOR_LIMIT_INFINITE;
+	m_isAsynchronousReceive=true;
 }
 
-AsyncUdpClient::AsyncUdpClient(const ClientOps &ops):BaseUdpClient(ops)
-{
-	m_processorList=ServerObjectList(ops.waitTimeMilliSec,ops.lockPolicyType);
-	m_maxProcessorCount=ops.maximumProcessorCount;
-	m_isAsynchronousReceive=ops.isAsynchronousReceive;
-}
 
 AsyncUdpClient::AsyncUdpClient(const AsyncUdpClient& b):BaseUdpClient(b)
 {
@@ -151,19 +145,23 @@ void AsyncUdpClient::execute()
 	disconnect();
 }
 
-bool AsyncUdpClient::Connect(const TCHAR * hostName, const TCHAR * port)
+bool AsyncUdpClient::Connect(const ClientOps &ops)
 {
 	epl::LockObj lock(m_generalLock);
 	if(IsConnectionAlive())
 		return true;
 
-	if(hostName)
+	if(ops.callBackObj)
+		m_callBackObj=ops.callBackObj;
+	EP_ASSERT(m_callBackObj);
+
+	if(ops.hostName)
 	{
-		setHostName(hostName);
+		setHostName(ops.hostName);
 	}
-	if(port)
+	if(ops.port)
 	{
-		setPort(port);
+		setPort(ops.port);
 	}
 
 	if(!m_port.length())
@@ -175,6 +173,9 @@ bool AsyncUdpClient::Connect(const TCHAR * hostName, const TCHAR * port)
 	{
 		m_hostName=DEFAULT_HOSTNAME;
 	}
+	SetWaitTime(ops.waitTimeMilliSec);
+	m_maxProcessorCount=ops.maximumProcessorCount;
+	m_isAsynchronousReceive=ops.isAsynchronousReceive;
 
 
 	WSADATA wsaData;
@@ -245,10 +246,14 @@ void AsyncUdpClient::disconnect()
 			m_connectSocket = INVALID_SOCKET;
 
 		}
+		else
+		{
+			m_sendLock->Unlock();
+			return;
+		}
 		m_sendLock->Unlock();
-
-		m_processorList.Clear();
 	}
+	m_processorList.Clear();
 	cleanUpClient();
 	m_callBackObj->OnDisconnect(reinterpret_cast<ClientInterface*>(this));
 }
@@ -260,6 +265,7 @@ void AsyncUdpClient::Disconnect()
 	{
 		return;
 	}
+	m_sendLock->Lock();
 	if(m_connectSocket!=INVALID_SOCKET)
 	{
 		int iResult = shutdown(m_connectSocket, SD_SEND);
@@ -268,8 +274,15 @@ void AsyncUdpClient::Disconnect()
 		closesocket(m_connectSocket);
 		m_connectSocket = INVALID_SOCKET;
 	}
+	else
+	{
+		m_sendLock->Unlock();
+		return;
+	}
+	m_sendLock->Unlock();
 
-	TerminateAfter(m_waitTime);
+	if(TerminateAfter(m_waitTime)==Thread::TERMINATE_RESULT_GRACEFULLY_TERMINATED)
+		return;
 	
 	m_processorList.Clear();
 	cleanUpClient();

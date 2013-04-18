@@ -25,18 +25,13 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-AsyncTcpClient::AsyncTcpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName, const TCHAR * port,bool isAsynchronousReceive,unsigned int waitTimeMilliSec,unsigned int maximumProcessorCount,epl::LockPolicy lockPolicyType) :BaseTcpClient(callBackObj,hostName,port,waitTimeMilliSec,lockPolicyType)
+AsyncTcpClient::AsyncTcpClient(epl::LockPolicy lockPolicyType) :BaseTcpClient(lockPolicyType)
 {
-	m_processorList=ServerObjectList(waitTimeMilliSec,lockPolicyType);
-	m_maxProcessorCount=maximumProcessorCount;
-	m_isAsynchronousReceive=isAsynchronousReceive;
+	m_processorList=ServerObjectList(WAITTIME_INIFINITE,lockPolicyType);
+	m_maxProcessorCount=PROCESSOR_LIMIT_INFINITE;
+	m_isAsynchronousReceive=true;
 }
-AsyncTcpClient::AsyncTcpClient(const ClientOps &ops):BaseTcpClient(ops)
-{
-	m_processorList=ServerObjectList(ops.waitTimeMilliSec,ops.lockPolicyType);
-	m_maxProcessorCount=ops.maximumProcessorCount;
-	m_isAsynchronousReceive=ops.isAsynchronousReceive;
-}
+
 
 AsyncTcpClient::AsyncTcpClient(const AsyncTcpClient& b) :BaseTcpClient(b)
 {
@@ -159,19 +154,23 @@ void AsyncTcpClient::execute()
 }
 
 
-bool AsyncTcpClient::Connect(const TCHAR * hostName, const TCHAR * port)
+bool AsyncTcpClient::Connect(const ClientOps &ops)
 {
 	LockObj lock(m_generalLock);
 	if(IsConnectionAlive())
 		return true;
 
-	if(hostName)
+	if(ops.callBackObj)
+		m_callBackObj=ops.callBackObj;
+	EP_ASSERT(m_callBackObj);
+
+	if(ops.hostName)
 	{
-		setHostName(hostName);
+		setHostName(ops.hostName);
 	}
-	if(port)
+	if(ops.port)
 	{
-		setPort(port);
+		setPort(ops.port);
 	}
 
 	if(!m_port.length())
@@ -183,6 +182,9 @@ bool AsyncTcpClient::Connect(const TCHAR * hostName, const TCHAR * port)
 	{
 		m_hostName=DEFAULT_HOSTNAME;
 	}
+	SetWaitTime(ops.waitTimeMilliSec);
+	m_maxProcessorCount=ops.maximumProcessorCount;
+	m_isAsynchronousReceive=ops.isAsynchronousReceive;
 
 
 	WSADATA wsaData;
@@ -257,6 +259,11 @@ void AsyncTcpClient::disconnect()
  			m_connectSocket = INVALID_SOCKET;
 
 		}
+		else
+		{
+			m_sendLock->Unlock();
+			return;
+		}
 		m_sendLock->Unlock();
 
 		m_processorList.Clear();
@@ -284,7 +291,13 @@ void AsyncTcpClient::Disconnect()
 		m_connectSocket = INVALID_SOCKET;
 
 	}
-	TerminateAfter(m_waitTime);
+	else
+	{
+		m_sendLock->Unlock();
+		return;
+	}
+	if(TerminateAfter(m_waitTime)==Thread::TERMINATE_RESULT_GRACEFULLY_TERMINATED)
+		return;
 
 	m_processorList.Clear();
 	cleanUpClient();

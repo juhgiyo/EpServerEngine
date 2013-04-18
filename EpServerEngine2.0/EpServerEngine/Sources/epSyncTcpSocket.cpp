@@ -59,6 +59,11 @@ void SyncTcpSocket::KillConnection()
 		closesocket(m_clientSocket);
 		m_clientSocket = INVALID_SOCKET;
 	}
+	else
+	{
+		m_sendLock->Unlock();
+		return;
+	}
 	m_sendLock->Unlock();
 
 	m_isConnected=false;
@@ -77,6 +82,11 @@ void SyncTcpSocket::killConnection()
 		{
 			closesocket(m_clientSocket);
 			m_clientSocket = INVALID_SOCKET;
+		}
+		else
+		{
+			m_sendLock->Unlock();
+			return;
 		}
 		m_sendLock->Unlock();
 

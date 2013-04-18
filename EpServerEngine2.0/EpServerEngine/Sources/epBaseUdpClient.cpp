@@ -26,16 +26,11 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-BaseUdpClient::BaseUdpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName, const TCHAR * port,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType): BaseClient(callBackObj,hostName,port,waitTimeMilliSec,lockPolicyType)
+BaseUdpClient::BaseUdpClient(epl::LockPolicy lockPolicyType): BaseClient(lockPolicyType)
 {
 
 	m_ptr=0;
 	m_maxPacketSize=0;
-}
-
-BaseUdpClient::BaseUdpClient(const ClientOps &ops):BaseClient(ops)
-{
-
 }
 
 BaseUdpClient::BaseUdpClient(const BaseUdpClient& b):BaseClient(b)

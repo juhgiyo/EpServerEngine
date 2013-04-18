@@ -60,11 +60,10 @@ namespace epse{
 		unsigned int waitTimeMilliSec;
 		/*!
 		The maximum possible number of packet processor
+		@remark If isAsynchronousReceive is false then this value is ignored!
 		@remark For Asynchronous Client Use Only!
 		*/
 		unsigned int maximumProcessorCount;
-		/// Lock Policy
-		epl::LockPolicy lockPolicyType;
 
 		/*!
 		Default Constructor
@@ -79,8 +78,9 @@ namespace epse{
 			isAsynchronousReceive=true;
 			waitTimeMilliSec=WAITTIME_INIFINITE;
 			maximumProcessorCount=PROCESSOR_LIMIT_INFINITE;
-			lockPolicyType=epl::EP_LOCK_POLICY;
 		}
+
+		static ClientOps defaultClientOps;
 	};
 
 	/*! 
@@ -121,6 +121,7 @@ namespace epse{
 		@param[in] maxProcessorCount The Maximum Processor Count to set.
 		@remark 0 means there is no limit
 		@remark For Asynchronous Client Use Only!
+		@remark If IsAsynchronousReceive is false then this value is ignored!
 		*/
 		virtual void SetMaximumProcessorCount(unsigned int maxProcessorCount){}
 
@@ -129,6 +130,7 @@ namespace epse{
 		@return The Maximum Processor Count
 		@remark 0 means there is no limit
 		@remark For Asynchronous Client Use Only!
+		@remark If IsAsynchronousReceive is false then this value is ignored!
 		*/
 		virtual unsigned int GetMaximumProcessorCount() const{return 0;}
 
@@ -142,7 +144,7 @@ namespace epse{
 		Get the wait time for the parser thread termination
 		@return the current time for waiting in millisecond
 		*/
-		virtual unsigned int GetWaitTime()=0;
+		virtual unsigned int GetWaitTime() const=0;
 
 		/*!
 		Connect to the server
@@ -150,7 +152,7 @@ namespace epse{
 		@param[in] port the port string
 		@remark if argument is NULL then previously setting value is used
 		*/
-		virtual bool Connect(const TCHAR * hostName=NULL, const TCHAR * port=NULL)=0;
+		virtual bool Connect(const ClientOps &ops=ClientOps::defaultClientOps)=0;
 
 		/*!
 		Disconnect from the server

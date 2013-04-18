@@ -25,10 +25,9 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-BaseServer::BaseServer(ServerCallbackInterface *callBackObj,const TCHAR * port,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType):BaseServerObject(waitTimeMilliSec,lockPolicyType)
+BaseServer::BaseServer(epl::LockPolicy lockPolicyType):BaseServerObject(WAITTIME_INIFINITE,lockPolicyType)
 {
-	EP_ASSERT(callBackObj);
-	m_socketList=ServerObjectList(waitTimeMilliSec,lockPolicyType);
+	m_socketList=ServerObjectList(WAITTIME_INIFINITE,lockPolicyType);
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
 	{
@@ -45,37 +44,11 @@ BaseServer::BaseServer(ServerCallbackInterface *callBackObj,const TCHAR * port,u
 		m_baseServerLock=NULL;
 		break;
 	}
-	SetPort(port);
 	m_listenSocket=INVALID_SOCKET;
 	m_result=0;
-	m_maxConnectionCount=maximumConnectionCount;
-	m_callBackObj=callBackObj;
-}
-BaseServer::BaseServer(const ServerOps &ops):BaseServerObject(ops.waitTimeMilliSec,ops.lockPolicyType)
-{
-	EP_ASSERT(ops.callBackObj);
-	m_socketList=ServerObjectList(ops.waitTimeMilliSec,ops.lockPolicyType);
-	m_lockPolicy=ops.lockPolicyType;
-	switch(ops.lockPolicyType)
-	{
-	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_baseServerLock=EP_NEW epl::CriticalSectionEx();
-		break;
-	case epl::LOCK_POLICY_MUTEX:
-		m_baseServerLock=EP_NEW epl::Mutex();
-		break;
-	case epl::LOCK_POLICY_NONE:
-		m_baseServerLock=EP_NEW epl::NoLock();
-		break;
-	default:
-		m_baseServerLock=NULL;
-		break;
-	}
-	SetPort(ops.port);
-	m_listenSocket=INVALID_SOCKET;
-	m_result=0;
-	m_maxConnectionCount=ops.maximumConnectionCount;
-	m_callBackObj=ops.callBackObj;
+	m_maxConnectionCount=CONNECTION_LIMIT_INFINITE;
+	SetPort(_T(DEFAULT_PORT));
+	m_callBackObj=NULL;
 }
 
 BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
@@ -219,91 +192,11 @@ void BaseServer::SetWaitTime(unsigned int milliSec)
 	m_socketList.SetWaitTime(milliSec);
 }
 
-bool BaseServer::StartServer(const TCHAR * port)
+unsigned int BaseServer::GetWaitTime() const
 {
-	epl::LockObj lock(m_baseServerLock);
-	if(IsServerStarted())
-		return true;
-
-	if(port)
-	{
-		setPort(port);
-	}
-
-	if(!m_port.length())
-	{
-		m_port=DEFAULT_PORT;
-	}
-
-	WSADATA wsaData;
-	int iResult;
-
-	m_listenSocket= INVALID_SOCKET;
-
-	m_result = NULL;
-
-
-	// Initialize Winsock
-	iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-	if (iResult != 0) {
-
-		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) WSAStartup failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-		return false;
-	}
-	/// internal use variable2
-	struct addrinfo iHints;
-	ZeroMemory(&iHints, sizeof(iHints));
-	iHints.ai_family = AF_INET;
-	iHints.ai_socktype = SOCK_STREAM;
-	iHints.ai_protocol = IPPROTO_TCP;
-	iHints.ai_flags = AI_PASSIVE;
-
-
-	// Resolve the server address and port
-	iResult = getaddrinfo(NULL, m_port.c_str(), &iHints, &m_result);
-	if ( iResult != 0 ) {
-		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) getaddrinfo failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);		
-		WSACleanup();
-		return false;
-	}
-
-	// Create a SOCKET for connecting to server
-	m_listenSocket = socket(m_result->ai_family, m_result->ai_socktype, m_result->ai_protocol);
-	if (m_listenSocket == INVALID_SOCKET) {
-		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) socket failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-		cleanUpServer();
-		return false;
-	}
-
-	// set SO_REUSEADDR for setsockopt function to reuse the port immediately as soon as the service exits.
-	int sockoptval = 1;
-	setsockopt(m_listenSocket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&sockoptval), sizeof(int));
-
-	// Setup the TCP listening socket
-	iResult = bind( m_listenSocket, m_result->ai_addr, static_cast<int>(m_result->ai_addrlen));
-	if (iResult == SOCKET_ERROR) {
-		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) bind failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-		cleanUpServer();
-		return false;
-	}
-
-	iResult = listen(m_listenSocket, SOMAXCONN);
-	if (iResult == SOCKET_ERROR) {
-		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) listen failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
-		cleanUpServer();
-		return false;
-	}
-
-	// Create thread 1.
-	if(Start())
-	{
-		return true;
-	}
-	cleanUpServer();
-	return false;
-
-
+	return BaseServerObject::GetWaitTime();
 }
+
 
 void BaseServer::killConnection(BaseServerObject *clientObj,unsigned int argCount,va_list args)
 {
@@ -325,24 +218,6 @@ void BaseServer::shutdownAllClient()
 bool BaseServer::IsServerStarted() const
 {
 	return (GetStatus()==Thread::THREAD_STATUS_STARTED);
-}
-
-void BaseServer::StopServer()
-{
-	epl::LockObj lock(m_baseServerLock);
-	if(!IsServerStarted())
-	{
-		return;
-	}
-	// No longer need server socket
-	if(m_listenSocket!=INVALID_SOCKET)
-	{
-		closesocket(m_listenSocket);
-		m_listenSocket=INVALID_SOCKET;
-	}
-	TerminateAfter(m_waitTime);
-	shutdownAllClient();
-	cleanUpServer();
 }
 
 void BaseServer::cleanUpServer()

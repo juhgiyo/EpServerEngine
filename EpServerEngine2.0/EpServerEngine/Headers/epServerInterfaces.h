@@ -56,8 +56,6 @@ namespace epse{
 		unsigned int waitTimeMilliSec;
 		///The maximum possible number of client connection
 		unsigned int maximumConnectionCount;
-		/// Lock Policy
-		epl::LockPolicy lockPolicyType;
 
 		/*!
 		Default Constructor
@@ -71,8 +69,9 @@ namespace epse{
 			isAsynchronousReceive=true;
 			waitTimeMilliSec=WAITTIME_INIFINITE;
 			maximumConnectionCount=CONNECTION_LIMIT_INFINITE;
-			lockPolicyType=epl::EP_LOCK_POLICY;
 		}
+
+		static ServerOps defaultServerOps;
 	};
 
 	/*! 
@@ -121,10 +120,10 @@ namespace epse{
 
 		/*!
 		Start the server
-		@param[in] port the port string
+		@param[in] ops the server options
 		@remark if argument is NULL then previously setting value is used
 		*/
-		virtual bool StartServer(const TCHAR * port=NULL)=0;
+		virtual bool StartServer(const ServerOps &ops=ServerOps::defaultServerOps)=0;
 		/*!
 		Stop the server
 		*/
@@ -238,7 +237,7 @@ namespace epse{
 		Get the wait time for the parser thread termination
 		@return the current time for waiting in millisecond
 		*/
-		virtual unsigned int GetWaitTime()=0;
+		virtual unsigned int GetWaitTime() const=0;
 
 		/*!
 		Set the Callback Object for the server.

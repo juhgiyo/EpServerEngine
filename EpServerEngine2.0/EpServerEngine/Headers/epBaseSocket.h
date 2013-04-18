@@ -122,7 +122,7 @@ namespace epse
 		Get the wait time for the parser thread termination
 		@return the current time for waiting in millisecond
 		*/
-		unsigned int GetWaitTime();
+		unsigned int GetWaitTime() const;
 
 		/*!
 		Set the Callback Object for the Socket.

@@ -26,15 +26,11 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-AsyncTcpServer::AsyncTcpServer(ServerCallbackInterface *callBackObj,const TCHAR * port,bool isAsynchronousReceive,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType):BaseTcpServer(callBackObj,port,waitTimeMilliSec,maximumConnectionCount,lockPolicyType)
+AsyncTcpServer::AsyncTcpServer(epl::LockPolicy lockPolicyType):BaseTcpServer(lockPolicyType)
 {
-	m_isAsynchronousReceive=isAsynchronousReceive;
+	m_isAsynchronousReceive=true;
 }
 
-AsyncTcpServer::AsyncTcpServer(const ServerOps &ops):BaseTcpServer(ops)
-{
-	m_isAsynchronousReceive=ops.isAsynchronousReceive;
-}
 
 AsyncTcpServer::AsyncTcpServer(const AsyncTcpServer& b):BaseTcpServer(b)
 {
@@ -64,6 +60,12 @@ bool AsyncTcpServer::GetIsAsynchronousReceive() const
 void AsyncTcpServer::SetIsAsynchronousReceive(bool isASynchronousReceive)
 {
 	m_isAsynchronousReceive=isASynchronousReceive;
+}
+
+bool AsyncTcpServer::StartServer(const ServerOps &ops)
+{
+	m_isAsynchronousReceive=ops.isAsynchronousReceive;
+	return BaseTcpServer::StartServer(ops);
 }
 
 void AsyncTcpServer::execute()

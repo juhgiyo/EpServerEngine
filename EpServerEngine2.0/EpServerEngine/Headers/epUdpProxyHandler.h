@@ -1,9 +1,9 @@
 /*! 
-@file epSyncTcpServer.h
+@file epUdpProxyHandler.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/epserverengine>
 @date February 13, 2012
-@brief Synchronous TCP Server Interface
+@brief Proxy UDP Handler Interface
 @version 1.0
 
 @section LICENSE
@@ -25,63 +25,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for Synchronous TCP Server.
+An Interface for Proxy UDP Handler.
 
 */
-#ifndef __EP_SYNC_TCP_SERVER_H__
-#define __EP_SYNC_TCP_SERVER_H__
 
+#ifndef __EP_PROXY_UDP_HANDLE_H__
+#define __EP_PROXY_UDP_HANDLE_H__
 #include "epServerEngine.h"
-#include "epBaseTcpServer.h"
-
+#include "epBaseProxyHandler.h"
 
 namespace epse{
 
 
 	/*! 
-	@class SyncTcpServer epSyncTcpServer.h
-	@brief A class for Synchronous TCP Server.
+	@class UdpProxyHandler epUdpProxyHandler.h
+	@brief A class for Proxy UDP Handler.
 	*/
-	class EP_SERVER_ENGINE SyncTcpServer:public BaseTcpServer{
+	class UdpProxyHandler:public BaseProxyHandler{
 
-	public:
+		friend class UdpProxyServer;
+	private:
 		/*!
 		Default Constructor
 
-		Initializes the Server
+		Initializes the Handler
+		@param[in] callBack the callback object
+		@param[in] proxyServerInfo the forward server info
 		@param[in] lockPolicyType The lock policy
 		*/
-		SyncTcpServer(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		UdpProxyHandler(ProxyServerCallbackInterface *callBack,const ForwardServerInfo& forwardServerInfo, SocketInterface *socket, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 
-		/*!
-		Default Copy Constructor
-
-		Initializes the Server
-		@param[in] b the second object
-		*/
-		SyncTcpServer(const SyncTcpServer& b);
 		/*!
 		Default Destructor
 
-		Destroy the Server
+		Destroy the Handler
 		*/
-		virtual ~SyncTcpServer();
+		virtual ~UdpProxyHandler();
 
-		/*!
-		Assignment operator overloading
-		@param[in] b the second object
-		@return the new copied object
-		*/
-		SyncTcpServer & operator=(const SyncTcpServer&b);
-		
-	private:
-
-		/*!
-		Listening Loop Function
-		*/
-		virtual void execute() ;
-	
-	};
+		};
 }
-#endif //__EP_SYNC_TCP_SERVER_H__
+
+#endif //__EP_PROXY_UDP_HANDLE_H__

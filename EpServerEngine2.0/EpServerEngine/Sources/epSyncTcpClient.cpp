@@ -25,15 +25,11 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-SyncTcpClient::SyncTcpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName, const TCHAR * port,epl::LockPolicy lockPolicyType) :BaseTcpClient(callBackObj,hostName,port,WAITTIME_INIFINITE,lockPolicyType)
+SyncTcpClient::SyncTcpClient(epl::LockPolicy lockPolicyType) :BaseTcpClient(lockPolicyType)
 {
 	m_isConnected=false;
 }
 
-SyncTcpClient::SyncTcpClient(const ClientOps &ops):BaseTcpClient(ops)
-{
-
-}
 
 SyncTcpClient::SyncTcpClient(const SyncTcpClient& b) :BaseTcpClient(b)
 {
@@ -62,19 +58,23 @@ SyncTcpClient & SyncTcpClient::operator=(const SyncTcpClient&b)
 void SyncTcpClient::execute()
 {}
 
-bool SyncTcpClient::Connect(const TCHAR * hostName, const TCHAR * port)
+bool SyncTcpClient::Connect(const ClientOps &ops)
 {
 	epl::LockObj lock(m_generalLock);
 	if(IsConnectionAlive())
 		return true;
 
-	if(hostName)
+	if(ops.callBackObj)
+		m_callBackObj=ops.callBackObj;
+	EP_ASSERT(m_callBackObj);
+
+	if(ops.hostName)
 	{
-		setHostName(hostName);
+		setHostName(ops.hostName);
 	}
-	if(port)
+	if(ops.port)
 	{
-		setPort(port);
+		setPort(ops.port);
 	}
 
 	if(!m_port.length())
@@ -86,6 +86,7 @@ bool SyncTcpClient::Connect(const TCHAR * hostName, const TCHAR * port)
 	{
 		m_hostName=DEFAULT_HOSTNAME;
 	}
+	SetWaitTime(ops.waitTimeMilliSec);
 
 
 	WSADATA wsaData;
@@ -172,6 +173,11 @@ void SyncTcpClient::Disconnect()
 		m_connectSocket = INVALID_SOCKET;
 
 	}
+	else
+	{
+		m_sendLock->Unlock();
+		return;
+	}
 	m_sendLock->Unlock();
 
 	cleanUpClient();
@@ -189,6 +195,11 @@ void SyncTcpClient::disconnect()
 		{
 			closesocket(m_connectSocket);
 			m_connectSocket = INVALID_SOCKET;
+		}
+		else
+		{
+			m_sendLock->Unlock();
+			return;
 		}
 		m_sendLock->Unlock();
 

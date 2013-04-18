@@ -26,12 +26,8 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-SyncTcpServer::SyncTcpServer(ServerCallbackInterface *callBackObj,const TCHAR * port,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType):BaseTcpServer(callBackObj,port,waitTimeMilliSec,maximumConnectionCount,lockPolicyType)
+SyncTcpServer::SyncTcpServer(epl::LockPolicy lockPolicyType):BaseTcpServer(lockPolicyType)
 {
-}
-SyncTcpServer::SyncTcpServer(const ServerOps &ops):BaseTcpServer(ops)
-{
-
 }
 
 SyncTcpServer::SyncTcpServer(const SyncTcpServer& b):BaseTcpServer(b)

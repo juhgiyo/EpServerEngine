@@ -74,7 +74,8 @@ void AsyncUdpSocket::KillConnection()
 	m_threadStopEvent.SetEvent();
 	if(GetStatus()==Thread::THREAD_STATUS_SUSPENDED)
 		Resume();
-	TerminateAfter(m_waitTime);
+	if(TerminateAfter(m_waitTime)==Thread::TERMINATE_RESULT_GRACEFULLY_TERMINATED)
+		return;
 	m_processorList.Clear();
 
 	m_listLock->Lock();

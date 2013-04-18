@@ -25,9 +25,8 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-BaseClient::BaseClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName,const TCHAR * port,unsigned int waitTimeMilliSec,  epl::LockPolicy lockPolicyType) :BaseServerObject(waitTimeMilliSec,lockPolicyType)
+BaseClient::BaseClient( epl::LockPolicy lockPolicyType) :BaseServerObject(WAITTIME_INIFINITE,lockPolicyType)
 {
-	EP_ASSERT(callBackObj);
 
 	m_lockPolicy=lockPolicyType;
 	switch(lockPolicyType)
@@ -50,45 +49,14 @@ BaseClient::BaseClient(ClientCallbackInterface *callBackObj,const TCHAR * hostNa
 		break;
 	}
 
-	SetHostName(hostName);
-	SetPort(port);
 	m_connectSocket=INVALID_SOCKET;
 	m_result=0;
 
-	m_callBackObj=callBackObj;
+	setHostName(_T(DEFAULT_HOSTNAME));
+	setPort(_T(DEFAULT_PORT));
+	m_callBackObj=NULL;
 }
-BaseClient::BaseClient(const ClientOps &ops):BaseServerObject(ops.waitTimeMilliSec,ops.lockPolicyType)
-{
-	EP_ASSERT(ops.callBackObj);
 
-	m_lockPolicy=ops.lockPolicyType;
-	switch(ops.lockPolicyType)
-	{
-	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_sendLock=EP_NEW epl::CriticalSectionEx();
-		m_generalLock=EP_NEW epl::CriticalSectionEx();
-		break;
-	case epl::LOCK_POLICY_MUTEX:
-		m_sendLock=EP_NEW epl::Mutex();
-		m_generalLock=EP_NEW epl::Mutex();
-		break;
-	case epl::LOCK_POLICY_NONE:
-		m_sendLock=EP_NEW epl::NoLock();
-		m_generalLock=EP_NEW epl::NoLock();
-		break;
-	default:
-		m_sendLock=NULL;
-		m_generalLock=NULL;
-		break;
-	}
-
-	SetHostName(ops.hostName);
-	SetPort(ops.port);
-	m_connectSocket=INVALID_SOCKET;
-	m_result=0;
-
-	m_callBackObj=ops.callBackObj;
-}
 BaseClient::BaseClient(const BaseClient& b) :BaseServerObject(b)
 {
 	m_connectSocket=INVALID_SOCKET;
@@ -262,6 +230,15 @@ ClientCallbackInterface *BaseClient::GetCallbackObject()
 }
 
 
+void BaseClient::SetWaitTime(unsigned int milliSec)
+{
+	BaseServerObject::SetWaitTime(milliSec);
+}
+		
+unsigned int BaseClient::GetWaitTime() const
+{
+	return BaseServerObject::GetWaitTime();
+}
 
 bool BaseClient::IsConnectionAlive() const
 {

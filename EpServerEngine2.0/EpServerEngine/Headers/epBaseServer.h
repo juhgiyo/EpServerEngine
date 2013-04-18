@@ -67,21 +67,10 @@ namespace epse{
 		Default Constructor
 
 		Initializes the Server
-		@param[in] callBackObj the callback object
-		@param[in] port the port string
-		@param[in] maximumConnectionCount the maximum number of connection
-		@param[in] waitTimeMilliSec wait time for Server Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseServer(ServerCallbackInterface *callBackObj,const TCHAR * port=_T(DEFAULT_PORT),unsigned int waitTimeMilliSec=WAITTIME_INIFINITE, unsigned int maximumConnectionCount=CONNECTION_LIMIT_INFINITE, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseServer(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
-		/*!
-		Default Constructor
-
-		Initializes the Server
-		@param[in] ops the server options
-		*/
-		BaseServer(const ServerOps &ops);
 
 		/*!
 		Default Copy Constructor
@@ -150,13 +139,19 @@ namespace epse{
 		*/
 		void SetWaitTime(unsigned int milliSec);
 
+		/*!
+		Get the wait time for the parser thread termination
+		@return the current time for waiting in millisecond
+		*/
+		unsigned int GetWaitTime() const;
+
 
 		/*!
 		Start the server
-		@param[in] port the port string
+		@param[in] ops the server options
 		@remark if argument is NULL then previously setting value is used
 		*/
-		virtual bool StartServer(const TCHAR * port=NULL)=0;
+		virtual bool StartServer(const ServerOps &ops=ServerOps::defaultServerOps)=0;
 		/*!
 		Stop the server
 		*/

@@ -1,9 +1,9 @@
 /*! 
-@file epAsyncTcpServer.h
+@file epTcpProxyServer.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/epserverengine>
 @date February 13, 2012
-@brief Asynchronous TCP Server Interface
+@brief Proxy TCP Server Interface
 @version 1.0
 
 @section LICENSE
@@ -25,33 +25,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for Asynchronous TCP Server.
+An Interface for Proxy TCP Server.
 
 */
-#ifndef __EP_ASYNC_TCP_SERVER_H__
-#define __EP_ASYNC_TCP_SERVER_H__
+
+#ifndef __EP_PROXY_TCP_SERVER_H__
+#define __EP_PROXY_TCP_SERVER_H__
 
 #include "epServerEngine.h"
-#include "epBaseTcpServer.h"
+#include "epBaseProxyServer.h"
+#include "epAsyncTcpServer.h"
+
 
 namespace epse{
 
-
+	
 	/*! 
-	@class AsyncTcpServer epAsyncTcpServer.h
-	@brief A class for Asynchronous TCP Server.
+	@class TcpProxyServer epTcpProxyServer.h
+	@brief A class for Proxy TCP Server.
 	*/
-	class EP_SERVER_ENGINE AsyncTcpServer:public BaseTcpServer{
-
+	class EP_SERVER_ENGINE TcpProxyServer:public BaseProxyServer{
 	public:
+
 		/*!
 		Default Constructor
 
 		Initializes the Server
 		@param[in] lockPolicyType The lock policy
 		*/
-		AsyncTcpServer(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
-
+		TcpProxyServer(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -59,51 +61,34 @@ namespace epse{
 		Initializes the Server
 		@param[in] b the second object
 		*/
-		AsyncTcpServer(const AsyncTcpServer& b);
+		TcpProxyServer(const TcpProxyServer& b);
+
 		/*!
 		Default Destructor
 
 		Destroy the Server
 		*/
-		virtual ~AsyncTcpServer();
+		virtual ~TcpProxyServer();
 
 		/*!
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		AsyncTcpServer & operator=(const AsyncTcpServer&b);
+		TcpProxyServer & operator=(const TcpProxyServer&b);
 
-		/*!
-		Get the asynchronous receive flag for the Socket.
-		@return The flag whether to receive asynchronously.
-		*/
-		bool GetIsAsynchronousReceive() const;
-
-		/*!
-		Set the asynchronous receive flag for the Socket.
-		@param[in] isASynchronousReceive The flag whether to receive asynchronously.
-		*/
-		void SetIsAsynchronousReceive(bool isASynchronousReceive);
-
-		/*!
-		Start the server
-		@param[in] ops the server options
-		@remark if argument is NULL then previously setting value is used
-		*/
-		bool StartServer(const ServerOps &ops=ServerOps::defaultServerOps);
 	
 	private:
-
 		/*!
-		Listening Loop Function
+		When accepted client tries to make connection.
+		@param[in] socket the client socket
+		@remark When this function calls, it is right before making connection,<br/>
+		        so user can configure the socket before the connection is actually made.		
 		*/
-		virtual void execute() ;
-
-		/// Flag for Asynchronous Receive
-		bool m_isAsynchronousReceive;
-
+		virtual void OnNewConnection(SocketInterface *socket);
 
 	};
 }
-#endif //__EP_ASYNC_TCP_SERVER_H__
+
+
+#endif //__EP_PROXY_SERVER_H__

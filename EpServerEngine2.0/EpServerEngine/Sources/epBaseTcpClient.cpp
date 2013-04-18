@@ -25,15 +25,11 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-BaseTcpClient::BaseTcpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName, const TCHAR * port,unsigned int waitTimeMilliSec,epl::LockPolicy lockPolicyType) :BaseClient(callBackObj,hostName,port,waitTimeMilliSec,lockPolicyType)
+BaseTcpClient::BaseTcpClient(epl::LockPolicy lockPolicyType) :BaseClient(lockPolicyType)
 {
 	m_recvSizePacket=Packet(NULL,4);
 }
 
-BaseTcpClient::BaseTcpClient(const ClientOps &ops):BaseClient(ops)
-{
-
-}
 
 BaseTcpClient::BaseTcpClient(const BaseTcpClient& b) :BaseClient(b)
 {

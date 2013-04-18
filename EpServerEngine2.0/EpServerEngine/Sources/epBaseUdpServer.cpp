@@ -25,29 +25,9 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-BaseUdpServer::BaseUdpServer(ServerCallbackInterface *callBackObj,const TCHAR *  port,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType): BaseServer(callBackObj,port,waitTimeMilliSec,maximumConnectionCount,lockPolicyType)
+BaseUdpServer::BaseUdpServer(epl::LockPolicy lockPolicyType): BaseServer(lockPolicyType)
 {
 	switch(lockPolicyType)
-	{
-	case epl::LOCK_POLICY_CRITICALSECTION:
-		m_sendLock=EP_NEW epl::CriticalSectionEx();
-		break;
-	case epl::LOCK_POLICY_MUTEX:
-		m_sendLock=EP_NEW epl::Mutex();
-		break;
-	case epl::LOCK_POLICY_NONE:
-		m_sendLock=EP_NEW epl::NoLock();
-		break;
-	default:
-		m_sendLock=NULL;
-		break;
-	}
-	m_maxPacketSize=0;
-}
-
-BaseUdpServer::BaseUdpServer(const ServerOps &ops):BaseServer(ops)
-{
-	switch(ops.lockPolicyType)
 	{
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
@@ -193,21 +173,29 @@ bool BaseUdpServer::socketCompare(sockaddr const & clientSocket, const BaseServe
 }
 
 
-bool BaseUdpServer::StartServer(const TCHAR * port)
+bool BaseUdpServer::StartServer(const ServerOps &ops)
 {
 	epl::LockObj lock(m_baseServerLock);
 	if(IsServerStarted())
 		return true;
 
-	if(port)
+
+	if(ops.callBackObj)
+		m_callBackObj=ops.callBackObj;
+	EP_ASSERT(m_callBackObj);
+
+	if(ops.port)
 	{
-		setPort(port);
+		setPort(ops.port);
 	}
 
 	if(!m_port.length())
 	{
 		m_port=DEFAULT_PORT;
 	}
+
+	SetWaitTime(ops.waitTimeMilliSec);
+	m_maxConnectionCount=ops.maximumConnectionCount;
 
 	WSADATA wsaData;
 	int iResult;

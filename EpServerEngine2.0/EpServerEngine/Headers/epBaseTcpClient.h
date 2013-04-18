@@ -46,21 +46,10 @@ namespace epse{
 		Default Constructor
 
 		Initializes the Client
-		@param[in] callBackObj the call back object
-		@param[in] hostName the hostname string
-		@param[in] port the port string
-		@param[in] waitTimeMilliSec wait time for Client Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseTcpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName=_T(DEFAULT_HOSTNAME), const TCHAR * port=_T(DEFAULT_PORT),unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseTcpClient(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
-		/*!
-		Default Constructor
-
-		Initializes the Client
-		@param[in] ops the client options
-		*/
-		BaseTcpClient(const ClientOps &ops);
 
 		/*!
 		Default Copy Constructor
@@ -89,7 +78,7 @@ namespace epse{
 		@param[in] port the port string
 		@remark if argument is NULL then previously setting value is used
 		*/
-		virtual bool Connect(const TCHAR * hostName=NULL, const TCHAR * port=NULL)=0;
+		virtual bool Connect(const ClientOps &ops=ClientOps::defaultClientOps)=0;
 
 		/*!
 		Disconnect from the server

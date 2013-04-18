@@ -113,7 +113,7 @@ void BaseServerObject::SetWaitTime(unsigned int milliSec)
 {
 	m_waitTime=milliSec;
 }
-unsigned int BaseServerObject::GetWaitTime()
+unsigned int BaseServerObject::GetWaitTime() const
 {
 	return m_waitTime;
 }

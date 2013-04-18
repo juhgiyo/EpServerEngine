@@ -26,14 +26,10 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-BaseTcpServer::BaseTcpServer(ServerCallbackInterface *callBackObj,const TCHAR * port,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType):BaseServer(callBackObj,port,waitTimeMilliSec,maximumConnectionCount,lockPolicyType)
+BaseTcpServer::BaseTcpServer(epl::LockPolicy lockPolicyType):BaseServer(lockPolicyType)
 {
 }
 
-BaseTcpServer::BaseTcpServer(const ServerOps &ops):BaseServer(ops)
-{
-
-}
 
 BaseTcpServer::BaseTcpServer(const BaseTcpServer& b):BaseServer(b)
 {}
@@ -52,15 +48,20 @@ BaseTcpServer & BaseTcpServer::operator=(const BaseTcpServer&b)
 }
 
 
-bool BaseTcpServer::StartServer(const TCHAR * port)
+bool BaseTcpServer::StartServer(const ServerOps &ops)
 {
 	epl::LockObj lock(m_baseServerLock);
 	if(IsServerStarted())
 		return true;
 
-	if(port)
+
+	if(ops.callBackObj)
+		m_callBackObj=ops.callBackObj;
+	EP_ASSERT(m_callBackObj);
+
+	if(ops.port)
 	{
-		setPort(port);
+		setPort(ops.port);
 	}
 
 	if(!m_port.length())
@@ -68,6 +69,9 @@ bool BaseTcpServer::StartServer(const TCHAR * port)
 		m_port=DEFAULT_PORT;
 	}
 
+	SetWaitTime(ops.waitTimeMilliSec);
+	m_maxConnectionCount=ops.maximumConnectionCount;
+	
 	WSADATA wsaData;
 	int iResult;
 

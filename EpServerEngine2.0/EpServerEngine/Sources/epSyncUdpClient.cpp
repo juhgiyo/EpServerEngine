@@ -26,16 +26,12 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-SyncUdpClient::SyncUdpClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName, const TCHAR * port,epl::LockPolicy lockPolicyType): BaseUdpClient(callBackObj,hostName,port,WAITTIME_INIFINITE,lockPolicyType)
+SyncUdpClient::SyncUdpClient(epl::LockPolicy lockPolicyType): BaseUdpClient(lockPolicyType)
 {
 	m_isConnected=false;
 
 }
 
-SyncUdpClient::SyncUdpClient(const ClientOps &ops):BaseUdpClient(ops)
-{
-
-}
 
 SyncUdpClient::SyncUdpClient(const SyncUdpClient& b):BaseUdpClient(b)
 {
@@ -60,19 +56,23 @@ SyncUdpClient & SyncUdpClient::operator=(const SyncUdpClient&b)
 
 
 
-bool SyncUdpClient::Connect(const TCHAR * hostName, const TCHAR * port)
+bool SyncUdpClient::Connect(const ClientOps &ops)
 {
 	epl::LockObj lock(m_generalLock);
 	if(IsConnectionAlive())
 		return true;
 
-	if(hostName)
+	if(ops.callBackObj)
+		m_callBackObj=ops.callBackObj;
+	EP_ASSERT(m_callBackObj);
+
+	if(ops.hostName)
 	{
-		setHostName(hostName);
+		setHostName(ops.hostName);
 	}
-	if(port)
+	if(ops.port)
 	{
-		setPort(port);
+		setPort(ops.port);
 	}
 
 	if(!m_port.length())
@@ -84,7 +84,7 @@ bool SyncUdpClient::Connect(const TCHAR * hostName, const TCHAR * port)
 	{
 		m_hostName=DEFAULT_HOSTNAME;
 	}
-
+	SetWaitTime(ops.waitTimeMilliSec);
 
 	WSADATA wsaData;
 	m_connectSocket = INVALID_SOCKET;
@@ -164,6 +164,11 @@ void SyncUdpClient::Disconnect()
 		closesocket(m_connectSocket);
 		m_connectSocket = INVALID_SOCKET;
 	}
+	else
+	{
+		m_sendLock->Unlock();
+		return;
+	}
 	m_sendLock->Unlock();
 
 	cleanUpClient();
@@ -185,6 +190,11 @@ void SyncUdpClient::disconnect()
 		{
 			closesocket(m_connectSocket);
 			m_connectSocket = INVALID_SOCKET;
+		}
+		else
+		{
+			m_sendLock->Unlock();
+			return;
 		}
 		m_sendLock->Unlock();
 

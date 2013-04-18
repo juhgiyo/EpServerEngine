@@ -573,6 +573,10 @@
 			<Filter
 				Name="Server Side"
 				>
+				<File
+					RelativePath=".\Sources\epServerInterface.cpp"
+					>
+				</File>
 				<Filter
 					Name="Templates"
 					>
@@ -669,10 +673,58 @@
 						</File>
 					</Filter>
 				</Filter>
+				<Filter
+					Name="Proxy"
+					>
+					<File
+						RelativePath=".\Sources\epProxyServerInterfaces.cpp"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epTcpProxyHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epTcpProxyServer.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epUdpProxyHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epUdpProxyServer.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="Templates"
+						>
+						<File
+							RelativePath=".\Sources\epBaseProxyHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epBaseProxyServer.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Client Side"
 				>
+				<File
+					RelativePath=".\Sources\epClientInterface.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\Sources\epClientPacketProcessor.cpp"
 					>
@@ -983,6 +1035,50 @@
 						</File>
 						<File
 							RelativePath=".\Headers\epSyncUdpSocket.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Proxy"
+					>
+					<File
+						RelativePath=".\Headers\epProxyServerInterfaces.h"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Headers\epTcpProxyHandler.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epTcpProxyServer.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Headers\epUdpProxyHandler.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epUdpProxyServer.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="Templates"
+						>
+						<File
+							RelativePath=".\Headers\epBaseProxyHandler.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epBaseProxyServer.h"
 							>
 						</File>
 					</Filter>

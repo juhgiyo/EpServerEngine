@@ -84,7 +84,7 @@ namespace epse{
 		Get the wait time for the parser thread termination
 		@return the current time for waiting in millisecond
 		*/
-		virtual unsigned int GetWaitTime();
+		virtual unsigned int GetWaitTime() const;
 		
 
 

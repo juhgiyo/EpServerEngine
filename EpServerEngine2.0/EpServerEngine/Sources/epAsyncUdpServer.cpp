@@ -26,15 +26,11 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-AsyncUdpServer::AsyncUdpServer(ServerCallbackInterface *callBackObj,const TCHAR *  port,bool isAsynchronousReceive,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType): BaseUdpServer(callBackObj,port,waitTimeMilliSec,maximumConnectionCount,lockPolicyType)
+AsyncUdpServer::AsyncUdpServer(epl::LockPolicy lockPolicyType): BaseUdpServer(lockPolicyType)
 {
-	m_isAsynchronousReceive=isAsynchronousReceive;
+	m_isAsynchronousReceive=true;
 }
 
-AsyncUdpServer::AsyncUdpServer(const ServerOps &ops):BaseUdpServer(ops)
-{
-	m_isAsynchronousReceive=ops.isAsynchronousReceive;
-}
 
 AsyncUdpServer::AsyncUdpServer(const AsyncUdpServer& b):BaseUdpServer(b)
 {
@@ -63,6 +59,12 @@ bool AsyncUdpServer::GetIsAsynchronousReceive() const
 void AsyncUdpServer::SetIsAsynchronousReceive(bool isASynchronousReceive)
 {
 	m_isAsynchronousReceive=isASynchronousReceive;
+}
+
+bool AsyncUdpServer::StartServer(const ServerOps &ops)
+{
+	m_isAsynchronousReceive=ops.isAsynchronousReceive;
+	return BaseUdpServer::StartServer(ops);
 }
 
 void AsyncUdpServer::execute()

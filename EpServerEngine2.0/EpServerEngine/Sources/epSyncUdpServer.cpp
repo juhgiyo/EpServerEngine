@@ -26,14 +26,10 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-SyncUdpServer::SyncUdpServer(ServerCallbackInterface *callBackObj,const TCHAR *  port,unsigned int waitTimeMilliSec, unsigned int maximumConnectionCount, epl::LockPolicy lockPolicyType): BaseUdpServer(callBackObj,port,waitTimeMilliSec,maximumConnectionCount,lockPolicyType)
+SyncUdpServer::SyncUdpServer(epl::LockPolicy lockPolicyType): BaseUdpServer(lockPolicyType)
 {
 }
 
-SyncUdpServer::SyncUdpServer(const ServerOps &ops):BaseUdpServer(ops)
-{
-
-}
 
 SyncUdpServer::SyncUdpServer(const SyncUdpServer& b):BaseUdpServer(b)
 {

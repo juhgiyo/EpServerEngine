@@ -63,7 +63,7 @@ void BaseSocket::SetWaitTime(unsigned int milliSec)
 {
 	BaseServerObject::SetWaitTime(milliSec);
 }
-unsigned int BaseSocket::GetWaitTime()
+unsigned int BaseSocket::GetWaitTime() const
 {
 	return BaseServerObject::GetWaitTime();
 }

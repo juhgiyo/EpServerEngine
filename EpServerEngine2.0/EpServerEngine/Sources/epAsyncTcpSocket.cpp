@@ -85,9 +85,15 @@ void AsyncTcpSocket::KillConnection()
 		closesocket(m_clientSocket);
 		m_clientSocket = INVALID_SOCKET;
 	}
+	else
+	{
+		m_sendLock->Unlock();
+		return;
+	}
 	m_sendLock->Unlock();
 
-	TerminateAfter(m_waitTime);
+	if(TerminateAfter(m_waitTime)==Thread::TERMINATE_RESULT_GRACEFULLY_TERMINATED)
+		return;
 	m_processorList.Clear();
 
 	removeSelfFromContainer();
@@ -105,6 +111,11 @@ void AsyncTcpSocket::killConnection()
 		{
 			closesocket(m_clientSocket);
 			m_clientSocket = INVALID_SOCKET;
+		}
+		else
+		{
+			m_sendLock->Unlock();
+			return;
 		}
 		m_sendLock->Unlock();
 		m_processorList.Clear();

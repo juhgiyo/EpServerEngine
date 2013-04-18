@@ -52,21 +52,10 @@ namespace epse{
 		Default Constructor
 
 		Initializes the Server
-		@param[in] callBackObj the callback object
-		@param[in] port the port string
-		@param[in] maximumConnectionCount the maximum number of connection
-		@param[in] waitTimeMilliSec wait time for Server Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseUdpServer(ServerCallbackInterface *callBackObj,const TCHAR * port=_T(DEFAULT_PORT),unsigned int waitTimeMilliSec=WAITTIME_INIFINITE, unsigned int maximumConnectionCount=CONNECTION_LIMIT_INFINITE, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseUdpServer(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
-		/*!
-		Default Constructor
-
-		Initializes the Server
-		@param[in] ops the server options
-		*/
-		BaseUdpServer(const ServerOps &ops);
 
 		/*!
 		Default Copy Constructor
@@ -91,10 +80,10 @@ namespace epse{
 		
 		/*!
 		Start the server
-		@param[in] port the port string
+		@param[in] ops the server options
 		@remark if argument is NULL then previously setting value is used
 		*/
-		bool StartServer(const TCHAR * port=NULL);
+		virtual bool StartServer(const ServerOps &ops=ServerOps::defaultServerOps);
 		/*!
 		Stop the server
 		*/

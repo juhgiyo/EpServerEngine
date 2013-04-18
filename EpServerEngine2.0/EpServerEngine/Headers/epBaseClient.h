@@ -69,21 +69,10 @@ namespace epse{
 		Default Constructor
 
 		Initializes the Client
-		@param[in] callBackObj the callback object
-		@param[in] hostName the hostname string
-		@param[in] port the port string
-		@param[in] waitTimeMilliSec wait time for Client Thread to terminate
 		@param[in] lockPolicyType The lock policy
 		*/
-		BaseClient(ClientCallbackInterface *callBackObj,const TCHAR * hostName=_T(DEFAULT_HOSTNAME),const TCHAR * port=_T(DEFAULT_PORT),unsigned int waitTimeMilliSec=WAITTIME_INIFINITE,  epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		BaseClient(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
-		/*!
-		Default Constructor
-
-		Initializes the Client
-		@param[in] ops the client options
-		*/
-		BaseClient(const ClientOps &ops);
 		/*!
 		Default Copy Constructor
 
@@ -144,12 +133,23 @@ namespace epse{
 		ClientCallbackInterface *GetCallbackObject();
 
 		/*!
+		Set the wait time for the thread termination
+		@param[in] milliSec the time for waiting in millisecond
+		*/
+		virtual void SetWaitTime(unsigned int milliSec);
+		
+		/*!
+		Get the wait time for the parser thread termination
+		@return the current time for waiting in millisecond
+		*/
+		unsigned int GetWaitTime() const;
+
+		/*!
 		Connect to the server
-		@param[in] hostName the hostname string
-		@param[in] port the port string
+		@param[in] ops the client options
 		@remark if argument is NULL then previously setting value is used
 		*/
-		virtual bool Connect(const TCHAR * hostName=NULL, const TCHAR * port=NULL)=0;
+		virtual bool Connect(const ClientOps &ops=ClientOps::defaultClientOps)=0;
 
 		/*!
 		Disconnect from the server

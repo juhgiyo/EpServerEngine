@@ -49,22 +49,9 @@ namespace epse{
 		Default Constructor
 
 		Initializes the Server
-		@param[in] callBackObj the callback object
-		@param[in] port the port string
-		@param[in] isAsynchronousReceive the flag for Asynchronous Receive
-		@param[in] waitTimeMilliSec wait time for Server Thread to terminate
-		@param[in] maximumConnectionCount the maximum number of connection
 		@param[in] lockPolicyType The lock policy
 		*/
-		AsyncUdpServer(ServerCallbackInterface *callBackObj,const TCHAR * port=_T(DEFAULT_PORT),bool isAsynchronousReceive=true,unsigned int waitTimeMilliSec=WAITTIME_INIFINITE, unsigned int maximumConnectionCount=CONNECTION_LIMIT_INFINITE, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
-
-		/*!
-		Default Constructor
-
-		Initializes the Server
-		@param[in] ops the server options
-		*/
-		AsyncUdpServer(const ServerOps &ops);
+		AsyncUdpServer(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -98,6 +85,14 @@ namespace epse{
 		@param[in] isASynchronousReceive The flag whether to receive asynchronously.
 		*/
 		void SetIsAsynchronousReceive(bool isASynchronousReceive);
+
+		
+		/*!
+		Start the server
+		@param[in] ops the server options
+		@remark if argument is NULL then previously setting value is used
+		*/
+		bool StartServer(const ServerOps &ops=ServerOps::defaultServerOps);
 	
 	private:
 	
