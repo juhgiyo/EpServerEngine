@@ -74,8 +74,8 @@ namespace epse{
 		
 		/*!
 		Connect to the server
-		@param[in] hostName the hostname string
-		@param[in] port the port string
+		@param[in] ops the client options
+		@return true if successfully connected otherwise false
 		@remark if argument is NULL then previously setting value is used
 		*/
 		bool Connect(const ClientOps &ops=ClientOps::defaultClientOps);

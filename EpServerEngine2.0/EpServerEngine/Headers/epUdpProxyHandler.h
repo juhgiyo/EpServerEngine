@@ -50,7 +50,8 @@ namespace epse{
 
 		Initializes the Handler
 		@param[in] callBack the callback object
-		@param[in] proxyServerInfo the forward server info
+		@param[in] forwardServerInfo the forward server info
+		@param[in] socket the client socket
 		@param[in] lockPolicyType The lock policy
 		*/
 		UdpProxyHandler(ProxyServerCallbackInterface *callBack,const ForwardServerInfo& forwardServerInfo, SocketInterface *socket, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);

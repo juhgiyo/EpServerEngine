@@ -51,6 +51,7 @@ namespace epse{
 
 		Initializes the Handler
 		@param[in] callBack the callback object
+		@param[in] socket the client socket
 		@param[in] lockPolicyType The lock policy
 		*/
 		BaseProxyHandler(ProxyServerCallbackInterface *callBack, SocketInterface *socket, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);

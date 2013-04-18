@@ -79,6 +79,7 @@ namespace epse{
 		/*!
 		Start the server
 		@param[in] ops the server options
+		@return true if successfully started otherwise false
 		@remark if argument is NULL then previously setting value is used
 		*/
 		virtual bool StartServer(const ServerOps &ops=ServerOps::defaultServerOps);
