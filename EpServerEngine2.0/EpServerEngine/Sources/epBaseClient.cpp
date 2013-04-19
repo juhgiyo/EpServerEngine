@@ -34,22 +34,18 @@ BaseClient::BaseClient( epl::LockPolicy lockPolicyType) :BaseServerObject(WAITTI
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_generalLock=EP_NEW epl::CriticalSectionEx();
-		m_socketLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
 		m_generalLock=EP_NEW epl::Mutex();
-		m_socketLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
 		m_generalLock=EP_NEW epl::NoLock();
-		m_socketLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
 		m_generalLock=NULL;
-		m_socketLock=NULL;
 		break;
 	}
 	m_connectSocket=INVALID_SOCKET;
@@ -70,22 +66,18 @@ BaseClient::BaseClient(const BaseClient& b) :BaseServerObject(b)
 	case epl::LOCK_POLICY_CRITICALSECTION:
 		m_sendLock=EP_NEW epl::CriticalSectionEx();
 		m_generalLock=EP_NEW epl::CriticalSectionEx();
-		m_socketLock=EP_NEW epl::CriticalSectionEx();
 		break;
 	case epl::LOCK_POLICY_MUTEX:
 		m_sendLock=EP_NEW epl::Mutex();
 		m_generalLock=EP_NEW epl::Mutex();
-		m_socketLock=EP_NEW epl::Mutex();
 		break;
 	case epl::LOCK_POLICY_NONE:
 		m_sendLock=EP_NEW epl::NoLock();
 		m_generalLock=EP_NEW epl::NoLock();
-		m_socketLock=EP_NEW epl::NoLock();
 		break;
 	default:
 		m_sendLock=NULL;
 		m_generalLock=NULL;
-		m_socketLock=NULL;
 		break;
 	}
 	m_connectSocket=INVALID_SOCKET;
@@ -116,22 +108,18 @@ BaseClient & BaseClient::operator=(const BaseClient&b)
 		case epl::LOCK_POLICY_CRITICALSECTION:
 			m_sendLock=EP_NEW epl::CriticalSectionEx();
 			m_generalLock=EP_NEW epl::CriticalSectionEx();
-			m_socketLock=EP_NEW epl::CriticalSectionEx();
 			break;
 		case epl::LOCK_POLICY_MUTEX:
 			m_sendLock=EP_NEW epl::Mutex();
 			m_generalLock=EP_NEW epl::Mutex();
-			m_socketLock=EP_NEW epl::Mutex();
 			break;
 		case epl::LOCK_POLICY_NONE:
 			m_sendLock=EP_NEW epl::NoLock();
 			m_generalLock=EP_NEW epl::NoLock();
-			m_socketLock=EP_NEW epl::NoLock();
 			break;
 		default:
 			m_sendLock=NULL;
 			m_generalLock=NULL;
-			m_socketLock=NULL;
 			break;
 		}
 		m_connectSocket=INVALID_SOCKET;
@@ -171,16 +159,6 @@ void  BaseClient::SetPort(const TCHAR *port)
 }
 
 
-SOCKET BaseClient::getSocket()
-{
-	epl::LockObj lock(m_socketLock);
-	return m_connectSocket;
-}
-void BaseClient::setSocket(SOCKET sock)
-{
-	epl::LockObj lock(m_socketLock);
-	m_connectSocket=sock;
-}
 void BaseClient::setHostName(const TCHAR * hostName)
 {
 	unsigned int strLength=epl::System::TcsLen(hostName);
@@ -271,11 +249,10 @@ bool BaseClient::IsConnectionAlive() const
 
 void BaseClient::cleanUpClient()
 {
-	SOCKET connectSocket=getSocket();
-	setSocket(INVALID_SOCKET);
-	if(connectSocket!=INVALID_SOCKET)
+	if(m_connectSocket!=INVALID_SOCKET)
 	{
-		closesocket(connectSocket);
+		closesocket(m_connectSocket);
+		m_connectSocket=INVALID_SOCKET;
 	}
 	if(m_result)
 	{

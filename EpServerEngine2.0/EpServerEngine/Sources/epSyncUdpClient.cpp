@@ -85,8 +85,6 @@ bool SyncUdpClient::Connect(const ClientOps &ops)
 	SetWaitTime(ops.waitTimeMilliSec);
 
 	WSADATA wsaData;
-	setSocket(INVALID_SOCKET);
-	SOCKET connectSocket = INVALID_SOCKET;
 	m_maxPacketSize=0;
 	struct addrinfo hints;
 	int iResult;
@@ -115,24 +113,23 @@ bool SyncUdpClient::Connect(const ClientOps &ops)
 	for(m_ptr=m_result; m_ptr != NULL ;m_ptr=m_ptr->ai_next) {
 
 		// Create a SOCKET for connecting to server
-		connectSocket = socket(m_ptr->ai_family, m_ptr->ai_socktype, 
+		m_connectSocket = socket(m_ptr->ai_family, m_ptr->ai_socktype, 
 			m_ptr->ai_protocol);
-		if (connectSocket == INVALID_SOCKET) {
+		if (m_connectSocket == INVALID_SOCKET) {
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Socket failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			cleanUpClient();
 			return false;
 		}
 		break;
 	}
-	if (connectSocket == INVALID_SOCKET) {
+	if (m_connectSocket == INVALID_SOCKET) {
 		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to connect to server!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 		cleanUpClient();
 		return false;
 	}
 
 	int nTmp = sizeof(int);
-	getsockopt(connectSocket, SOL_SOCKET,SO_MAX_MSG_SIZE, (char *)&m_maxPacketSize,&nTmp);
-	setSocket(connectSocket);
+	getsockopt(m_connectSocket, SOL_SOCKET,SO_MAX_MSG_SIZE, (char *)&m_maxPacketSize,&nTmp);
 	m_isConnected=true;
 	return true;
 }
@@ -151,11 +148,10 @@ void SyncUdpClient::Disconnect()
 		return;
 	}
 	m_isConnected=false;
-	SOCKET connectSocket=getSocket();
-	if(connectSocket!=INVALID_SOCKET)
+	if(m_connectSocket!=INVALID_SOCKET)
 	{
 		// shutdown the connection since no more data will be sent
-		int iResult = shutdown(connectSocket, SD_SEND);
+		int iResult = shutdown(m_connectSocket, SD_SEND);
 		if (iResult == SOCKET_ERROR){
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
 		}
@@ -187,11 +183,16 @@ void SyncUdpClient::disconnect()
 }
 
 
-
+int SyncUdpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec,SendStatus *sendStatus)
+{
+	epl::LockObj lock(m_generalLock);
+	return BaseUdpClient::Send(packet,waitTimeInMilliSec,sendStatus);
+}
 
 
 Packet *SyncUdpClient::Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *retStatus)
 {
+	epl::LockObj lock(m_generalLock);
 	if(!IsConnectionAlive())
 	{
 		if(retStatus)
@@ -203,10 +204,9 @@ Packet *SyncUdpClient::Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *re
 	TIMEVAL	timeOutVal;
 	fd_set	fdSet;
 	int		retfdNum = 0;
-	SOCKET connectSocket=getSocket();
 
 	FD_ZERO(&fdSet);
-	FD_SET(connectSocket, &fdSet);
+	FD_SET(m_connectSocket, &fdSet);
 	if(waitTimeInMilliSec!=WAITTIME_INIFINITE)
 	{
 		// socket select time out setting

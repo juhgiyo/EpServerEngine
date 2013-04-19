@@ -169,15 +169,10 @@ namespace epse{
 		@return sent byte size
 		@remark return -1 if error occurred
 		*/
-		virtual int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE)=0;
+		virtual int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE,SendStatus *sendStatus=NULL)=0;
 	
 
 	protected:
-
-		/*!
-		*/
-		SOCKET getSocket();
-		void setSocket(SOCKET sock);
 
 		/*!
 		Actually set the hostname for the server.
@@ -223,16 +218,12 @@ namespace epse{
 		/// general lock
 		epl::BaseLock *m_generalLock;
 
-		/// socket lock
-		epl::BaseLock *m_socketLock;
-
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;
 
 		/// Callback Object
 		ClientCallbackInterface *m_callBackObj;
 
-	private:
 		/// connection socket
 		SOCKET m_connectSocket;
 	};

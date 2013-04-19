@@ -67,16 +67,37 @@ namespace epse{
 	*/
 	#define PROCESSOR_LIMIT_INFINITE 0
 
+	/// Receive Status
 	typedef enum _receiveStatus{
+		/// Success
 		RECEIVE_STATUS_SUCCESS=0,
+		/// Time-out
 		RECEIVE_STATUS_FAIL_TIME_OUT,
+		/// Not connected
 		RECEIVE_STATUS_FAIL_NOT_CONNECTED,
+		/// Connection closing
 		RECEIVE_STATUS_FAIL_CONNECTION_CLOSING,
+		/// Socket error
 		RECEIVE_STATUS_FAIL_SOCKET_ERROR,
+		/// Receive failed
 		RECEIVE_STATUS_FAIL_RECEIVE_FAILED,
+		/// Not supported
 		RECEIVE_STATUS_FAIL_NOT_SUPPORTED,
 		
 	}ReceiveStatus;
+
+	/// Send Status
+	typedef enum _sendStatus{
+		/// Success
+		SEND_STATUS_SUCCESS=0,
+		/// Time-out
+		SEND_STATUS_FAIL_TIME_OUT,
+		/// Socket error
+		SEND_STATUS_FAIL_SOCKET_ERROR,
+		/// Send failed
+		SEND_STATUS_FAIL_SEND_FAILED,
+
+	}SendStatus;
 	
 }
 #endif //__EP_SERVER_CONF_H__

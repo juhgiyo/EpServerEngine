@@ -184,8 +184,7 @@ bool AsyncTcpClient::Connect(const ClientOps &ops)
 
 
 	WSADATA wsaData;
-	setSocket(INVALID_SOCKET);
-	SOCKET connectSocket = INVALID_SOCKET;
+	m_connectSocket=INVALID_SOCKET;
 	struct addrinfo hints;
 	int iResult;
 
@@ -214,29 +213,28 @@ bool AsyncTcpClient::Connect(const ClientOps &ops)
 	for(iPtr=m_result; iPtr != NULL ;iPtr=iPtr->ai_next) {
 
 		// Create a SOCKET for connecting to server
-		connectSocket = socket(iPtr->ai_family, iPtr->ai_socktype, 
+		m_connectSocket = socket(iPtr->ai_family, iPtr->ai_socktype, 
 			iPtr->ai_protocol);
-		if (connectSocket == INVALID_SOCKET) {
+		if (m_connectSocket == INVALID_SOCKET) {
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Socket failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			cleanUpClient();
 			return false;
 		}
 
 		// Connect to server.
-		iResult = connect( connectSocket, iPtr->ai_addr, static_cast<int>(iPtr->ai_addrlen));
+		iResult = connect( m_connectSocket, iPtr->ai_addr, static_cast<int>(iPtr->ai_addrlen));
 		if (iResult == SOCKET_ERROR) {
-			closesocket(connectSocket);
-			connectSocket = INVALID_SOCKET;
+			closesocket(m_connectSocket);
+			m_connectSocket = INVALID_SOCKET;
 			continue;
 		}
 		break;
 	}
-	if (connectSocket == INVALID_SOCKET) {
+	if (m_connectSocket == INVALID_SOCKET) {
 		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to connect to server!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 		cleanUpClient();
 		return false;
 	}
-	setSocket(connectSocket);
 	if(Start())
 	{
 		return true;
@@ -263,11 +261,10 @@ void AsyncTcpClient::Disconnect()
 	{
 		return;
 	}
-	SOCKET connectSocket=getSocket();
-	if(connectSocket!=INVALID_SOCKET)
+	if(m_connectSocket!=INVALID_SOCKET)
 	{
 		// shutdown the connection since no more data will be sent
-		int iResult = shutdown(connectSocket, SD_SEND);
+		int iResult = shutdown(m_connectSocket, SD_SEND);
 		if (iResult == SOCKET_ERROR) {
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
 		}

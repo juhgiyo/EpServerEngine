@@ -48,6 +48,7 @@ void SyncUdpSocket::KillConnection()
 	{
 		return;
 	}
+	m_isConnected=false;
 
 	m_listLock->Lock();
 	Packet *removeElem=NULL;
@@ -60,7 +61,6 @@ void SyncUdpSocket::KillConnection()
 	}
 	m_listLock->Unlock();
 
-	m_isConnected=false;
 	removeSelfFromContainer();
 	m_callBackObj->OnDisconnect(this);
 }
@@ -70,6 +70,8 @@ void SyncUdpSocket::killConnection()
 {
 	if(IsConnectionAlive())
 	{
+		m_isConnected=false;
+
 		m_listLock->Lock();
 		Packet *removeElem=NULL;
 		while(!m_packetList.empty())
@@ -81,7 +83,7 @@ void SyncUdpSocket::killConnection()
 		}
 		m_listLock->Unlock();
 
-		m_isConnected=false;
+
 		removeSelfFromContainer();
 		m_callBackObj->OnDisconnect(this);
 
@@ -97,8 +99,15 @@ void SyncUdpSocket::addPacket(Packet *packet)
 	m_packetReceivedEvent.SetEvent();
 }
 
+int SyncUdpSocket::Send(const Packet &packet, unsigned int waitTimeInMilliSec,SendStatus *sendStatus)
+{
+	epl::LockObj lock(m_baseSocketLock);
+	return BaseUdpSocket::Send(packet,waitTimeInMilliSec,sendStatus);
+}
+
 Packet *SyncUdpSocket::Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *retStatus)
 {
+	epl::LockObj lock(m_baseSocketLock);
 	if(!IsConnectionAlive())
 	{
 		if(retStatus)

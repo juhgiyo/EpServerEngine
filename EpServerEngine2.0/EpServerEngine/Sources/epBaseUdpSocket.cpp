@@ -71,12 +71,12 @@ void BaseUdpSocket::setMaxPacketByteSize(unsigned int maxPacketSize)
 	m_maxPacketSize=maxPacketSize;
 }
 
-int BaseUdpSocket::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
+int BaseUdpSocket::Send(const Packet &packet, unsigned int waitTimeInMilliSec,SendStatus *sendStatus)
 {
 	epl::LockObj lock(m_baseSocketLock);
 	EP_ASSERT(packet.GetPacketByteSize()<=m_maxPacketSize);
 	if(m_owner)
-		return ((BaseUdpServer*)m_owner)->send(packet,m_sockAddr,waitTimeInMilliSec);
+		return ((BaseUdpServer*)m_owner)->send(packet,m_sockAddr,waitTimeInMilliSec,sendStatus);
 	return 0;
 }
 

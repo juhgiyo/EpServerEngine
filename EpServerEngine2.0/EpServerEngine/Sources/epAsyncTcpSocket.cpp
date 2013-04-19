@@ -95,8 +95,8 @@ void AsyncTcpSocket::KillConnection()
 		closesocket(m_clientSocket);
 		m_clientSocket = INVALID_SOCKET;
 	}
-	m_processorList.Clear();
 
+	m_processorList.Clear();
 	removeSelfFromContainer();
 	m_callBackObj->OnDisconnect(this);
 }
@@ -111,10 +111,6 @@ void AsyncTcpSocket::killConnection()
 		{
 			closesocket(m_clientSocket);
 			m_clientSocket = INVALID_SOCKET;
-		}
-		else
-		{
-			return;
 		}
 		m_processorList.Clear();
 		removeSelfFromContainer();

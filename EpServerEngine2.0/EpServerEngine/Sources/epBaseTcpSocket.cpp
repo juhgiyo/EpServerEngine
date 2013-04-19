@@ -60,7 +60,7 @@ void BaseTcpSocket::setClientSocket(const SOCKET& clientSocket )
 }
 
 
-int BaseTcpSocket::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
+int BaseTcpSocket::Send(const Packet &packet, unsigned int waitTimeInMilliSec,SendStatus *sendStatus)
 {	
 	epl::LockObj lock(m_sendLock);
 
@@ -88,10 +88,14 @@ int BaseTcpSocket::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 	}
 	if (retfdNum == SOCKET_ERROR)	// select failed
 	{
+		if(sendStatus)
+			*sendStatus=SEND_STATUS_FAIL_SOCKET_ERROR;
 		return retfdNum;
 	}
 	else if (retfdNum == 0)		// select time-out
 	{
+		if(sendStatus)
+			*sendStatus=SEND_STATUS_FAIL_TIME_OUT;
 		return retfdNum;
 	}
 
@@ -104,17 +108,27 @@ int BaseTcpSocket::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 	{
 		int sentLength=send(m_clientSocket,reinterpret_cast<char*>(&length),4,0);
 		if(sentLength<=0)
+		{
+			if(sendStatus)
+				*sendStatus=SEND_STATUS_SUCCESS;
 			return sentLength;
+		}
 	}
 	while(length>0)
 	{
 		int sentLength=send(m_clientSocket,packetData,length,0);
 		writeLength+=sentLength;
-		if(writeLength<=0)
-			break;
+		if(sentLength<=0)
+		{
+			if(sendStatus)
+				*sendStatus=SEND_STATUS_FAIL_SEND_FAILED;
+			return sentLength;
+		}
 		length-=sentLength;
 		packetData+=sentLength;
 	}
+	if(sendStatus)
+		*sendStatus=SEND_STATUS_SUCCESS;
 	return writeLength;
 }
 
@@ -129,7 +143,9 @@ int BaseTcpSocket::receive(Packet &packet)
 		int recvLength=recv(m_clientSocket,packetData, length, 0);
 		readLength+=recvLength;
 		if(recvLength<=0)
-			break;
+		{
+			return recvLength;
+		}
 		length-=recvLength;
 		packetData+=recvLength;
 	}

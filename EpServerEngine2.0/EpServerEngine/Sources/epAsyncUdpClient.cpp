@@ -175,8 +175,7 @@ bool AsyncUdpClient::Connect(const ClientOps &ops)
 
 
 	WSADATA wsaData;
-	setSocket(INVALID_SOCKET);
-	SOCKET connectSocket = INVALID_SOCKET;
+	m_connectSocket=INVALID_SOCKET;
 	m_maxPacketSize=0;
 	struct addrinfo hints;
 	int iResult;
@@ -205,25 +204,24 @@ bool AsyncUdpClient::Connect(const ClientOps &ops)
 	for(m_ptr=m_result; m_ptr != NULL ;m_ptr=m_ptr->ai_next) {
 
 		// Create a SOCKET for connecting to server
-		connectSocket = socket(m_ptr->ai_family, m_ptr->ai_socktype, 
+		m_connectSocket = socket(m_ptr->ai_family, m_ptr->ai_socktype, 
 			m_ptr->ai_protocol);
-		if (connectSocket == INVALID_SOCKET) {
+		if (m_connectSocket == INVALID_SOCKET) {
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Socket failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			cleanUpClient();
 			return false;
 		}
 		break;
 	}
-	if (connectSocket == INVALID_SOCKET) {
+	if (m_connectSocket == INVALID_SOCKET) {
 		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to connect to server!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 		cleanUpClient();
 		return false;
 	}
 
 	int nTmp = sizeof(int);
-	getsockopt(connectSocket, SOL_SOCKET,SO_MAX_MSG_SIZE, (char *)&m_maxPacketSize,&nTmp);
+	getsockopt(m_connectSocket, SOL_SOCKET,SO_MAX_MSG_SIZE, (char *)&m_maxPacketSize,&nTmp);
 
-	setSocket(connectSocket);
 	if(Start())
 	{
 		return true;
@@ -250,10 +248,9 @@ void AsyncUdpClient::Disconnect()
 	{
 		return;
 	}
-	SOCKET connectSocket=getSocket();
-	if(connectSocket!=INVALID_SOCKET)
+	if(m_connectSocket!=INVALID_SOCKET)
 	{
-		int iResult = shutdown(connectSocket, SD_SEND);
+		int iResult = shutdown(m_connectSocket, SD_SEND);
 		if (iResult == SOCKET_ERROR)
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
 	}

@@ -52,7 +52,7 @@ BaseTcpClient & BaseTcpClient::operator=(const BaseTcpClient&b)
 }
 
 
-int BaseTcpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
+int BaseTcpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec,SendStatus *sendStatus)
 {
 	epl::LockObj lock(m_sendLock);
 	if(!IsConnectionAlive())
@@ -62,10 +62,9 @@ int BaseTcpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 	TIMEVAL	timeOutVal;
 	fd_set	fdSet;
 	int		retfdNum = 0;
-	SOCKET connectSocket=getSocket();
 
 	FD_ZERO(&fdSet);
-	FD_SET(connectSocket, &fdSet);
+	FD_SET(m_connectSocket, &fdSet);
 	if(waitTimeInMilliSec!=WAITTIME_INIFINITE)
 	{
 		// socket select time out setting
@@ -81,10 +80,14 @@ int BaseTcpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 	}
 	if (retfdNum == SOCKET_ERROR)	// select failed
 	{
+		if(sendStatus)
+			*sendStatus=SEND_STATUS_FAIL_SOCKET_ERROR;
 		return retfdNum;
 	}
 	else if (retfdNum == 0)		    // select time-out
 	{
+		if(sendStatus)
+			*sendStatus=SEND_STATUS_FAIL_TIME_OUT;
 		return retfdNum;
 	}
 
@@ -95,36 +98,41 @@ int BaseTcpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 
 	if(length>0)
 	{
-		int sentLength=send(connectSocket,reinterpret_cast<char*>(&length),4,0);
+		int sentLength=send(m_connectSocket,reinterpret_cast<char*>(&length),4,0);
 		if(sentLength<=0)
 			return sentLength;
 	}
 	while(length>0)
 	{
-		int sentLength=send(connectSocket,packetData,length,0);
+		int sentLength=send(m_connectSocket,packetData,length,0);
 		writeLength+=sentLength;
 		if(sentLength<=0)
 		{
-			return writeLength;
+			if(sendStatus)
+				*sendStatus=SEND_STATUS_FAIL_SEND_FAILED;
+			return sentLength;
 		}
 		length-=sentLength;
 		packetData+=sentLength;
 	}
+	if(sendStatus)
+		*sendStatus=SEND_STATUS_SUCCESS;
 	return writeLength;
 }
 
 int BaseTcpClient::receive(Packet &packet)
 {
-	SOCKET connectSocket=getSocket();
 	int readLength=0;
 	int length=packet.GetPacketByteSize();
 	char *packetData=const_cast<char*>(packet.GetPacket());
 	while(length>0)
 	{
-		int recvLength=recv(connectSocket,packetData, length, 0);
+		int recvLength=recv(m_connectSocket,packetData, length, 0);
 		readLength+=recvLength;
 		if(recvLength<=0)
-			break;
+		{
+			return recvLength;
+		}
 		length-=recvLength;
 		packetData+=recvLength;
 	}

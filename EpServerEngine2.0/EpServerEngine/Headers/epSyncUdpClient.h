@@ -94,6 +94,14 @@ namespace epse{
 		*/
 		bool IsConnectionAlive() const;
 
+		/*!
+		Send the packet to the server
+		@param[in] packet the packet to be sent
+		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
+		@return sent byte size
+		@remark return -1 if error occurred
+		*/
+		int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE,SendStatus *sendStatus=NULL);
 	
 		/*!
 		Receive the packet from the server

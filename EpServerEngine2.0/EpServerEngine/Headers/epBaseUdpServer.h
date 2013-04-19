@@ -123,7 +123,7 @@ namespace epse{
 		@return sent byte size
 		@remark return -1 if error occurred
 		*/
-		int send(const Packet &packet,const sockaddr &clientSockAddr, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
+		int send(const Packet &packet,const sockaddr &clientSockAddr, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE,SendStatus *sendStatus=NULL);
 
 
 		/*!

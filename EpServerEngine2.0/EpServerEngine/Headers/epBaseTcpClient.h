@@ -93,7 +93,7 @@ namespace epse{
 		@return sent byte size
 		@remark return -1 if error occurred
 		*/
-		int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE);
+		virtual int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE,SendStatus *sendStatus=NULL);
 
 	protected:
 

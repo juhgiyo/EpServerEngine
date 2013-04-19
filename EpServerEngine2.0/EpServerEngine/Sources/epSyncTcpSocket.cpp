@@ -47,6 +47,7 @@ void SyncTcpSocket::KillConnection()
 	{
 		return;
 	}
+	m_isConnected=false;
 	// No longer need client socket
 	if(m_clientSocket!=INVALID_SOCKET)
 	{
@@ -55,15 +56,14 @@ void SyncTcpSocket::KillConnection()
 		if (iResult == SOCKET_ERROR) {
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 		}
-		closesocket(m_clientSocket);
-		m_clientSocket = INVALID_SOCKET;
 	}
 	else
 	{
 		return;
 	}
 
-	m_isConnected=false;
+	closesocket(m_clientSocket);
+	m_clientSocket = INVALID_SOCKET;
 	removeSelfFromContainer();
 	m_callBackObj->OnDisconnect(this);
 }
@@ -73,25 +73,28 @@ void SyncTcpSocket::killConnection()
 {
 	if(IsConnectionAlive())
 	{
+		m_isConnected=false;
 		// No longer need client socket
 		if(m_clientSocket!=INVALID_SOCKET)
 		{
 			closesocket(m_clientSocket);
 			m_clientSocket = INVALID_SOCKET;
 		}
-		else
-		{
-			return;
-		}
 
-		m_isConnected=false;
+
 		removeSelfFromContainer();
 		m_callBackObj->OnDisconnect(this);
 	}
 }
+int SyncTcpSocket::Send(const Packet &packet, unsigned int waitTimeInMilliSec,SendStatus *sendStatus)
+{
+	epl::LockObj lock(m_baseSocketLock);
+	return BaseTcpSocket::Send(packet,waitTimeInMilliSec,sendStatus);
+}
 
 Packet *SyncTcpSocket::Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *retStatus)
 {
+	epl::LockObj lock(m_baseSocketLock);
 	if(!IsConnectionAlive())
 	{
 		if(retStatus)

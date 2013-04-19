@@ -65,20 +65,19 @@ unsigned int BaseUdpClient::GetMaxPacketByteSize() const
 	return m_maxPacketSize;
 }
 
-int BaseUdpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
+int BaseUdpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec,SendStatus *sendStatus)
 {
 	epl::LockObj lock(m_sendLock);
 	if(!IsConnectionAlive())
 		return 0;
 
-	SOCKET connectSocket=getSocket();
 	// select routine
 	TIMEVAL	timeOutVal;
 	fd_set	fdSet;
 	int		retfdNum = 0;
 
 	FD_ZERO(&fdSet);
-	FD_SET(connectSocket, &fdSet);
+	FD_SET(m_connectSocket, &fdSet);
 	if(waitTimeInMilliSec!=WAITTIME_INIFINITE)
 	{
 		// socket select time out setting
@@ -94,27 +93,39 @@ int BaseUdpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 	}
 	if (retfdNum == SOCKET_ERROR)	// select failed
 	{
+		if(sendStatus)
+			*sendStatus=SEND_STATUS_FAIL_SOCKET_ERROR;
 		return retfdNum;
 	}
 	else if (retfdNum == 0)		    // select time-out
 	{
+		if(sendStatus)
+			*sendStatus=SEND_STATUS_FAIL_TIME_OUT;
 		return retfdNum;
 	}
 
 	// send routine
 	int sentLength=0;
+	int writeLength=0;
 	const char *packetData=packet.GetPacket();
 	int length=packet.GetPacketByteSize();
 	EP_ASSERT(length<=m_maxPacketSize);
-	if(length>0)
+	int sockAddrSize=sizeof(sockaddr);
+	while(length>0)
 	{
-		//int sentLength=send(m_connectSocket,packetData,length,0);
-		sentLength=sendto(connectSocket,packetData,length,0,m_ptr->ai_addr,sizeof(sockaddr));
+		sentLength=sendto(m_connectSocket,packetData,length,0,m_ptr->ai_addr,sizeof(sockaddr));
+		writeLength+=sentLength;
 		if(sentLength<=0)
 		{
+			if(sendStatus)
+				*sendStatus=SEND_STATUS_FAIL_SEND_FAILED;
 			return sentLength;
 		}
+		length-=sentLength;
+		packetData+=sentLength;
 	}
+	if(sendStatus)
+		*sendStatus=SEND_STATUS_SUCCESS;
 	return sentLength;
 }
 
@@ -122,12 +133,11 @@ int BaseUdpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 
 int BaseUdpClient::receive(Packet &packet)
 {
-	SOCKET connectSocket=getSocket();
 	int length=packet.GetPacketByteSize();
 	char *packetData=const_cast<char*>(packet.GetPacket());
 	sockaddr tmpInfo;
 	int tmpInfoSize=sizeof(sockaddr);
-	int recvLength = recvfrom(connectSocket,packetData,length,0,&tmpInfo,&tmpInfoSize);
+	int recvLength = recvfrom(m_connectSocket,packetData,length,0,&tmpInfo,&tmpInfoSize);
 	return recvLength;
 }
 

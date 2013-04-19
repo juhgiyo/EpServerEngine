@@ -113,7 +113,7 @@ unsigned int BaseUdpServer::GetMaxPacketByteSize() const
 	return m_maxPacketSize;
 }
 
-int BaseUdpServer::send(const Packet &packet,const sockaddr &clientSockAddr, unsigned int waitTimeInMilliSec)
+int BaseUdpServer::send(const Packet &packet,const sockaddr &clientSockAddr, unsigned int waitTimeInMilliSec,SendStatus *sendStatus)
 {
 
 	epl::LockObj lock(m_sendLock);
@@ -140,24 +140,41 @@ int BaseUdpServer::send(const Packet &packet,const sockaddr &clientSockAddr, uns
 	}
 	if (retfdNum == SOCKET_ERROR)	// select failed
 	{
+		if(sendStatus)
+			*sendStatus=SEND_STATUS_FAIL_SOCKET_ERROR;
 		return retfdNum;
 	}
 	else if (retfdNum == 0)		    // select time-out
 	{
+		if(sendStatus)
+			*sendStatus=SEND_STATUS_FAIL_TIME_OUT;
 		return retfdNum;
 	}
 
 	// send routine
 
 	int sentLength=0;
+	int writeLength=0;
 	const char *packetData=packet.GetPacket();
 	int length=packet.GetPacketByteSize();
 	EP_ASSERT(length<=m_maxPacketSize);
-	if(length>0)
+
+	int sockAddrSize=sizeof(sockaddr);
+	while(length>0)
 	{
-		int sockAddrSize=sizeof(sockaddr);
 		sentLength=sendto(m_listenSocket,packetData,length,0,&clientSockAddr,sizeof(sockaddr));
+		writeLength+=sentLength;
+		if(sentLength<=0)
+		{
+			if(sendStatus)
+				*sendStatus=SEND_STATUS_FAIL_SEND_FAILED;
+			return sentLength;
+		}
+		length-=sentLength;
+		packetData+=sentLength;
 	}
+	if(sendStatus)
+		*sendStatus=SEND_STATUS_SUCCESS;
 	return sentLength;
 }
 
