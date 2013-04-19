@@ -175,6 +175,11 @@ namespace epse{
 	protected:
 
 		/*!
+		*/
+		SOCKET getSocket();
+		SOCKET setSocket(SOCKET sock);
+
+		/*!
 		Actually set the hostname for the server.
 		@remark Cannot be changed while connected to server
 		@param[in] hostName The hostname to set.
@@ -210,8 +215,6 @@ namespace epse{
 		epl::EpString m_port;
 		/// hostname
 		epl::EpString m_hostName;
-		/// connection socket
-		SOCKET m_connectSocket;
 		/// internal variable
 		struct addrinfo *m_result;
 
@@ -225,6 +228,10 @@ namespace epse{
 
 		/// Callback Object
 		ClientCallbackInterface *m_callBackObj;
+
+	private:
+		/// connection socket
+		SOCKET m_connectSocket;
 	};
 }
 #endif //__EP_BASE_CLIENT_H__

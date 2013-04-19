@@ -74,7 +74,6 @@ void AsyncTcpSocket::KillConnection()
 		return;
 	}
 	// No longer need client socket
-	m_sendLock->Lock();
 	if(m_clientSocket!=INVALID_SOCKET)
 	{
 		int iResult;
@@ -82,18 +81,20 @@ void AsyncTcpSocket::KillConnection()
 		if (iResult == SOCKET_ERROR) {
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 		}
-		closesocket(m_clientSocket);
-		m_clientSocket = INVALID_SOCKET;
 	}
 	else
 	{
-		m_sendLock->Unlock();
 		return;
 	}
-	m_sendLock->Unlock();
 
 	if(TerminateAfter(m_waitTime)==Thread::TERMINATE_RESULT_GRACEFULLY_TERMINATED)
 		return;
+
+	if(m_clientSocket!=INVALID_SOCKET)
+	{
+		closesocket(m_clientSocket);
+		m_clientSocket = INVALID_SOCKET;
+	}
 	m_processorList.Clear();
 
 	removeSelfFromContainer();
@@ -106,7 +107,6 @@ void AsyncTcpSocket::killConnection()
 	if(IsConnectionAlive())
 	{
 		// No longer need client socket
-		m_sendLock->Lock();
 		if(m_clientSocket!=INVALID_SOCKET)
 		{
 			closesocket(m_clientSocket);
@@ -114,10 +114,8 @@ void AsyncTcpSocket::killConnection()
 		}
 		else
 		{
-			m_sendLock->Unlock();
 			return;
 		}
-		m_sendLock->Unlock();
 		m_processorList.Clear();
 		removeSelfFromContainer();
 		m_callBackObj->OnDisconnect(this);

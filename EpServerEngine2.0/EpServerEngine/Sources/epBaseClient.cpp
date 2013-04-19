@@ -48,7 +48,6 @@ BaseClient::BaseClient( epl::LockPolicy lockPolicyType) :BaseServerObject(WAITTI
 		m_generalLock=NULL;
 		break;
 	}
-
 	m_connectSocket=INVALID_SOCKET;
 	m_result=0;
 
@@ -59,8 +58,7 @@ BaseClient::BaseClient( epl::LockPolicy lockPolicyType) :BaseServerObject(WAITTI
 
 BaseClient::BaseClient(const BaseClient& b) :BaseServerObject(b)
 {
-	m_connectSocket=INVALID_SOCKET;
-	m_result=0;
+
 
 	m_lockPolicy=b.m_lockPolicy;
 	switch(m_lockPolicy)
@@ -82,6 +80,9 @@ BaseClient::BaseClient(const BaseClient& b) :BaseServerObject(b)
 		m_generalLock=NULL;
 		break;
 	}
+	m_connectSocket=INVALID_SOCKET;
+	m_result=0;
+
 	LockObj lock(b.m_generalLock);
 	m_hostName=b.m_hostName;
 	m_port=b.m_port;
@@ -100,9 +101,6 @@ BaseClient & BaseClient::operator=(const BaseClient&b)
 		resetClient();
 
 		BaseServerObject::operator =(b);
-
-		m_connectSocket=INVALID_SOCKET;
-		m_result=0;
 
 		m_lockPolicy=b.m_lockPolicy;
 		switch(m_lockPolicy)
@@ -124,6 +122,9 @@ BaseClient & BaseClient::operator=(const BaseClient&b)
 			m_generalLock=NULL;
 			break;
 		}
+		m_connectSocket=INVALID_SOCKET;
+		m_result=0;
+
 		LockObj lock(b.m_generalLock);
 		m_hostName=b.m_hostName;
 		m_port=b.m_port;
@@ -157,6 +158,15 @@ void  BaseClient::SetPort(const TCHAR *port)
 	setPort(port);
 }
 
+
+SOCKET BaseClient::getSocket()
+{
+	return m_connectSocket;
+}
+SOCKET BaseClient::setSocket(SOCKET sock)
+{
+	m_connectSocket=sock;
+}
 void BaseClient::setHostName(const TCHAR * hostName)
 {
 	unsigned int strLength=epl::System::TcsLen(hostName);
@@ -247,11 +257,11 @@ bool BaseClient::IsConnectionAlive() const
 
 void BaseClient::cleanUpClient()
 {
-
-	if(m_connectSocket!=INVALID_SOCKET)
+	SOCKET connectSocket=getSocket();
+	setSocket(INVALID_SOCKET);
+	if(connectSocket!=INVALID_SOCKET)
 	{
-		closesocket(m_connectSocket);
-		m_connectSocket = INVALID_SOCKET;
+		closesocket(connectSocket);
 	}
 	if(m_result)
 	{

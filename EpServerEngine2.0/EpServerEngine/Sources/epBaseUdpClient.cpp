@@ -74,13 +74,14 @@ int BaseUdpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 	if(!IsConnectionAlive())
 		return 0;
 
+	SOCKET connectSocket=getSocket();
 	// select routine
 	TIMEVAL	timeOutVal;
 	fd_set	fdSet;
 	int		retfdNum = 0;
 
 	FD_ZERO(&fdSet);
-	FD_SET(m_connectSocket, &fdSet);
+	FD_SET(connectSocket, &fdSet);
 	if(waitTimeInMilliSec!=WAITTIME_INIFINITE)
 	{
 		// socket select time out setting
@@ -111,7 +112,7 @@ int BaseUdpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 	if(length>0)
 	{
 		//int sentLength=send(m_connectSocket,packetData,length,0);
-		sentLength=sendto(m_connectSocket,packetData,length,0,m_ptr->ai_addr,sizeof(sockaddr));
+		sentLength=sendto(connectSocket,packetData,length,0,m_ptr->ai_addr,sizeof(sockaddr));
 		if(sentLength<=0)
 		{
 			return sentLength;
@@ -124,12 +125,12 @@ int BaseUdpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec)
 
 int BaseUdpClient::receive(Packet &packet)
 {
-
+	SOCKET connectSocket=getSocket();
 	int length=packet.GetPacketByteSize();
 	char *packetData=const_cast<char*>(packet.GetPacket());
 	sockaddr tmpInfo;
 	int tmpInfoSize=sizeof(sockaddr);
-	int recvLength = recvfrom(m_connectSocket,packetData,length,0,&tmpInfo,&tmpInfoSize);
+	int recvLength = recvfrom(connectSocket,packetData,length,0,&tmpInfo,&tmpInfoSize);
 	return recvLength;
 }
 

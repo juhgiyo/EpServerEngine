@@ -36,8 +36,6 @@ AsyncUdpClient::AsyncUdpClient(epl::LockPolicy lockPolicyType): BaseUdpClient(lo
 
 AsyncUdpClient::AsyncUdpClient(const AsyncUdpClient& b):BaseUdpClient(b)
 {
-	LockObj lock(b.m_generalLock);
-
 	m_processorList=b.m_processorList;
 	m_maxProcessorCount=b.m_maxProcessorCount;
 	m_isAsynchronousReceive=b.m_isAsynchronousReceive;
@@ -53,8 +51,7 @@ AsyncUdpClient & AsyncUdpClient::operator=(const AsyncUdpClient&b)
 	{				
 
 		BaseUdpClient::operator =(b);
-		LockObj lock(b.m_generalLock);
-
+	
 		m_processorList=b.m_processorList;
 		m_maxProcessorCount=b.m_maxProcessorCount;
 		m_isAsynchronousReceive=b.m_isAsynchronousReceive;
@@ -66,13 +63,11 @@ AsyncUdpClient & AsyncUdpClient::operator=(const AsyncUdpClient&b)
 
 void AsyncUdpClient::SetMaximumProcessorCount(unsigned int maxProcessorCount)
 {
-	epl::LockObj lock(m_generalLock);
 	m_maxProcessorCount=maxProcessorCount;
 
 }
 unsigned int AsyncUdpClient::GetMaximumProcessorCount() const
 {
-	epl::LockObj lock(m_generalLock);
 	return m_maxProcessorCount;
 }
 
@@ -115,9 +110,10 @@ void AsyncUdpClient::execute()
 				parser->Start();
 				parser->ReleaseObj();
 				passPacket->ReleaseObj();
-				if(GetMaximumProcessorCount()!=PROCESSOR_LIMIT_INFINITE)
+				unsigned int maximumProcessorCount=GetMaximumProcessorCount();
+				if(maximumProcessorCount!=PROCESSOR_LIMIT_INFINITE)
 				{
-					while(m_processorList.Count()>=GetMaximumProcessorCount())
+					while(m_processorList.Count()>=maximumProcessorCount)
 					{
 						m_processorList.WaitForListSizeDecrease();
 					}
@@ -179,7 +175,8 @@ bool AsyncUdpClient::Connect(const ClientOps &ops)
 
 
 	WSADATA wsaData;
-	m_connectSocket = INVALID_SOCKET;
+	setSocket(INVALID_SOCKET);
+	SOCKET connectSocket = INVALID_SOCKET;
 	m_maxPacketSize=0;
 	struct addrinfo hints;
 	int iResult;
@@ -208,24 +205,25 @@ bool AsyncUdpClient::Connect(const ClientOps &ops)
 	for(m_ptr=m_result; m_ptr != NULL ;m_ptr=m_ptr->ai_next) {
 
 		// Create a SOCKET for connecting to server
-		m_connectSocket = socket(m_ptr->ai_family, m_ptr->ai_socktype, 
+		connectSocket = socket(m_ptr->ai_family, m_ptr->ai_socktype, 
 			m_ptr->ai_protocol);
-		if (m_connectSocket == INVALID_SOCKET) {
+		if (connectSocket == INVALID_SOCKET) {
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Socket failed with error\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 			cleanUpClient();
 			return false;
 		}
 		break;
 	}
-	if (m_connectSocket == INVALID_SOCKET) {
+	if (connectSocket == INVALID_SOCKET) {
 		epl::System::OutputDebugString(_T("%s::%s(%d)(%x) Unable to connect to server!\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this);
 		cleanUpClient();
 		return false;
 	}
 
 	int nTmp = sizeof(int);
-	getsockopt(m_connectSocket, SOL_SOCKET,SO_MAX_MSG_SIZE, (char *)&m_maxPacketSize,&nTmp);
+	getsockopt(connectSocket, SOL_SOCKET,SO_MAX_MSG_SIZE, (char *)&m_maxPacketSize,&nTmp);
 
+	setSocket(connectSocket);
 	if(Start())
 	{
 		return true;
@@ -239,23 +237,10 @@ void AsyncUdpClient::disconnect()
 {
 	if(IsConnectionAlive())
 	{
-		m_sendLock->Lock();
-		if(m_connectSocket!=INVALID_SOCKET)
-		{
-			closesocket(m_connectSocket);
-			m_connectSocket = INVALID_SOCKET;
-
-		}
-		else
-		{
-			m_sendLock->Unlock();
-			return;
-		}
-		m_sendLock->Unlock();
+		cleanUpClient();
+		m_processorList.Clear();
+		m_callBackObj->OnDisconnect(reinterpret_cast<ClientInterface*>(this));
 	}
-	m_processorList.Clear();
-	cleanUpClient();
-	m_callBackObj->OnDisconnect(reinterpret_cast<ClientInterface*>(this));
 }
 
 void AsyncUdpClient::Disconnect()
@@ -265,27 +250,21 @@ void AsyncUdpClient::Disconnect()
 	{
 		return;
 	}
-	m_sendLock->Lock();
-	if(m_connectSocket!=INVALID_SOCKET)
+	SOCKET connectSocket=getSocket();
+	if(connectSocket!=INVALID_SOCKET)
 	{
-		int iResult = shutdown(m_connectSocket, SD_SEND);
+		int iResult = shutdown(connectSocket, SD_SEND);
 		if (iResult == SOCKET_ERROR)
 			epl::System::OutputDebugString(_T("%s::%s(%d)(%x) shutdown failed with error: %d\r\n"),__TFILE__,__TFUNCTION__,__LINE__,this, WSAGetLastError());
-		closesocket(m_connectSocket);
-		m_connectSocket = INVALID_SOCKET;
 	}
 	else
 	{
-		m_sendLock->Unlock();
 		return;
 	}
-	m_sendLock->Unlock();
-
 	if(TerminateAfter(m_waitTime)==Thread::TERMINATE_RESULT_GRACEFULLY_TERMINATED)
 		return;
-	
-	m_processorList.Clear();
 	cleanUpClient();
+	m_processorList.Clear();
 	m_callBackObj->OnDisconnect(reinterpret_cast<ClientInterface*>(this));
 
 }

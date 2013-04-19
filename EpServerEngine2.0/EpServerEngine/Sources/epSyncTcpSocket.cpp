@@ -48,7 +48,6 @@ void SyncTcpSocket::KillConnection()
 		return;
 	}
 	// No longer need client socket
-	m_sendLock->Lock();
 	if(m_clientSocket!=INVALID_SOCKET)
 	{
 		int iResult;
@@ -61,10 +60,8 @@ void SyncTcpSocket::KillConnection()
 	}
 	else
 	{
-		m_sendLock->Unlock();
 		return;
 	}
-	m_sendLock->Unlock();
 
 	m_isConnected=false;
 	removeSelfFromContainer();
@@ -77,7 +74,6 @@ void SyncTcpSocket::killConnection()
 	if(IsConnectionAlive())
 	{
 		// No longer need client socket
-		m_sendLock->Lock();
 		if(m_clientSocket!=INVALID_SOCKET)
 		{
 			closesocket(m_clientSocket);
@@ -85,10 +81,8 @@ void SyncTcpSocket::killConnection()
 		}
 		else
 		{
-			m_sendLock->Unlock();
 			return;
 		}
-		m_sendLock->Unlock();
 
 		m_isConnected=false;
 		removeSelfFromContainer();

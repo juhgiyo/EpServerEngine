@@ -217,7 +217,8 @@ void BaseServer::shutdownAllClient()
 
 bool BaseServer::IsServerStarted() const
 {
-	return (GetStatus()==Thread::THREAD_STATUS_STARTED);
+	//return (GetStatus()==Thread::THREAD_STATUS_STARTED);
+	return (m_listenSocket!=INVALID_SOCKET);
 }
 
 void BaseServer::cleanUpServer()
