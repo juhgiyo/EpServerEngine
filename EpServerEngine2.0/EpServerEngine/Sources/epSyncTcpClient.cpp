@@ -159,6 +159,7 @@ void SyncTcpClient::Disconnect()
 	{
 		return;
 	}
+	m_isConnected=false;	
 	SOCKET connectSocket=getSocket();
 	if(connectSocket!=INVALID_SOCKET)
 	{
@@ -175,7 +176,6 @@ void SyncTcpClient::Disconnect()
 	}
 
 	cleanUpClient();
-	m_isConnected=false;	
 	m_callBackObj->OnDisconnect(this);
 }
 
@@ -184,8 +184,8 @@ void SyncTcpClient::disconnect()
 	if(IsConnectionAlive())
 	{
 		// No longer need client socket
-		cleanUpClient();
 		m_isConnected=false;	
+		cleanUpClient();
 		m_callBackObj->OnDisconnect(this);
 	}
 
@@ -210,9 +210,10 @@ Packet *SyncTcpClient::Receive(unsigned int waitTimeInMilliSec,ReceiveStatus *re
 	TIMEVAL	timeOutVal;
 	fd_set	fdSet;
 	int		retfdNum = 0;
+	SOCKET connectSocket=getSocket();
 
 	FD_ZERO(&fdSet);
-	FD_SET(m_connectSocket, &fdSet);
+	FD_SET(connectSocket, &fdSet);
 	if(waitTimeInMilliSec!=WAITTIME_INIFINITE)
 	{
 		// socket select time out setting

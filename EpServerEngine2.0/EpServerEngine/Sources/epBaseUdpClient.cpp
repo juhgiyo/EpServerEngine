@@ -35,7 +35,6 @@ BaseUdpClient::BaseUdpClient(epl::LockPolicy lockPolicyType): BaseClient(lockPol
 
 BaseUdpClient::BaseUdpClient(const BaseUdpClient& b):BaseClient(b)
 {
-	LockObj lock(b.m_generalLock);
 	m_ptr=0;
 	m_maxPacketSize=b.m_maxPacketSize;
 
@@ -52,8 +51,6 @@ BaseUdpClient & BaseUdpClient::operator=(const BaseUdpClient&b)
 	{				
 
 		BaseClient::operator =(b);
-
-		LockObj lock(b.m_generalLock);
 
 		m_ptr=0;
 		m_maxPacketSize=b.m_maxPacketSize;

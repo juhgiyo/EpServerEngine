@@ -177,7 +177,7 @@ namespace epse{
 		/*!
 		*/
 		SOCKET getSocket();
-		SOCKET setSocket(SOCKET sock);
+		void setSocket(SOCKET sock);
 
 		/*!
 		Actually set the hostname for the server.
@@ -222,6 +222,9 @@ namespace epse{
 		epl::BaseLock *m_sendLock;
 		/// general lock
 		epl::BaseLock *m_generalLock;
+
+		/// socket lock
+		epl::BaseLock *m_socketLock;
 
 		/// Lock Policy
 		epl::LockPolicy m_lockPolicy;
