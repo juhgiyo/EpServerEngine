@@ -89,36 +89,10 @@ namespace epse{
 
 
 		
-	private:
+	protected:
 		friend class ServerObjectList;
 
-		friend class BasePacketProcessor;
-		friend class ServerPacketProcessor;
-		friend class ClientPacketProcessor;
 
-		friend class BaseClient;
-
-		friend class AsyncTcpClient;
-
-		friend class AsyncUdpClient;
-
-		friend class BaseServer;
-		friend class BaseTcpServer;
-		friend class BaseUdpServer;
-
-		friend class BaseSocket;
-		friend class BaseTcpSocket;
-		friend class BaseUdpSocket;
-
-		friend class AsyncTcpServer;
-		friend class AsyncTcpSocket;
-		friend class SyncTcpServer;
-		friend class SyncTcpSocket;
-
-		friend class AsyncUdpServer;
-		friend class AsyncUdpSocket;
-		friend class SyncUdpServer;
-		friend class SyncUdpSocket;
 
 		/*!
 		Set Container
@@ -131,7 +105,7 @@ namespace epse{
 		@return true if successfully removed otherwise false
 		*/
 		bool removeSelfFromContainer();
-	private:
+	protected:
 
 		/// Lock Policy
 		LockPolicy m_lockPolicy;

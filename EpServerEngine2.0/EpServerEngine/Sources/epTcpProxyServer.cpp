@@ -1,5 +1,5 @@
 /*! 
-TcpProxyServer for the EpServerEngine
+ProxyTcpServer for the EpServerEngine
 Copyright (C) 2012  Woong Gyu La <juhgiyo@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "epTcpProxyServer.h"
-#include "epTcpProxyHandler.h"
+#include "epProxyTcpServer.h"
+#include "epProxyTcpHandler.h"
 #include "epAsyncTcpClient.h"
 
 #if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
@@ -28,21 +28,21 @@ static char THIS_FILE[] = __FILE__;
 using namespace epse;
 
 
-TcpProxyServer::TcpProxyServer(epl::LockPolicy lockPolicyType):BaseProxyServer(lockPolicyType)
+ProxyTcpServer::ProxyTcpServer(epl::LockPolicy lockPolicyType):BaseProxyServer(lockPolicyType)
 {
 	m_proxyServer=EP_NEW AsyncTcpServer(lockPolicyType);
 
 
 }
-TcpProxyServer::TcpProxyServer(const TcpProxyServer& b):BaseProxyServer(b)
+ProxyTcpServer::ProxyTcpServer(const ProxyTcpServer& b):BaseProxyServer(b)
 {
 	m_proxyServer=EP_NEW AsyncTcpServer(*((AsyncTcpServer*)b.m_proxyServer));
 
 }
-TcpProxyServer::~TcpProxyServer()
+ProxyTcpServer::~ProxyTcpServer()
 {
 }
-TcpProxyServer & TcpProxyServer::operator=(const TcpProxyServer&b)
+ProxyTcpServer & ProxyTcpServer::operator=(const ProxyTcpServer&b)
 {
 	if(this!=&b)
 	{
@@ -51,9 +51,9 @@ TcpProxyServer & TcpProxyServer::operator=(const TcpProxyServer&b)
 	return *this;
 }
 
-void TcpProxyServer::OnNewConnection(SocketInterface *socket)
+void ProxyTcpServer::OnNewConnection(SocketInterface *socket)
 {
 	epl::LockObj lock(m_baseProxyServerLock);
-	TcpProxyHandler *newHandler=EP_NEW TcpProxyHandler(m_callBack,m_callBack->GetForwardServerInfo(socket->GetSockAddress()),socket);
+	ProxyTcpHandler *newHandler=EP_NEW ProxyTcpHandler(m_callBack,m_callBack->GetForwardServerInfo(socket->GetSockAddress()),socket);
 	m_proxyHandlerList.push_back(newHandler);
 }

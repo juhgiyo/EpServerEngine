@@ -1,5 +1,5 @@
 /*! 
-TcpProxyHandler for the EpServerEngine
+ProxyTcpHandler for the EpServerEngine
 Copyright (C) 2012  Woong Gyu La <juhgiyo@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "epTcpProxyHandler.h"
+#include "epProxyTcpHandler.h"
 #include "epAsyncTcpClient.h"
 #if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
 #define new DEBUG_NEW
@@ -26,7 +26,7 @@ static char THIS_FILE[] = __FILE__;
 using namespace epse;
 
 
-TcpProxyHandler::TcpProxyHandler(ProxyServerCallbackInterface *callBack,const ForwardServerInfo& forwardServerInfo, SocketInterface *socket, epl::LockPolicy lockPolicyType):BaseProxyHandler(callBack,socket,lockPolicyType)
+ProxyTcpHandler::ProxyTcpHandler(ProxyServerCallbackInterface *callBack,const ForwardServerInfo& forwardServerInfo, SocketInterface *socket, epl::LockPolicy lockPolicyType):BaseProxyHandler(callBack,socket,lockPolicyType)
 {
 	m_forwardClient=EP_NEW AsyncTcpClient(lockPolicyType);
 	ClientOps ops;
@@ -37,6 +37,6 @@ TcpProxyHandler::TcpProxyHandler(ProxyServerCallbackInterface *callBack,const Fo
 	m_forwardClient->Connect(ops);
 }
 
-TcpProxyHandler::~TcpProxyHandler()
+ProxyTcpHandler::~ProxyTcpHandler()
 {
 }

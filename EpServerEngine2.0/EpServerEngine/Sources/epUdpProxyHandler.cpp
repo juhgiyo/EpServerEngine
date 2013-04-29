@@ -1,5 +1,5 @@
 /*! 
-UdpProxyHandler for the EpServerEngine
+ProxyUdpHandler for the EpServerEngine
 Copyright (C) 2012  Woong Gyu La <juhgiyo@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "epUdpProxyHandler.h"
+#include "epProxyUdpHandler.h"
 #include "epAsyncUdpClient.h"
 #if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
 #define new DEBUG_NEW
@@ -26,7 +26,7 @@ static char THIS_FILE[] = __FILE__;
 using namespace epse;
 
 
-UdpProxyHandler::UdpProxyHandler(ProxyServerCallbackInterface *callBack,const ForwardServerInfo& forwardServerInfo, SocketInterface *socket, epl::LockPolicy lockPolicyType):BaseProxyHandler(callBack,socket,lockPolicyType)
+ProxyUdpHandler::ProxyUdpHandler(ProxyServerCallbackInterface *callBack,const ForwardServerInfo& forwardServerInfo, SocketInterface *socket, epl::LockPolicy lockPolicyType):BaseProxyHandler(callBack,socket,lockPolicyType)
 {
 	m_forwardClient=EP_NEW AsyncUdpClient(lockPolicyType);
 	ClientOps ops;
@@ -37,7 +37,7 @@ UdpProxyHandler::UdpProxyHandler(ProxyServerCallbackInterface *callBack,const Fo
 	m_forwardClient->Connect(ops);
 }
 
-UdpProxyHandler::~UdpProxyHandler()
+ProxyUdpHandler::~ProxyUdpHandler()
 {
 
 }

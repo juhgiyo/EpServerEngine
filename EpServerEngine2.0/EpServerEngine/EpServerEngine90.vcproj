@@ -717,6 +717,22 @@
 						</File>
 					</Filter>
 				</Filter>
+				<Filter
+					Name="IOCP"
+					>
+					<File
+						RelativePath=".\Sources\epIocpTcpServer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Sources\epIocpTcpSocket.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Sources\epIocpTcpWorker.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Client Side"
@@ -1050,11 +1066,11 @@
 						Name="TCP"
 						>
 						<File
-							RelativePath=".\Headers\epTcpProxyHandler.h"
+							RelativePath=".\Headers\epProxyTcpHandler.h"
 							>
 						</File>
 						<File
-							RelativePath=".\Headers\epTcpProxyServer.h"
+							RelativePath=".\Headers\epProxyTcpServer.h"
 							>
 						</File>
 					</Filter>
@@ -1062,11 +1078,11 @@
 						Name="UDP"
 						>
 						<File
-							RelativePath=".\Headers\epUdpProxyHandler.h"
+							RelativePath=".\Headers\epProxyUdpHandler.h"
 							>
 						</File>
 						<File
-							RelativePath=".\Headers\epUdpProxyServer.h"
+							RelativePath=".\Headers\epProxyUdpServer.h"
 							>
 						</File>
 					</Filter>
@@ -1082,6 +1098,22 @@
 							>
 						</File>
 					</Filter>
+				</Filter>
+				<Filter
+					Name="IOCP"
+					>
+					<File
+						RelativePath=".\Headers\epIocpTcpServer.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Headers\epIocpTcpSocket.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Headers\epIocpTcpWorker.h"
+						>
+					</File>
 				</Filter>
 			</Filter>
 		</Filter>

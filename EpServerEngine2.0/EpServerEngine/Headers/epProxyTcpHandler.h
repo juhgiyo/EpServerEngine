@@ -1,5 +1,5 @@
 /*! 
-@file epTcpProxyHandler.h
+@file epProxyTcpHandler.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/epserverengine>
 @date February 13, 2012
@@ -39,12 +39,12 @@ namespace epse{
 
 
 	/*! 
-	@class TcpProxyHandler epTcpProxyHandler.h
+	@class ProxyTcpHandler epProxyTcpHandler.h
 	@brief A class for Proxy TCP Handler.
 	*/
-	class TcpProxyHandler:public BaseProxyHandler{
+	class ProxyTcpHandler:public BaseProxyHandler{
 
-		friend class TcpProxyServer;
+		friend class ProxyTcpServer;
 	private:
 		/*!
 		Default Constructor
@@ -55,7 +55,7 @@ namespace epse{
 		@param[in] socket the client socket
 		@param[in] lockPolicyType The lock policy
 		*/
-		TcpProxyHandler(ProxyServerCallbackInterface *callBack,const ForwardServerInfo& forwardServerInfo, SocketInterface *socket, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		ProxyTcpHandler(ProxyServerCallbackInterface *callBack,const ForwardServerInfo& forwardServerInfo, SocketInterface *socket, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 
 		/*!
@@ -63,7 +63,7 @@ namespace epse{
 
 		Destroy the Handler
 		*/
-		virtual ~TcpProxyHandler();
+		virtual ~ProxyTcpHandler();
 
 
 	};

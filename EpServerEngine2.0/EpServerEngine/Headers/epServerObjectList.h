@@ -67,6 +67,8 @@ namespace epse{
 		friend class SyncUdpServer;
 		
 		friend class BaseServerObject;
+
+		friend class IocpTcpServer;
 		/*!
 		Default Constructor
 

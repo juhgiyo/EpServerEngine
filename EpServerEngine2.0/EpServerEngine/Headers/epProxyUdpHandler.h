@@ -1,5 +1,5 @@
 /*! 
-@file epUdpProxyHandler.h
+@file epProxyUdpHandler.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/epserverengine>
 @date February 13, 2012
@@ -38,12 +38,12 @@ namespace epse{
 
 
 	/*! 
-	@class UdpProxyHandler epUdpProxyHandler.h
+	@class ProxyUdpHandler epProxyUdpHandler.h
 	@brief A class for Proxy UDP Handler.
 	*/
-	class UdpProxyHandler:public BaseProxyHandler{
+	class ProxyUdpHandler:public BaseProxyHandler{
 
-		friend class UdpProxyServer;
+		friend class ProxyUdpServer;
 	private:
 		/*!
 		Default Constructor
@@ -54,7 +54,7 @@ namespace epse{
 		@param[in] socket the client socket
 		@param[in] lockPolicyType The lock policy
 		*/
-		UdpProxyHandler(ProxyServerCallbackInterface *callBack,const ForwardServerInfo& forwardServerInfo, SocketInterface *socket, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		ProxyUdpHandler(ProxyServerCallbackInterface *callBack,const ForwardServerInfo& forwardServerInfo, SocketInterface *socket, epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 
 		/*!
@@ -62,7 +62,7 @@ namespace epse{
 
 		Destroy the Handler
 		*/
-		virtual ~UdpProxyHandler();
+		virtual ~ProxyUdpHandler();
 
 		};
 }

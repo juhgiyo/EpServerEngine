@@ -29,8 +29,8 @@ An Interface for Proxy Base Handler.
 
 */
 
-#ifndef __EP_PROXY_BASE_HANDLE_H__
-#define __EP_PROXY_BASE_HANDLE_H__
+#ifndef __EP_BASE_PROXY_HANDLE_H__
+#define __EP_BASE_PROXY_HANDLE_H__
 #include "epServerEngine.h"
 #include "epProxyServerInterfaces.h"
 #include "epBaseClient.h"
@@ -122,4 +122,4 @@ namespace epse{
 	};
 }
 
-#endif //__EP_PROXY_BASE_HANDLE_H__
+#endif //__EP_BASE_PROXY_HANDLE_H__

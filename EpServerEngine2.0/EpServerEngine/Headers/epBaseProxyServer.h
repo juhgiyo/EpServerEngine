@@ -29,8 +29,8 @@ An Interface for Proxy Base Server.
 
 */
 
-#ifndef __EP_PROXY_BASE_SERVER_H__
-#define __EP_PROXY_BASE_SERVER_H__
+#ifndef __EP_BASE_PROXY_SERVER_H__
+#define __EP_BASE_PROXY_SERVER_H__
 
 #include "epServerEngine.h"
 #include "epProxyServerInterfaces.h"
@@ -181,4 +181,4 @@ namespace epse{
 }
 
 
-#endif //__EP_PROXY_SERVER_H__
+#endif //__EP_BASE_PROXY_SERVER_H__

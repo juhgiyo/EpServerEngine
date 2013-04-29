@@ -1,5 +1,5 @@
 /*! 
-UdpProxyServer for the EpServerEngine
+ProxyUdpServer for the EpServerEngine
 Copyright (C) 2012  Woong Gyu La <juhgiyo@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,9 +15,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "epUdpProxyServer.h"
+#include "epProxyUdpServer.h"
 #include "epAsyncUdpServer.h"
-#include "epUdpProxyHandler.h"
+#include "epProxyUdpHandler.h"
 
 #if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
 #define new DEBUG_NEW
@@ -28,18 +28,18 @@ static char THIS_FILE[] = __FILE__;
 using namespace epse;
 
 
-UdpProxyServer::UdpProxyServer(epl::LockPolicy lockPolicyType):BaseProxyServer(lockPolicyType)
+ProxyUdpServer::ProxyUdpServer(epl::LockPolicy lockPolicyType):BaseProxyServer(lockPolicyType)
 {
 	m_proxyServer=EP_NEW AsyncUdpServer(lockPolicyType);
 }
-UdpProxyServer::UdpProxyServer(const UdpProxyServer& b):BaseProxyServer(b)
+ProxyUdpServer::ProxyUdpServer(const ProxyUdpServer& b):BaseProxyServer(b)
 {
 	m_proxyServer=EP_NEW AsyncUdpServer(*((AsyncUdpServer*)b.m_proxyServer));
 }
-UdpProxyServer::~UdpProxyServer()
+ProxyUdpServer::~ProxyUdpServer()
 {
 }
-UdpProxyServer & UdpProxyServer::operator=(const UdpProxyServer&b)
+ProxyUdpServer & ProxyUdpServer::operator=(const ProxyUdpServer&b)
 {
 	if(this!=&b)
 	{
@@ -47,9 +47,9 @@ UdpProxyServer & UdpProxyServer::operator=(const UdpProxyServer&b)
 	}
 	return *this;
 }
-void UdpProxyServer::OnNewConnection(SocketInterface *socket)
+void ProxyUdpServer::OnNewConnection(SocketInterface *socket)
 {
 	epl::LockObj lock(m_baseProxyServerLock);
-	UdpProxyHandler *newHandler=EP_NEW UdpProxyHandler(m_callBack,m_callBack->GetForwardServerInfo(socket->GetSockAddress()),socket);
+	ProxyUdpHandler *newHandler=EP_NEW ProxyUdpHandler(m_callBack,m_callBack->GetForwardServerInfo(socket->GetSockAddress()),socket);
 	m_proxyHandlerList.push_back(newHandler);
 }

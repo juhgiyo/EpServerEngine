@@ -1,9 +1,9 @@
 /*! 
-@file epTcpProxyServer.h
+@file epProxyUdpServer.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/epserverengine>
 @date February 13, 2012
-@brief Proxy TCP Server Interface
+@brief Proxy UDP Server Interface
 @version 1.0
 
 @section LICENSE
@@ -25,26 +25,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for Proxy TCP Server.
+An Interface for Proxy UDP Server.
 
 */
 
-#ifndef __EP_PROXY_TCP_SERVER_H__
-#define __EP_PROXY_TCP_SERVER_H__
+#ifndef __EP_PROXY_UDP_SERVER_H__
+#define __EP_PROXY_UDP_SERVER_H__
 
 #include "epServerEngine.h"
 #include "epBaseProxyServer.h"
-#include "epAsyncTcpServer.h"
 
 
 namespace epse{
 
 	
 	/*! 
-	@class TcpProxyServer epTcpProxyServer.h
-	@brief A class for Proxy TCP Server.
+	@class ProxyUdpServer epProxyUdpServer.h
+	@brief A class for Proxy UDP Server.
 	*/
-	class EP_SERVER_ENGINE TcpProxyServer:public BaseProxyServer{
+	class EP_SERVER_ENGINE ProxyUdpServer:public BaseProxyServer{
 	public:
 
 		/*!
@@ -53,7 +52,7 @@ namespace epse{
 		Initializes the Server
 		@param[in] lockPolicyType The lock policy
 		*/
-		TcpProxyServer(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		ProxyUdpServer(epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Copy Constructor
@@ -61,23 +60,22 @@ namespace epse{
 		Initializes the Server
 		@param[in] b the second object
 		*/
-		TcpProxyServer(const TcpProxyServer& b);
+		ProxyUdpServer(const ProxyUdpServer& b);
 
 		/*!
 		Default Destructor
 
 		Destroy the Server
 		*/
-		virtual ~TcpProxyServer();
+		virtual ~ProxyUdpServer();
 
 		/*!
 		Assignment operator overloading
 		@param[in] b the second object
 		@return the new copied object
 		*/
-		TcpProxyServer & operator=(const TcpProxyServer&b);
+		ProxyUdpServer & operator=(const ProxyUdpServer&b);
 
-	
 	private:
 		/*!
 		When accepted client tries to make connection.
@@ -91,4 +89,4 @@ namespace epse{
 }
 
 
-#endif //__EP_PROXY_SERVER_H__
+#endif //__EP_PROXY_UDP_SERVER_H__
