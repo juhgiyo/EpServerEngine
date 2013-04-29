@@ -88,6 +88,8 @@ namespace epse{
 		*/
 		virtual void execute() ;
 
+		vector<BaseWorkerThread*> m_workerList;
+
 	};
 }
 

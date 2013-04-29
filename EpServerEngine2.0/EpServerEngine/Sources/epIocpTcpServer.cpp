@@ -54,6 +54,21 @@ IocpTcpServer & IocpTcpServer::operator=(const IocpTcpServer&b)
 
 bool IocpTcpServer::StartServer(const ServerOps &ops)
 {
+	int workerCount=ops.maximumConnectionCount;
+	if(workerCount==0)
+	{
+		SYSTEM_INFO sysinfo;
+		GetSystemInfo( &sysinfo );
+		workerCount=sysinfo.dwNumberOfProcessors*2;
+	}
+	for(int trav=0;trav<ops.maximumConnectionCount;trav++)
+	{
+		BaseWorkerThread *workerThread=WorkerThreadFactory::GetWorkerThread(BaseWorkerThread::THREAD_LIFE_SUSPEND_AFTER_WORK);
+		m_workerList.push_back(workerThread);
+		workerThread->Start();
+	}
+	
+	
 	return BaseTcpServer::StartServer(ops);
 }
 
