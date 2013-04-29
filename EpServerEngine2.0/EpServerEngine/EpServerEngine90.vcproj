@@ -684,11 +684,11 @@
 						Name="TCP"
 						>
 						<File
-							RelativePath=".\Sources\epTcpProxyHandler.cpp"
+							RelativePath=".\Sources\epProxyTcpHandler.cpp"
 							>
 						</File>
 						<File
-							RelativePath=".\Sources\epTcpProxyServer.cpp"
+							RelativePath=".\Sources\epProxyTcpServer.cpp"
 							>
 						</File>
 					</Filter>
@@ -696,11 +696,11 @@
 						Name="UDP"
 						>
 						<File
-							RelativePath=".\Sources\epUdpProxyHandler.cpp"
+							RelativePath=".\Sources\epProxyUdpHandler.cpp"
 							>
 						</File>
 						<File
-							RelativePath=".\Sources\epUdpProxyServer.cpp"
+							RelativePath=".\Sources\epProxyUdpServer.cpp"
 							>
 						</File>
 					</Filter>
