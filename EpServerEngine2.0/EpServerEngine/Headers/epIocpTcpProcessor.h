@@ -1,9 +1,9 @@
 /*! 
-@file epIocpTcpWorker.h
+@file epIocpTcpProcessor.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/epserverengine>
 @date February 13, 2012
-@brief IOCP TCP Worker Interface
+@brief IOCP TCP Processor Interface
 @version 1.0
 
 @section LICENSE
@@ -25,28 +25,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for IOCP TCP Worker.
+An Interface for IOCP TCP Processor.
 
 */
-#ifndef __EP_IOCP_TCP_WORKER_H__
-#define __EP_IOCP_TCP_WORKER_H__
+#ifndef __EP_IOCP_TCP_PROCESSOR_H__
+#define __EP_IOCP_TCP_PROCESSOR_H__
 
 #include "epServerEngine.h"
 namespace epse{
 		/*! 
-	@class BaseServer epBaseServer.h
-	@brief A class for Base Server.
+	@class IocpTcpProcessor epIocpTcpProcessor.h
+	@brief A class for IOCP TCP Processor.
 	*/
-	class EP_SERVER_ENGINE IocpTcp:public BaseJobProcessor{
+	class EP_SERVER_ENGINE IocpTcpProcessor:public BaseJobProcessor{
 
 	public:
 		/*!
 		Process the job given, subclasses must implement this function.
-		@param[in] threadId The Thread Id which doing the job.
-		@param[in] threadLifePolicy the life policy of the thread that this job assigned to.
+		@param[in] workerThread The worker thread which called the DoJob.
 		@param[in] data The job given to this object.
 		*/
-		virtual void DoJob(const BaseWorkerThread::ThreadID threadId, const BaseWorkerThread::ThreadLifePolicy threadLifePolicy,  BaseJob* const data);
+		virtual void DoJob(BaseWorkerThread *workerThread,  BaseJob* const data);
 
 
 	protected:
@@ -56,10 +55,8 @@ namespace epse{
 		@param[in] status The Status of the Job
 		*/
 		virtual void handleReport(const JobProcessorStatus status);
-	protected:
-		ServerObjectList m_socketList;
 	};
 }
 
 
-#endif //__EP_IOCP_TCP_WORKER_H__
+#endif //__EP_IOCP_TCP_PROCESSOR_H__

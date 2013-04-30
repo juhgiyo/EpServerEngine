@@ -62,7 +62,7 @@ BaseProxyHandler::~BaseProxyHandler()
 		EP_DELETE m_baseProxyHandlerLock;
 }
 
-void BaseProxyHandler::OnReceived(SocketInterface *socket,const Packet&receivedPacket)
+void BaseProxyHandler::OnReceived(SocketInterface *socket,const Packet*receivedPacket,ReceiveStatus status)
 {
 	epl::LockObj lock(m_baseProxyHandlerLock);
 	m_callBack->OnReceivedFromClient(m_client,m_forwardClient,receivedPacket);
@@ -75,7 +75,7 @@ void BaseProxyHandler::OnDisconnect(SocketInterface *socket)
 	m_callBack->OnDisconnect(socket->GetSockAddress());
 }
 
-void BaseProxyHandler::OnReceived(ClientInterface *client,const Packet&receivedPacket)
+void BaseProxyHandler::OnReceived(ClientInterface *client,const Packet*receivedPacket,ReceiveStatus status)
 {
 	epl::LockObj lock(m_baseProxyHandlerLock);
 	m_callBack->OnReceivedFromForwardServer(m_client,client,receivedPacket);

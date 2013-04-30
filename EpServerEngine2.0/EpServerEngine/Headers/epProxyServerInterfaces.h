@@ -184,9 +184,10 @@ namespace epse{
 		@param[in] receivedPacket the received packet
 		@remark The default is just forwarding the packet to forward server.
 		*/
-		virtual void OnReceivedFromClient(SocketInterface *clientSocket,ClientInterface *forwardServerClient, const Packet&receivedPacket)
+		virtual void OnReceivedFromClient(SocketInterface *clientSocket,ClientInterface *forwardServerClient, const Packet*receivedPacket)
 		{
-			forwardServerClient->Send(receivedPacket);
+			if(receivedPacket)
+				forwardServerClient->Send(*receivedPacket);
 		}
 
 		/*!
@@ -196,9 +197,10 @@ namespace epse{
 		@param[in] receivedPacket the received packet
 		@remark The default is just forwarding the packet to the client.
 		*/
-		virtual void OnReceivedFromForwardServer(SocketInterface *clientSocket,ClientInterface *forwardServerClient, const Packet&receivedPacket)
+		virtual void OnReceivedFromForwardServer(SocketInterface *clientSocket,ClientInterface *forwardServerClient, const Packet*receivedPacket)
 		{
-			clientSocket->Send(receivedPacket);
+			if(receivedPacket)
+				clientSocket->Send(*receivedPacket);
 		}
 
 		/*!

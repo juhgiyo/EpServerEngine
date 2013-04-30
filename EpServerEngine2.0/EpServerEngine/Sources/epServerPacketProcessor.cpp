@@ -42,7 +42,7 @@ void ServerPacketProcessor::execute()
 {
 	if(m_packetReceived)
 	{
-		m_callBackObj->OnReceived((SocketInterface*)m_owner,*m_packetReceived);
+		m_callBackObj->OnReceived((SocketInterface*)m_owner,m_packetReceived,RECEIVE_STATUS_SUCCESS);
 		removeSelfFromContainer();
 	}
 }

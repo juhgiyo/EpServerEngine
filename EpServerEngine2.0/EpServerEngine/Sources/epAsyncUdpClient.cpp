@@ -121,7 +121,7 @@ void AsyncUdpClient::execute()
 			}
 			else
 			{
-				m_callBackObj->OnReceived(reinterpret_cast<ClientInterface*>(this),*passPacket);
+				m_callBackObj->OnReceived(reinterpret_cast<ClientInterface*>(this),passPacket,RECEIVE_STATUS_SUCCESS);
 				passPacket->ReleaseObj();
 			}
 

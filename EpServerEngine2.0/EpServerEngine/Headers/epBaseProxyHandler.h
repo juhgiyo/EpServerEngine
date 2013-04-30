@@ -70,7 +70,7 @@ namespace epse{
 		@param[in] receivedPacket the received packet
 		@remark for Asynchronous Server Use Only!
 		*/
-		void OnReceived(SocketInterface *socket,const Packet&receivedPacket);
+		void OnReceived(SocketInterface *socket,const Packet *receivedPacket,ReceiveStatus status);
 
 		/*!
 		The client is disconnected.
@@ -85,7 +85,7 @@ namespace epse{
 		@param[in] receivedPacket the received packet
 		@remark for Asynchronous Client Use Only!
 		*/
-		void OnReceived(ClientInterface *client,const Packet&receivedPacket);
+		void OnReceived(ClientInterface *client,const Packet*receivedPacket,ReceiveStatus status);
 
 		/*!
 		The client is disconnected.

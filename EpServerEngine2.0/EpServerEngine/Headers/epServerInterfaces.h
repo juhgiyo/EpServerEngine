@@ -58,6 +58,12 @@ namespace epse{
 		unsigned int maximumConnectionCount;
 
 		/*!
+		The number of worker thread.
+		@remark For IOCP Use Only!
+		*/
+		unsigned int workerThreadCount;
+
+		/*!
 		Default Constructor
 
 		Initializes the Server Options
@@ -69,6 +75,8 @@ namespace epse{
 			isAsynchronousReceive=true;
 			waitTimeMilliSec=WAITTIME_INIFINITE;
 			maximumConnectionCount=CONNECTION_LIMIT_INFINITE;
+			workerThreadCount=0;
+
 		}
 
 		static ServerOps defaultServerOps;
@@ -324,9 +332,18 @@ namespace epse{
 		Received the packet from the client.
 		@param[in] socket the client socket which received the packet
 		@param[in] receivedPacket the received packet
+		@param[in] status the status of Receive
 		@remark for Asynchronous Server Use Only!
 		*/
-		virtual void OnReceived(SocketInterface *socket,const Packet&receivedPacket)=0;
+		virtual void OnReceived(SocketInterface *socket,const Packet*receivedPacket,ReceiveStatus status)=0;
+
+		/*!
+		Received the packet from the client.
+		@param[in] socket the client socket which sent the packet
+		@param[in] status the status of Send
+		@remark for IOCP Server Use Only!
+		*/
+		virtual void OnSent(SocketInterface *socket,SendStatus status){}
 
 		/*!
 		The client is disconnected.

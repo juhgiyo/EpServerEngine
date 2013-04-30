@@ -96,6 +96,8 @@ namespace epse{
 		SEND_STATUS_FAIL_SOCKET_ERROR,
 		/// Send failed
 		SEND_STATUS_FAIL_SEND_FAILED,
+		/// Not connected
+		SEND_STATUS_FAIL_NOT_CONNECTED,
 
 	}SendStatus;
 	

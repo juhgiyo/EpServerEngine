@@ -40,7 +40,7 @@ namespace epse{
 	@class IocpTcpServer epIocpTcpServer.h
 	@brief A class for IOCP TCP Server.
 	*/
-	class EP_SERVER_ENGINE IocpTcpServer:public BaseTcpServer{
+	class EP_SERVER_ENGINE IocpTcpServer:public BaseTcpServer, public WorkerThreadDelegate{
 		public:
 		/*!
 		Default Constructor
@@ -80,15 +80,32 @@ namespace epse{
 		*/
 		virtual bool StartServer(const ServerOps &ops=ServerOps::defaultServerOps);
 
-		
+		/*!
+		Stop the server
+		*/
+		virtual void StopServer();
 	private:
+
+			
+		/*!
+		Call Back Function.
+		@param[in] p the argument for call back function.
+		*/
+		virtual void CallBackFunc(BaseWorkerThread *p);
+
+		friend class IocpTcpSocket;
+		void pushJob(BaseJob * job);
 
 		/*!
 		Listening Loop Function
 		*/
 		virtual void execute() ;
 
+		/// general lock 
+		epl::BaseLock *m_workerLock;
+
 		vector<BaseWorkerThread*> m_workerList;
+		queue<BaseWorkerThread*> m_emptyWorkerList;
 
 	};
 }

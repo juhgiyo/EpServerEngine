@@ -86,7 +86,7 @@ namespace epse{
 		/*!
 		Stop the server
 		*/
-		void StopServer();
+		virtual void StopServer();
 
 	private:
 

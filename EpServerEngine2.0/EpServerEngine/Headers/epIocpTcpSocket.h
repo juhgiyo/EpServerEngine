@@ -62,18 +62,71 @@ namespace epse
 		virtual ~IocpTcpSocket();
 
 		/*!
+		Check if the connection is alive
+		@return true if the connection is alive otherwise false
+		*/
+		bool IsConnectionAlive() const;
+
+		/*!
+		Kill the connection
+		*/
+		void KillConnection(EventEx *completionEvent,ServerCallbackInterface *callBackObj,Priority priority);
+
+		/*!
 		Kill the connection
 		*/
 		void KillConnection();
-		
+
+		/*!
+		Send the packet to the server
+		@param[in] packet the packet to be sent
+		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
+		*/
+		void Send(Packet &packet,EventEx *completionEvent=NULL,ServerCallbackInterface *callBackObj=NULL,Priority priority=PRIORITY_NORMAL);
+
+
+		/*!
+		Receive the packet from the client
+		@param[in] waitTimeInMilliSec wait time for receiving the packet in millisecond
+		@param[out] retStatus the pointer to ReceiveStatus enumerator to get receive status.
+		@return received packet
+		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
+		*/
+		void Receive(EventEx *completionEvent=NULL,ServerCallbackInterface *callBackObj=NULL,Priority priority=PRIORITY_NORMAL);
 
 	private:	
 		friend class IocpTcpServer;
+		friend class IocpTcpProcessor;
+
+		/*!
+		Send the packet to the server
+		@param[in] packet the packet to be sent
+		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
+		@return sent byte size
+		@remark return -1 if error occurred
+		*/
+		int Send(const Packet &packet, unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE,SendStatus *sendStatus=NULL);
+
+
+		/*!
+		Receive the packet from the client
+		@param[in] waitTimeInMilliSec wait time for receiving the packet in millisecond
+		@param[out] retStatus the pointer to ReceiveStatus enumerator to get receive status.
+		@return received packet
+		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
+		*/
+		Packet *Receive(unsigned int waitTimeInMilliSec=WAITTIME_INIFINITE,ReceiveStatus *retStatus=NULL);
 	
+
 		/*!
 		Actually Kill the connection
 		*/
 		virtual void killConnection();
+
+		/*!
+		Actually Kill the connection without Callback
+		*/
+		void killConnectionNoCallBack();
 
 		/*!
 		thread loop function
@@ -103,7 +156,8 @@ namespace epse
 	
 	private:
 
-
+		/// Connection status
+		bool m_isConnected;
 	};
 
 }

@@ -65,7 +65,11 @@ int BaseTcpSocket::Send(const Packet &packet, unsigned int waitTimeInMilliSec,Se
 	epl::LockObj lock(m_sendLock);
 
 	if(m_clientSocket==INVALID_SOCKET)
+	{
+		if(sendStatus)
+			*sendStatus=SEND_STATUS_FAIL_NOT_CONNECTED;
 		return 0;
+	}
 
 	TIMEVAL	timeOutVal;
 	fd_set	fdSet;

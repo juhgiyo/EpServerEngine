@@ -176,7 +176,7 @@ void AsyncUdpSocket::execute()
 		}
 		else
 		{
-			m_callBackObj->OnReceived(this,*packet);
+			m_callBackObj->OnReceived(this,packet,RECEIVE_STATUS_SUCCESS);
 			packet->ReleaseObj();
 		}
 

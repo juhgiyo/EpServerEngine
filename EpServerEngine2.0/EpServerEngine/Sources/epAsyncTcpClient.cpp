@@ -122,7 +122,7 @@ void AsyncTcpClient::execute()
 				}
 				else
 				{
-					m_callBackObj->OnReceived(reinterpret_cast<ClientInterface*>(this),*recvPacket);
+					m_callBackObj->OnReceived(reinterpret_cast<ClientInterface*>(this),recvPacket,RECEIVE_STATUS_SUCCESS);
 					recvPacket->ReleaseObj();
 				}
 				

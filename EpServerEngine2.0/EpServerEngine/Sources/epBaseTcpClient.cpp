@@ -56,8 +56,11 @@ int BaseTcpClient::Send(const Packet &packet, unsigned int waitTimeInMilliSec,Se
 {
 	epl::LockObj lock(m_sendLock);
 	if(!IsConnectionAlive())
+	{
+		if(sendStatus)
+			*sendStatus=SEND_STATUS_FAIL_NOT_CONNECTED;
 		return 0;
-
+	}
 	// select routine
 	TIMEVAL	timeOutVal;
 	fd_set	fdSet;

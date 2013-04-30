@@ -245,7 +245,7 @@ namespace epse{
 		@param[in] receivedPacket the received packet
 		@remark for Asynchronous Client Use Only!
 		*/
-		virtual void OnReceived(ClientInterface *client,const Packet&receivedPacket)=0;
+		virtual void OnReceived(ClientInterface *client,const Packet*receivedPacket,ReceiveStatus status)=0;
 
 		/*!
 		The client is disconnected.

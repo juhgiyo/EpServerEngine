@@ -154,7 +154,7 @@ void AsyncTcpSocket::execute()
 				}
 				else
 				{
-					m_callBackObj->OnReceived(this,&recvPacket);
+					m_callBackObj->OnReceived(this,recvPacket,RECEIVE_STATUS_SUCCESS);
 					recvPacket->ReleaseObj();
 				}
 				

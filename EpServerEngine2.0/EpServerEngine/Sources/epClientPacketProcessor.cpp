@@ -41,7 +41,7 @@ void ClientPacketProcessor::execute()
 {
 	if(m_packetReceived)
 	{
-		m_callBackObj->OnReceived((ClientInterface*)m_owner, *m_packetReceived);
+		m_callBackObj->OnReceived((ClientInterface*)m_owner, m_packetReceived,RECEIVE_STATUS_SUCCESS);
 		removeSelfFromContainer();
 	}
 }

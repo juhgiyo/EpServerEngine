@@ -721,15 +721,19 @@
 					Name="IOCP"
 					>
 					<File
+						RelativePath=".\Sources\epIocpTcpJob.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Sources\epIocpTcpProcessor.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\Sources\epIocpTcpServer.cpp"
 						>
 					</File>
 					<File
 						RelativePath=".\Sources\epIocpTcpSocket.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\Sources\epIocpTcpWorker.cpp"
 						>
 					</File>
 				</Filter>
@@ -1103,15 +1107,19 @@
 					Name="IOCP"
 					>
 					<File
+						RelativePath=".\Headers\epIocpTcpJob.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Headers\epIocpTcpProcessor.h"
+						>
+					</File>
+					<File
 						RelativePath=".\Headers\epIocpTcpServer.h"
 						>
 					</File>
 					<File
 						RelativePath=".\Headers\epIocpTcpSocket.h"
-						>
-					</File>
-					<File
-						RelativePath=".\Headers\epIocpTcpWorker.h"
 						>
 					</File>
 				</Filter>
