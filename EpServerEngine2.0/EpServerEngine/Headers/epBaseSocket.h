@@ -138,11 +138,18 @@ namespace epse
 
 
 	protected:	
+		friend class IocpServerProcessor;
 	
 		/*!
 		Actually Kill the connection
 		*/
 		virtual void killConnection()=0;
+
+		/*!
+		Actually Kill the connection without Callback
+		@remark IOCP Use ONLY!
+		*/
+		virtual void killConnectionNoCallBack(){}
 
 		/*!
 		thread loop function
@@ -160,6 +167,7 @@ namespace epse
 		@param[in] sockAddr The Sock Address for this socket.
 		*/
 		virtual void setSockAddr(sockaddr sockAddr);
+
 
 	protected:
 		/*!

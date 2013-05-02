@@ -1,5 +1,5 @@
 /*! 
-IocpTcpProcessor for the EpServerEngine
+IocpServerProcessor for the EpServerEngine
 Copyright (C) 2012  Woong Gyu La <juhgiyo@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,22 +15,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */		
-#include "epIocpTcpProcessor.h"
-#include "epIocpTcpJob.h"
+#include "epIocpServerProcessor.h"
+#include "epIocpServerJob.h"
 #include "epPacket.h"
 using namespace epse;
 
-void IocpTcpProcessor::DoJob(BaseWorkerThread *workerThread,  BaseJob* const data)
+void IocpServerProcessor::DoJob(BaseWorkerThread *workerThread,  BaseJob* const data)
 {
-	IocpTcpJob * job=reinterpret_cast<IocpTcpJob*>(data);
+	IocpServerJob * job=reinterpret_cast<IocpServerJob*>(data);
 	Packet *receivedPacket=NULL;
 	SendStatus sendStatus;
 	ReceiveStatus receiveStatus;
 	switch(job->GetJobType())
 	{
-	case IocpTcpJob::IOCP_TCP_JOB_TYPE_NULL:
+	case IocpServerJob::IOCP_SERVER_JOB_TYPE_NULL:
 		break;
-	case IocpTcpJob::IOCP_TCP_JOB_TYPE_SEND:
+	case IocpServerJob::IOCP_SERVER_JOB_TYPE_SEND:
 		job->GetSocket()->Send(*job->GetPacket(),0,&sendStatus);
 		
 		if(sendStatus==SEND_STATUS_FAIL_TIME_OUT)
@@ -49,7 +49,7 @@ void IocpTcpProcessor::DoJob(BaseWorkerThread *workerThread,  BaseJob* const dat
 				job->GetSocket()->GetCallbackObject()->OnSent(job->GetSocket(),sendStatus);
 		}
 		break;
-	case IocpTcpJob::IOCP_TCP_JOB_TYPE_RECEIVE:
+	case IocpServerJob::IOCP_SERVER_JOB_TYPE_RECEIVE:
 		receivedPacket=job->GetSocket()->Receive(0,&receiveStatus);
 		
 		if(receiveStatus==RECEIVE_STATUS_FAIL_TIME_OUT)
@@ -71,7 +71,7 @@ void IocpTcpProcessor::DoJob(BaseWorkerThread *workerThread,  BaseJob* const dat
 				receivedPacket->ReleaseObj();
 		}
 		break;
-	case IocpTcpJob::IOCP_TCP_JOB_TYPE_DISCONNECT:
+	case IocpServerJob::IOCP_SERVER_JOB_TYPE_DISCONNECT:
 		job->GetSocket()->killConnectionNoCallBack();
 
 		if(job->GetCompletionEvent())
@@ -87,7 +87,7 @@ void IocpTcpProcessor::DoJob(BaseWorkerThread *workerThread,  BaseJob* const dat
 	}
 }
 
-void IocpTcpProcessor::handleReport(const JobProcessorStatus status)
+void IocpServerProcessor::handleReport(const JobProcessorStatus status)
 {
 
 }

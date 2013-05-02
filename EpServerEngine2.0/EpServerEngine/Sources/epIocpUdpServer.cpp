@@ -1,5 +1,5 @@
 /*! 
-IocpTcpServer for the EpServerEngine
+IocpUdpServer for the EpServerEngine
 Copyright (C) 2012  Woong Gyu La <juhgiyo@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "epIocpTcpServer.h"
-#include "epIocpTcpSocket.h"
+#include "epIocpUdpServer.h"
+#include "epIocpUdpSocket.h"
 #include "epIocpServerProcessor.h"
 #if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
 #define new DEBUG_NEW
@@ -27,7 +27,7 @@ static char THIS_FILE[] = __FILE__;
 using namespace epse;
 
 
-IocpTcpServer::IocpTcpServer(epl::LockPolicy lockPolicyType):BaseTcpServer(lockPolicyType)
+IocpUdpServer::IocpUdpServer(epl::LockPolicy lockPolicyType):BaseUdpServer(lockPolicyType)
 {
 	switch(lockPolicyType)
 	{
@@ -47,7 +47,7 @@ IocpTcpServer::IocpTcpServer(epl::LockPolicy lockPolicyType):BaseTcpServer(lockP
 }
 
 
-IocpTcpServer::IocpTcpServer(const IocpTcpServer& b):BaseTcpServer(b)
+IocpUdpServer::IocpUdpServer(const IocpUdpServer& b):BaseUdpServer(b)
 {
 	switch(m_lockPolicy)
 	{
@@ -67,17 +67,17 @@ IocpTcpServer::IocpTcpServer(const IocpTcpServer& b):BaseTcpServer(b)
 	LockObj lock(b.m_baseServerLock);
 }
 
-IocpTcpServer::~IocpTcpServer()
+IocpUdpServer::~IocpUdpServer()
 {
 	if(m_workerLock)
 		EP_DELETE m_workerLock;
 }
 
-IocpTcpServer & IocpTcpServer::operator=(const IocpTcpServer&b)
+IocpUdpServer & IocpUdpServer::operator=(const IocpUdpServer&b)
 {
 	if(this!=&b)
 	{
-		BaseTcpServer::operator =(b);
+		BaseUdpServer::operator =(b);
 		switch(m_lockPolicy)
 		{
 		case epl::LOCK_POLICY_CRITICALSECTION:
@@ -99,12 +99,12 @@ IocpTcpServer & IocpTcpServer::operator=(const IocpTcpServer&b)
 	return *this;
 }
 
-void IocpTcpServer::CallBackFunc(BaseWorkerThread *p)
+void IocpUdpServer::CallBackFunc(BaseWorkerThread *p)
 {
 	epl::LockObj lock(m_workerLock);
 	m_emptyWorkerList.push(p);
 }
-void IocpTcpServer::pushJob(BaseJob * job)
+void IocpUdpServer::pushJob(BaseJob * job)
 {
 	epl::LockObj lock(m_workerLock);
 	if(m_emptyWorkerList.size())
@@ -134,10 +134,10 @@ void IocpTcpServer::pushJob(BaseJob * job)
 	}
 }
 
-void IocpTcpServer::StopServer()
+void IocpUdpServer::StopServer()
 {
 	epl::LockObj lock(m_workerLock);
-	BaseTcpServer::StopServer();
+	BaseUdpServer::StopServer();
 
 	while(!m_emptyWorkerList.empty())
 		m_emptyWorkerList.pop();
@@ -150,7 +150,7 @@ void IocpTcpServer::StopServer()
 	m_workerList.clear();
 }
 
-bool IocpTcpServer::StartServer(const ServerOps &ops)
+bool IocpUdpServer::StartServer(const ServerOps &ops)
 {
 	epl::LockObj lock(m_workerLock);
 	int workerCount=ops.workerThreadCount;
@@ -171,45 +171,63 @@ bool IocpTcpServer::StartServer(const ServerOps &ops)
 	}
 	
 	
-	return BaseTcpServer::StartServer(ops);
+	return BaseUdpServer::StartServer(ops);
 }
 
-void IocpTcpServer::execute()
+void IocpUdpServer::execute()
 {
-	SOCKET clientSocket;
-	sockaddr sockAddr;
-	int sizeOfSockAddr=sizeof(sockaddr);
-	while(1)
+	Packet recvPacket(NULL,m_maxPacketSize);
+	char *packetData=const_cast<char*>(recvPacket.GetPacket());
+	int length=recvPacket.GetPacketByteSize();
+	sockaddr clientSockAddr;
+	int sockAddrSize=sizeof(sockaddr);
+	while(m_listenSocket!=INVALID_SOCKET)
 	{
-		clientSocket=accept(m_listenSocket,&sockAddr,&sizeOfSockAddr);
-		if(clientSocket == INVALID_SOCKET || m_listenSocket== INVALID_SOCKET)
+		int recvLength=recvfrom(m_listenSocket,packetData,length, 0,&clientSockAddr,&sockAddrSize);
+
+		IocpUdpSocket *workerObj=(IocpUdpSocket*)m_socketList.Find(clientSockAddr,socketCompare);
+		if(workerObj)
 		{
-			break;			
+			if(recvLength<=0)
+			{
+				Packet *passPacket=EP_NEW Packet(packetData,0);
+				workerObj->addPacket(passPacket);
+				passPacket->ReleaseObj();
+				continue;
+			}	
+			Packet *passPacket=EP_NEW Packet(packetData,recvLength);
+			workerObj->addPacket(passPacket);
+			passPacket->ReleaseObj();
 		}
 		else
 		{
-			if(!m_callBackObj->OnAccept(sockAddr))
-			{
-				closesocket(clientSocket);
+			if(recvLength<=0)
 				continue;
-			}
-			IocpTcpSocket *accWorker=EP_NEW IocpTcpSocket(m_callBackObj,m_waitTime,m_lockPolicy);
-			accWorker->setClientSocket(clientSocket);
-			accWorker->setSockAddr(sockAddr);
-
-			accWorker->setOwner(this);
-			m_socketList.Push(accWorker);	
-			accWorker->Start();
-			accWorker->ReleaseObj();
 			if(GetMaximumConnectionCount()!=CONNECTION_LIMIT_INFINITE)
 			{
-				while(m_socketList.Count()>=GetMaximumConnectionCount())
+				if(m_socketList.Count()>=GetMaximumConnectionCount())
 				{
-					m_socketList.WaitForListSizeDecrease();
+					continue;
 				}
 			}
+			if(!m_callBackObj->OnAccept(clientSockAddr))
+			{
+				continue;
+			}
+			/// Create Worker Thread
+			Packet *passPacket=EP_NEW Packet(packetData,recvLength);
+			IocpUdpSocket *accWorker=EP_NEW IocpUdpSocket(m_callBackObj,m_waitTime,m_lockPolicy);
+			accWorker->setSockAddr(clientSockAddr);
+			accWorker->setOwner(this);
+			accWorker->setMaxPacketByteSize(m_maxPacketSize);
+			m_socketList.Push(accWorker);
+			accWorker->Start();
+			accWorker->addPacket(passPacket);
+			accWorker->ReleaseObj();
+			passPacket->ReleaseObj();
 
 		}
+
 	}
 
 	stopServer();

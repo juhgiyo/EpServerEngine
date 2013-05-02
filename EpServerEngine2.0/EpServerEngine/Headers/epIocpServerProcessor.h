@@ -1,9 +1,9 @@
 /*! 
-@file epIocpTcpProcessor.h
+@file epIocpServerProcessor.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/epserverengine>
 @date February 13, 2012
-@brief IOCP TCP Processor Interface
+@brief IOCP Server Processor Interface
 @version 1.0
 
 @section LICENSE
@@ -25,19 +25,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for IOCP TCP Processor.
+An Interface for IOCP Server Processor.
 
 */
-#ifndef __EP_IOCP_TCP_PROCESSOR_H__
-#define __EP_IOCP_TCP_PROCESSOR_H__
+#ifndef __EP_IOCP_SERVER_PROCESSOR_H__
+#define __EP_IOCP_SERVER_PROCESSOR_H__
 
 #include "epServerEngine.h"
 namespace epse{
 		/*! 
-	@class IocpTcpProcessor epIocpTcpProcessor.h
-	@brief A class for IOCP TCP Processor.
+	@class IocpServerProcessor epIocpServerProcessor.h
+	@brief A class for IOCP SERVER Processor.
 	*/
-	class EP_SERVER_ENGINE IocpTcpProcessor:public BaseJobProcessor{
+	class EP_SERVER_ENGINE IocpServerProcessor:public BaseJobProcessor{
 
 	public:
 		/*!
@@ -59,4 +59,4 @@ namespace epse{
 }
 
 
-#endif //__EP_IOCP_TCP_PROCESSOR_H__
+#endif //__EP_IOCP_SERVER_PROCESSOR_H__

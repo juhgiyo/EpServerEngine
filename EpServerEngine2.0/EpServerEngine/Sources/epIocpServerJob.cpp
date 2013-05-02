@@ -1,5 +1,5 @@
 /*! 
-IocpTcpJob for the EpServerEngine
+IocpServerJob for the EpServerEngine
 Copyright (C) 2012  Woong Gyu La <juhgiyo@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "epIocpTcpJob.h"
-#include "epSyncTcpServer.h"
+#include "epIocpServerJob.h"
 
 #if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
 #define new DEBUG_NEW
@@ -26,7 +25,7 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace epse;
 
-IocpTcpJob::IocpTcpJob(IocpTcpSocket *socket,IocpTcpJobType jobType,Packet *packet,EventEx *completionEvent,ServerCallbackInterface *callBackObj,Priority priority,epl::LockPolicy lockPolicyType):BaseJob(priority,lockPolicyType)
+IocpServerJob::IocpServerJob(BaseSocket *socket,IocpServerJobType jobType,Packet *packet,EventEx *completionEvent,ServerCallbackInterface *callBackObj,Priority priority,epl::LockPolicy lockPolicyType):BaseJob(priority,lockPolicyType)
 {
 	m_jobType=jobType;
 	m_packet=packet;
@@ -40,14 +39,14 @@ IocpTcpJob::IocpTcpJob(IocpTcpSocket *socket,IocpTcpJobType jobType,Packet *pack
 	m_callBackObj=callBackObj;
 }
 
-IocpTcpJob::~IocpTcpJob()
+IocpServerJob::~IocpServerJob()
 {
 	if(m_packet)
 		m_packet->ReleaseObj();
 	if(m_socket)
 		m_socket->ReleaseObj();
 }
-void IocpTcpJob::SetJob(IocpTcpSocket *socket,IocpTcpJobType jobType, Packet *packet,EventEx *completionEvent,ServerCallbackInterface *callBackObj)
+void IocpServerJob::SetJob(BaseSocket *socket,IocpServerJobType jobType, Packet *packet,EventEx *completionEvent,ServerCallbackInterface *callBackObj)
 {
 	if(m_socket)
 		m_socket->ReleaseObj();
@@ -66,27 +65,27 @@ void IocpTcpJob::SetJob(IocpTcpSocket *socket,IocpTcpJobType jobType, Packet *pa
 	m_callBackObj=callBackObj;
 }
 
-IocpTcpJob::IocpTcpJobType IocpTcpJob::GetJobType() const
+IocpServerJob::IocpServerJobType IocpServerJob::GetJobType() const
 {
 	return m_jobType;
 }
 
-const Packet *IocpTcpJob::GetPacket() const
+const Packet *IocpServerJob::GetPacket() const
 {
 	return m_packet;
 }
 
-IocpTcpSocket *IocpTcpJob::GetSocket()
+BaseSocket *IocpServerJob::GetSocket()
 {
 	return m_socket;
 }
 
-EventEx *IocpTcpJob::GetCompletionEvent()
+EventEx *IocpServerJob::GetCompletionEvent()
 {
 	return m_completeEvent;
 }
 
-ServerCallbackInterface *IocpTcpJob::GetCallBackObject()
+ServerCallbackInterface *IocpServerJob::GetCallBackObject()
 {
 	return m_callBackObj;
 }

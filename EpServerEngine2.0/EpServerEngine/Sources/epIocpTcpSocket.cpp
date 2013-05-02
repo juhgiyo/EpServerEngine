@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "epIocpTcpSocket.h"
 #include "epIocpTcpServer.h"
-#include "epIocpTcpJob.h"
+#include "epIocpServerJob.h"
 #if defined(_DEBUG) && defined(EP_ENABLE_CRTDBG)
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -42,7 +42,7 @@ bool IocpTcpSocket::IsConnectionAlive() const
 
 void IocpTcpSocket::KillConnection(EventEx *completionEvent,ServerCallbackInterface *callBackObj,Priority priority)
 {
-	IocpTcpJob *newJob= EP_NEW IocpTcpJob(this,IocpTcpJob::IOCP_TCP_JOB_TYPE_DISCONNECT,NULL,completionEvent,callBackObj,priority,m_lockPolicy);
+	IocpServerJob *newJob= EP_NEW IocpServerJob(this,IocpServerJob::IOCP_SERVER_JOB_TYPE_DISCONNECT,NULL,completionEvent,callBackObj,priority,m_lockPolicy);
 	((IocpTcpServer*)m_owner)->pushJob(newJob);
 	newJob->ReleaseObj();
 }
@@ -88,14 +88,14 @@ void IocpTcpSocket::killConnectionNoCallBack()
 
 void IocpTcpSocket::Send(Packet &packet,EventEx *completionEvent,ServerCallbackInterface *callBackObj,Priority priority)
 {
-	IocpTcpJob *newJob= EP_NEW IocpTcpJob(this,IocpTcpJob::IOCP_TCP_JOB_TYPE_SEND,&packet,completionEvent,callBackObj,priority,m_lockPolicy);
+	IocpServerJob *newJob= EP_NEW IocpServerJob(this,IocpServerJob::IOCP_SERVER_JOB_TYPE_SEND,&packet,completionEvent,callBackObj,priority,m_lockPolicy);
 	((IocpTcpServer*)m_owner)->pushJob(newJob);
 	newJob->ReleaseObj();
 }
 
 void IocpTcpSocket::Receive(EventEx *completionEvent,ServerCallbackInterface *callBackObj,Priority priority)
 {
-	IocpTcpJob *newJob= EP_NEW IocpTcpJob(this,IocpTcpJob::IOCP_TCP_JOB_TYPE_RECEIVE,NULL,completionEvent,callBackObj,priority,m_lockPolicy);
+	IocpServerJob *newJob= EP_NEW IocpServerJob(this,IocpServerJob::IOCP_SERVER_JOB_TYPE_RECEIVE,NULL,completionEvent,callBackObj,priority,m_lockPolicy);
 	((IocpTcpServer*)m_owner)->pushJob(newJob);
 	newJob->ReleaseObj();
 }

@@ -69,6 +69,7 @@ namespace epse{
 		friend class BaseServerObject;
 
 		friend class IocpTcpServer;
+		friend class IocpUdpServer;
 		/*!
 		Default Constructor
 

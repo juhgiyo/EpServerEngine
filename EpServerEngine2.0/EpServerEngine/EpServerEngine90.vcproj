@@ -721,21 +721,37 @@
 					Name="IOCP"
 					>
 					<File
-						RelativePath=".\Sources\epIocpTcpJob.cpp"
+						RelativePath=".\Sources\epIocpServerJob.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\Sources\epIocpTcpProcessor.cpp"
+						RelativePath=".\Sources\epIocpServerProcessor.cpp"
 						>
 					</File>
-					<File
-						RelativePath=".\Sources\epIocpTcpServer.cpp"
+					<Filter
+						Name="TCP"
 						>
-					</File>
-					<File
-						RelativePath=".\Sources\epIocpTcpSocket.cpp"
+						<File
+							RelativePath=".\Sources\epIocpTcpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epIocpTcpSocket.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
 						>
-					</File>
+						<File
+							RelativePath=".\Sources\epIocpUdpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epIocpUdpSocket.cpp"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 			<Filter
@@ -1107,21 +1123,37 @@
 					Name="IOCP"
 					>
 					<File
-						RelativePath=".\Headers\epIocpTcpJob.h"
+						RelativePath=".\Headers\epIocpServerJob.h"
 						>
 					</File>
 					<File
-						RelativePath=".\Headers\epIocpTcpProcessor.h"
+						RelativePath=".\Headers\epIocpServerProcessor.h"
 						>
 					</File>
-					<File
-						RelativePath=".\Headers\epIocpTcpServer.h"
+					<Filter
+						Name="TCP"
 						>
-					</File>
-					<File
-						RelativePath=".\Headers\epIocpTcpSocket.h"
+						<File
+							RelativePath=".\Headers\epIocpTcpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epIocpTcpSocket.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
 						>
-					</File>
+						<File
+							RelativePath=".\Headers\epIocpUdpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epIocpUdpSocket.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 		</Filter>

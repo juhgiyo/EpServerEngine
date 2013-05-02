@@ -1,9 +1,9 @@
 /*! 
-@file epIocpTcpJob.h
+@file epIocpServerJob.h
 @author Woong Gyu La a.k.a Chris. <juhgiyo@gmail.com>
 		<http://github.com/juhgiyo/epserverengine>
 @date February 13, 2012
-@brief IOCP TCP Job Interface
+@brief IOCP Server Job Interface
 @version 1.0
 
 @section LICENSE
@@ -25,30 +25,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 @section DESCRIPTION
 
-An Interface for IOCP TCP Job.
+An Interface for IOCP Server Job.
 
 */
-#ifndef __EP_IOCP_TCP_JOB_H__
-#define __EP_IOCP_TCP_JOB_H__
+#ifndef __EP_IOCP_SERVER_JOB_H__
+#define __EP_IOCP_SERVER_JOB_H__
 
 #include "epServerEngine.h"
-#include "epIocpTcpSocket.h"
+#include "epBaseSocket.h"
 
 namespace epse{
 		/*! 
-	@class IocpTcpJob epIocpTcpJob.h
-	@brief A class for IOCP TCP Job.
+	@class IocpServerJob epIocpServerJob.h
+	@brief A class for IOCP SERVER Job.
 	*/
-	class EP_SERVER_ENGINE IocpTcpJob:public BaseJob{
+	class EP_SERVER_ENGINE IocpServerJob:public BaseJob{
 
 	public:
 
-		typedef enum _IocpTcpJobType{
-			IOCP_TCP_JOB_TYPE_NULL=0,
-			IOCP_TCP_JOB_TYPE_SEND,
-			IOCP_TCP_JOB_TYPE_RECEIVE,
-			IOCP_TCP_JOB_TYPE_DISCONNECT,
-		}IocpTcpJobType;
+		typedef enum _IocpServerJobType{
+			IOCP_SERVER_JOB_TYPE_NULL=0,
+			IOCP_SERVER_JOB_TYPE_SEND,
+			IOCP_SERVER_JOB_TYPE_RECEIVE,
+			IOCP_SERVER_JOB_TYPE_DISCONNECT,
+		}IocpServerJobType;
 
 		/*!
 		Default Constructor
@@ -59,22 +59,22 @@ namespace epse{
 		@param[in] priority the priority of the job
 		@param[in] lockPolicyType The lock policy
 		*/
-		IocpTcpJob(IocpTcpSocket *socket=NULL,IocpTcpJobType jobType=IOCP_TCP_JOB_TYPE_NULL,Packet *packet=NULL,EventEx *completionEvent=NULL,ServerCallbackInterface *callBackObj=NULL,Priority priority=PRIORITY_NORMAL,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
+		IocpServerJob(BaseSocket *socket=NULL,IocpServerJobType jobType=IOCP_SERVER_JOB_TYPE_NULL,Packet *packet=NULL,EventEx *completionEvent=NULL,ServerCallbackInterface *callBackObj=NULL,Priority priority=PRIORITY_NORMAL,epl::LockPolicy lockPolicyType=epl::EP_LOCK_POLICY);
 
 		/*!
 		Default Destructor
 
 		Destroy the Socket
 		*/
-		virtual ~IocpTcpJob();
+		virtual ~IocpServerJob();
 
-		void SetJob(IocpTcpSocket *socket,IocpTcpJobType jobType,Packet *packet=NULL,EventEx *completionEvent=NULL,ServerCallbackInterface *callBackObj=NULL);
+		void SetJob(BaseSocket *socket,IocpServerJobType jobType,Packet *packet=NULL,EventEx *completionEvent=NULL,ServerCallbackInterface *callBackObj=NULL);
 
-		IocpTcpJobType GetJobType() const;
+		IocpServerJobType GetJobType() const;
 
 		const Packet *GetPacket() const;
 
-		IocpTcpSocket *GetSocket();
+		BaseSocket *GetSocket();
 
 		EventEx *GetCompletionEvent();
 
@@ -84,9 +84,9 @@ namespace epse{
 	protected:
 		Packet *m_packet;
 
-		IocpTcpJobType m_jobType;
+		IocpServerJobType m_jobType;
 
-		IocpTcpSocket *m_socket;
+		BaseSocket *m_socket;
 
 		EventEx *m_completeEvent;
 
@@ -96,4 +96,4 @@ namespace epse{
 }
 
 
-#endif //__EP_IOCP_TCP_JOB_H__
+#endif //__EP_IOCP_SERVER_JOB_H__
