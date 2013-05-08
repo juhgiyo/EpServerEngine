@@ -94,6 +94,11 @@ namespace epse{
 		virtual void CallBackFunc(BaseWorkerThread *p);
 
 		friend class IocpUdpSocket;
+
+		/*!
+		Add new job to the worker thread.
+		@param[in] job the job to push to the worker thread.
+		*/
 		void pushJob(BaseJob * job);
 
 		/*!
@@ -104,7 +109,9 @@ namespace epse{
 		/// general lock 
 		epl::BaseLock *m_workerLock;
 
+		/// Worker thread list
 		vector<BaseWorkerThread*> m_workerList;
+		/// worker thread list with no job
 		queue<BaseWorkerThread*> m_emptyWorkerList;
 
 	};

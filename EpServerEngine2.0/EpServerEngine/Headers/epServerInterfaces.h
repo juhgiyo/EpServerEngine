@@ -338,7 +338,7 @@ namespace epse{
 		virtual void OnReceived(SocketInterface *socket,const Packet*receivedPacket,ReceiveStatus status)=0;
 
 		/*!
-		Received the packet from the client.
+		Sent the packet from the client.
 		@param[in] socket the client socket which sent the packet
 		@param[in] status the status of Send
 		@remark for IOCP Server Use Only!

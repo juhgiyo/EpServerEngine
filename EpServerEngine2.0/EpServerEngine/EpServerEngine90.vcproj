@@ -829,6 +829,34 @@
 						</File>
 					</Filter>
 				</Filter>
+				<Filter
+					Name="IOCP"
+					>
+					<File
+						RelativePath=".\Sources\epIocpClientJob.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Sources\epIocpClientProcessor.cpp"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epIocpTcpClient.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epIocpUdpClient.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="General"
@@ -935,6 +963,34 @@
 						>
 						<File
 							RelativePath=".\Headers\epSyncUdpClient.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="IOCP"
+					>
+					<File
+						RelativePath=".\Headers\epIocpClientJob.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Headers\epIocpClientProcessor.h"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Headers\epIocpTcpClient.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Headers\epIocpUdpClient.h"
 							>
 						</File>
 					</Filter>

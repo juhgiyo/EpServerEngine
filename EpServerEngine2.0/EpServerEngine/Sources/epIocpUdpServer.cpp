@@ -136,9 +136,9 @@ void IocpUdpServer::pushJob(BaseJob * job)
 
 void IocpUdpServer::StopServer()
 {
-	epl::LockObj lock(m_workerLock);
 	BaseUdpServer::StopServer();
 
+	m_workerLock->Lock();
 	while(!m_emptyWorkerList.empty())
 		m_emptyWorkerList.pop();
 
@@ -148,11 +148,22 @@ void IocpUdpServer::StopServer()
 		EP_DELETE m_workerList.at(trav);
 	}
 	m_workerList.clear();
+	m_workerLock->Unlock();
 }
 
 bool IocpUdpServer::StartServer(const ServerOps &ops)
 {
-	epl::LockObj lock(m_workerLock);
+	m_workerLock->Lock();
+	while(!m_emptyWorkerList.empty())
+		m_emptyWorkerList.pop();
+
+	for(int trav=0;trav<m_workerList.size();trav++)
+	{
+		m_workerList.at(trav)->TerminateWorker(m_waitTime);
+		EP_DELETE m_workerList.at(trav);
+	}
+	m_workerList.clear();
+
 	int workerCount=ops.workerThreadCount;
 	if(workerCount==0)
 	{
@@ -169,7 +180,7 @@ bool IocpUdpServer::StartServer(const ServerOps &ops)
 		workerThread->SetJobProcessor(EP_NEW IocpServerProcessor());
 		workerThread->Start();
 	}
-	
+	m_workerLock->Unlock();
 	
 	return BaseUdpServer::StartServer(ops);
 }
