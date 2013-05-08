@@ -576,79 +576,123 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath=".\Sources\epBasePacketParser.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Sources\epBaseServerObject.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Sources\epPacket.cpp"
-				>
-			</File>
 			<Filter
 				Name="Client Side"
 				>
+				<File
+					RelativePath=".\Sources\epClientInterface.cpp"
+					>
+				</File>
 				<Filter
-					Name="TCP"
+					Name="Asynchronous"
+					>
+					<File
+						RelativePath=".\Sources\epClientPacketProcessor.cpp"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epAsyncTcpClient.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epAsyncUdpClient.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="IOCP"
+					>
+					<File
+						RelativePath=".\Sources\epIocpClientJob.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Sources\epIocpClientProcessor.cpp"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epIocpTcpClient.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epIocpUdpClient.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Synchronous"
+					>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epSyncTcpClient.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epSyncUdpClient.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Templates"
 					>
 					<File
 						RelativePath=".\Sources\epBaseClient.cpp"
 						>
 					</File>
-					<File
-						RelativePath=".\Sources\epBaseClientManual.cpp"
+					<Filter
+						Name="TCP"
 						>
-					</File>
-				</Filter>
-				<Filter
-					Name="UDP"
-					>
-					<File
-						RelativePath=".\Sources\epBaseClientUDP.cpp"
+						<File
+							RelativePath=".\Sources\epBaseTcpClient.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
 						>
-					</File>
-					<File
-						RelativePath=".\Sources\epBaseClientUDPManual.cpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="Server Side"
-				>
-				<Filter
-					Name="TCP"
-					>
-					<File
-						RelativePath=".\Sources\epBaseServer.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\Sources\epBaseServerWorker.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="UDP"
-					>
-					<File
-						RelativePath=".\Sources\epBaseServerUDP.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\Sources\epBaseServerWorkerUDP.cpp"
-						>
-					</File>
+						<File
+							RelativePath=".\Sources\epBaseUdpClient.cpp"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 			<Filter
-				Name="ServerObject List"
+				Name="General"
 				>
 				<File
-					RelativePath=".\Sources\epParserList.cpp"
+					RelativePath=".\Sources\epBasePacketProcessor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Sources\epBaseServerObject.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Sources\epPacket.cpp"
 					>
 				</File>
 				<File
@@ -660,6 +704,190 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Server Side"
+				>
+				<File
+					RelativePath=".\Sources\epServerInterface.cpp"
+					>
+				</File>
+				<Filter
+					Name="Asynchronous"
+					>
+					<File
+						RelativePath=".\Sources\epServerPacketProcessor.cpp"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epAsyncTcpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epAsyncTcpSocket.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epAsyncUdpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epAsyncUdpSocket.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="IOCP"
+					>
+					<File
+						RelativePath=".\Sources\epIocpServerJob.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Sources\epIocpServerProcessor.cpp"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epIocpTcpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epIocpTcpSocket.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epIocpUdpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epIocpUdpSocket.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Proxy"
+					>
+					<File
+						RelativePath=".\Sources\epProxyServerInterfaces.cpp"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epProxyTcpHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epProxyTcpServer.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epProxyUdpHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epProxyUdpServer.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="Templates"
+						>
+						<File
+							RelativePath=".\Sources\epBaseProxyHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epBaseProxyServer.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Synchronous"
+					>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epSyncTcpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epSyncTcpSocket.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epSyncUdpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epSyncUdpSocket.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Templates"
+					>
+					<File
+						RelativePath=".\Sources\epBaseServer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Sources\epBaseSocket.cpp"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Sources\epBaseTcpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epBaseTcpSocket.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Sources\epBaseUdpServer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\Sources\epBaseUdpSocket.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -667,31 +895,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\Headers\epBasePacketParser.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Headers\epBaseServerObject.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Headers\epBaseServerSendObject.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Headers\epPacket.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Headers\epPacketContainer.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Headers\epse.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Headers\epServerConf.h"
 				>
 			</File>
 			<File
@@ -701,64 +905,312 @@
 			<Filter
 				Name="Client Side"
 				>
+				<File
+					RelativePath=".\Headers\epClientInterfaces.h"
+					>
+				</File>
 				<Filter
-					Name="TCP"
+					Name="Asynchronous"
+					>
+					<File
+						RelativePath=".\Headers\epClientPacketProcessor.h"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Headers\epAsyncTcpClient.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Headers\epAsyncUdpClient.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="IOCP"
+					>
+					<File
+						RelativePath=".\Headers\epIocpClientJob.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Headers\epIocpClientProcessor.h"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Headers\epIocpTcpClient.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Headers\epIocpUdpClient.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Synchronous"
+					>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Headers\epSyncTcpClient.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Headers\epSyncUdpClient.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Templates"
 					>
 					<File
 						RelativePath=".\Headers\epBaseClient.h"
 						>
 					</File>
-					<File
-						RelativePath=".\Headers\epBaseClientManual.h"
+					<Filter
+						Name="TCP"
 						>
-					</File>
-				</Filter>
-				<Filter
-					Name="UDP"
-					>
-					<File
-						RelativePath=".\Headers\epBaseClientUDP.h"
+						<File
+							RelativePath=".\Headers\epBaseTcpClient.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
 						>
-					</File>
-					<File
-						RelativePath=".\Headers\epBaseClientUDPManual.h"
-						>
-					</File>
+						<File
+							RelativePath=".\Headers\epBaseUdpClient.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 			<Filter
 				Name="Server Side"
 				>
+				<File
+					RelativePath=".\Headers\epServerInterfaces.h"
+					>
+				</File>
 				<Filter
-					Name="TCP"
+					Name="Asynchronous"
+					>
+					<File
+						RelativePath=".\Headers\epServerPacketProcessor.h"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Headers\epAsyncTcpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epAsyncTcpSocket.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Headers\epAsyncUdpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epAsyncUdpSocket.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Synchronous"
+					>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Headers\epSyncTcpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epSyncTcpSocket.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Headers\epSyncUdpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epSyncUdpSocket.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="IOCP"
+					>
+					<File
+						RelativePath=".\Headers\epIocpServerJob.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Headers\epIocpServerProcessor.h"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Headers\epIocpTcpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epIocpTcpSocket.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Headers\epIocpUdpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epIocpUdpSocket.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Proxy"
+					>
+					<File
+						RelativePath=".\Headers\epProxyServerInterfaces.h"
+						>
+					</File>
+					<Filter
+						Name="TCP"
+						>
+						<File
+							RelativePath=".\Headers\epProxyTcpHandler.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epProxyTcpServer.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
+						>
+						<File
+							RelativePath=".\Headers\epProxyUdpHandler.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epProxyUdpServer.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="Templates"
+						>
+						<File
+							RelativePath=".\Headers\epBaseProxyHandler.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epBaseProxyServer.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="Templates"
 					>
 					<File
 						RelativePath=".\Headers\epBaseServer.h"
 						>
 					</File>
 					<File
-						RelativePath=".\Headers\epBaseServerWorker.h"
+						RelativePath=".\Headers\epBaseSocket.h"
 						>
 					</File>
-				</Filter>
-				<Filter
-					Name="UDP"
-					>
-					<File
-						RelativePath=".\Headers\epBaseServerUDP.h"
+					<Filter
+						Name="TCP"
 						>
-					</File>
-					<File
-						RelativePath=".\Headers\epBaseServerWorkerUDP.h"
+						<File
+							RelativePath=".\Headers\epBaseTcpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epBaseTcpSocket.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDP"
 						>
-					</File>
+						<File
+							RelativePath=".\Headers\epBaseUdpServer.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Headers\epBaseUdpSocket.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 			<Filter
-				Name="ServerObject List"
+				Name="General"
 				>
 				<File
-					RelativePath=".\Headers\epParserList.h"
+					RelativePath=".\Headers\epBasePacketProcessor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Headers\epBaseServerObject.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Headers\epPacket.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Headers\epPacketContainer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Headers\epServerConf.h"
 					>
 				</File>
 				<File
@@ -878,10 +1330,6 @@
 			</File>
 			<File
 				RelativePath=".\EpLibraryHeaders\epFolderHelper.h"
-				>
-			</File>
-			<File
-				RelativePath=".\EpLibraryHeaders\epFoundationLib.h"
 				>
 			</File>
 			<File

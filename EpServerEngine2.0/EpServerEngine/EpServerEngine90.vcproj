@@ -566,10 +566,6 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath=".\Sources\epPacket.cpp"
-				>
-			</File>
 			<Filter
 				Name="Server Side"
 				>
@@ -761,13 +757,13 @@
 					RelativePath=".\Sources\epClientInterface.cpp"
 					>
 				</File>
-				<File
-					RelativePath=".\Sources\epClientPacketProcessor.cpp"
-					>
-				</File>
 				<Filter
 					Name="Asynchronous"
 					>
+					<File
+						RelativePath=".\Sources\epClientPacketProcessor.cpp"
+						>
+					</File>
 					<Filter
 						Name="TCP"
 						>
@@ -867,6 +863,10 @@
 				</File>
 				<File
 					RelativePath=".\Sources\epBaseServerObject.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Sources\epPacket.cpp"
 					>
 				</File>
 				<File
