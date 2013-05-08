@@ -16,6 +16,192 @@
     <Filter Include="EpLibraryHeaders">
       <UniqueIdentifier>{1491596d-364e-472c-a1d7-7fb2aeb5314f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Client Side">
+      <UniqueIdentifier>{34e665ac-a4b3-4a38-8bd8-b6b56532e17a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\General">
+      <UniqueIdentifier>{5fcdb02f-a7a8-4fb2-8653-444e4b82f2b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side">
+      <UniqueIdentifier>{d601fb6d-fdeb-4ed0-9de0-166da3969924}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\Asynchronous">
+      <UniqueIdentifier>{0104e1e8-7606-4eb6-8e03-abcb0d46cf6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\IOCP">
+      <UniqueIdentifier>{0e01b249-3a9d-4f99-aa4b-ff73d462dfe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\Synchronous">
+      <UniqueIdentifier>{f7949e46-2408-40b7-b2ea-be9bc0b20692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\Templates">
+      <UniqueIdentifier>{859686bc-1617-4c26-943f-7ba7196518b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\Asynchronous\TCP">
+      <UniqueIdentifier>{088bb908-1a3e-4ea3-a5ea-e6e44f42cec9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\Asynchronous\UDP">
+      <UniqueIdentifier>{b221eab9-c279-4cb6-b937-7359e8201c93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\IOCP\UDP">
+      <UniqueIdentifier>{2c6f00e0-432c-4e1b-8cdd-5a6ee4a88230}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\IOCP\TCP">
+      <UniqueIdentifier>{53d7951b-99fa-4762-ad65-f4769c05d91a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\Synchronous\TCP">
+      <UniqueIdentifier>{e5166eab-c13b-458b-8c9e-def80c193db2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\Synchronous\UDP">
+      <UniqueIdentifier>{3499c87f-e1ae-4bbd-a0bf-328ba69f0260}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\Templates\TCP">
+      <UniqueIdentifier>{c385940c-7f1f-4b00-9e9b-8512646a19a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Client Side\Templates\UDP">
+      <UniqueIdentifier>{248eba59-bf89-4e9d-838b-78e5a11833db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Asynchronous">
+      <UniqueIdentifier>{e0140517-d786-4fa4-bb10-1375af90e11e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\IOCP">
+      <UniqueIdentifier>{205233c8-986b-449a-9070-da2d1a0e2a3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Proxy">
+      <UniqueIdentifier>{a7d295b4-5115-47ab-b340-d248dd5d41b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Synchronous">
+      <UniqueIdentifier>{faf91dc8-a1ff-486b-ba4b-61d067733789}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Templates">
+      <UniqueIdentifier>{77bc6fba-429f-41d1-b877-e1dd76e79a42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Asynchronous\TCP">
+      <UniqueIdentifier>{ad184583-9911-4bf3-b8d2-ad145edbe155}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Asynchronous\UDP">
+      <UniqueIdentifier>{8090f834-d848-4f73-92e9-7e290fa9cee0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\IOCP\TCP">
+      <UniqueIdentifier>{73c6ade4-e412-4fc8-9ab9-583010524ffc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\IOCP\UDP">
+      <UniqueIdentifier>{55cb8410-a280-41d4-a5bc-13211da42626}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Templates\TCP">
+      <UniqueIdentifier>{810cf62b-5bbe-4a0a-9bfe-b0862cd892fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Templates\UDP">
+      <UniqueIdentifier>{16eaf5a0-2e3b-4c74-9565-6d70a3aeda95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Synchronous\TCP">
+      <UniqueIdentifier>{22db46b1-f04e-40d9-aff8-de3479a04999}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Synchronous\UDP">
+      <UniqueIdentifier>{1dc77ee3-8d0d-46d4-b54f-1023bb5d1619}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Proxy\TCP">
+      <UniqueIdentifier>{ab447504-ff73-4fb7-9add-e1d1a010f7bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Proxy\UDP">
+      <UniqueIdentifier>{9a37f715-d031-44f8-a608-c06b3ba3570a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server Side\Proxy\Templates">
+      <UniqueIdentifier>{08b72aa0-9124-4242-bc15-70e80a42972d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side">
+      <UniqueIdentifier>{05a1a8ae-af95-42d7-a638-702c78ec1e2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\General">
+      <UniqueIdentifier>{bb7de806-a4d8-4d0a-beae-a69a7111e622}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side">
+      <UniqueIdentifier>{4b39df94-4abb-4423-9348-a753b2c30ebb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\Asynchronous">
+      <UniqueIdentifier>{30cca943-b2e7-4644-a461-c419a201e5c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\IOCP">
+      <UniqueIdentifier>{2f0a65ed-22cd-46fc-ba3e-8d740210653b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\Synchronous">
+      <UniqueIdentifier>{27bf6c81-4c66-4e4e-a8e5-67c57875112a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\Templates">
+      <UniqueIdentifier>{155e2f1a-2746-4058-90fd-5591a6669255}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\Asynchronous\TCP">
+      <UniqueIdentifier>{e990d142-9d93-417c-96dc-c99ea02722b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\Asynchronous\UDP">
+      <UniqueIdentifier>{f5956b7b-ce04-4c5d-a0ae-ed0750e6abe3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\IOCP\TCP">
+      <UniqueIdentifier>{e5c443f0-0a5d-4f95-84dc-b9aa94589d83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\IOCP\UDP">
+      <UniqueIdentifier>{9ca63ab4-82fc-49dc-8616-b5fb9126ac92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\Templates\TCP">
+      <UniqueIdentifier>{d6d5c8f3-ec78-4922-8dd8-c67a58aa9109}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\Templates\UDP">
+      <UniqueIdentifier>{571a9de1-c529-4c9b-b53b-2432fb2e567c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\Synchronous\TCP">
+      <UniqueIdentifier>{1dc4ae85-12df-44ca-8bfa-a9216e129775}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Client Side\Synchronous\UDP">
+      <UniqueIdentifier>{6541804e-4e65-4604-831c-3847f4fa0a38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Asynchronous">
+      <UniqueIdentifier>{15f96d37-2f26-40c5-99b2-195e1b3606dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\IOCP">
+      <UniqueIdentifier>{4bff0442-092e-4b7e-9a5e-1d60133bf906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Proxy">
+      <UniqueIdentifier>{544e6bfd-5060-4755-b6c8-6aed41c7e90b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Synchronous">
+      <UniqueIdentifier>{7206e86c-2c2e-40a1-b4fc-e93759adfb2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Templates">
+      <UniqueIdentifier>{b373dbfc-69f8-484c-ace5-622ca8fa40ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Asynchronous\TCP">
+      <UniqueIdentifier>{d6f1a3ad-e07c-48f9-b92b-9818acfa0eec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Asynchronous\UDP">
+      <UniqueIdentifier>{a5c7aaae-3d9e-4d26-bb9f-5a05d5ff3e33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\IOCP\TCP">
+      <UniqueIdentifier>{ef834afc-3be8-4a39-8893-70ac620d2cb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\IOCP\UDP">
+      <UniqueIdentifier>{261295b3-48dd-4611-b51c-fe2ecc2ace9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Templates\TCP">
+      <UniqueIdentifier>{dee84b70-4dca-4372-a339-613a4adfe139}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Templates\UDP">
+      <UniqueIdentifier>{f96de5be-88d4-4dba-b593-5c64a25c1431}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Synchronous\TCP">
+      <UniqueIdentifier>{8e0e75a1-eb43-44ec-8d94-0084b1ae8aa3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Synchronous\UDP">
+      <UniqueIdentifier>{2d0ea7a8-5777-47b7-b5cc-1e6646d83bc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Proxy\TCP">
+      <UniqueIdentifier>{2398ac0a-947c-4299-8b76-30c13dcbdde2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Proxy\UDP">
+      <UniqueIdentifier>{4fce12fa-e13a-4133-9bb4-63094334aa3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Side\Proxy\Templates">
+      <UniqueIdentifier>{7980cc92-c540-42cf-8c50-0e6aee5369fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EpLibraryHeaders\epAlgorithm.h">
@@ -213,158 +399,158 @@
     <ClInclude Include="EpLibraryHeaders\epXMLite.h">
       <Filter>EpLibraryHeaders</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\epAsyncTcpClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epAsyncTcpServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epAsyncTcpSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epAsyncUdpClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epAsyncUdpServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epAsyncUdpSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBasePacketProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseProxyHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseProxyServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseServerObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseTcpClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseTcpServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseTcpSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseUdpClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseUdpServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epBaseUdpSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epClientInterfaces.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epClientPacketProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epIocpClientJob.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epIocpClientProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epIocpServerJob.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epIocpServerProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epIocpTcpClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epIocpTcpServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epIocpTcpSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epIocpUdpClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epIocpUdpServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epIocpUdpSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epPacket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epPacketContainer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epProxyServerInterfaces.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epProxyTcpHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epProxyTcpServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epProxyUdpHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epProxyUdpServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\epse.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epServerConf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Headers\epServerEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\epServerInterfaces.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Headers\epAsyncTcpClient.h">
+      <Filter>Header Files\Client Side\Asynchronous\TCP</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\epServerObjectList.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Headers\epAsyncUdpClient.h">
+      <Filter>Header Files\Client Side\Asynchronous\UDP</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\epServerObjectRemover.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Headers\epClientPacketProcessor.h">
+      <Filter>Header Files\Client Side\Asynchronous</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\epServerPacketProcessor.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Headers\epClientInterfaces.h">
+      <Filter>Header Files\Client Side</Filter>
     </ClInclude>
     <ClInclude Include="Headers\epSyncTcpClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epSyncTcpServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\epSyncTcpSocket.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Client Side\Synchronous\TCP</Filter>
     </ClInclude>
     <ClInclude Include="Headers\epSyncUdpClient.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Client Side\Synchronous\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epIocpClientJob.h">
+      <Filter>Header Files\Client Side\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epIocpClientProcessor.h">
+      <Filter>Header Files\Client Side\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epIocpTcpClient.h">
+      <Filter>Header Files\Client Side\IOCP\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epIocpUdpClient.h">
+      <Filter>Header Files\Client Side\IOCP\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseClient.h">
+      <Filter>Header Files\Client Side\Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseTcpClient.h">
+      <Filter>Header Files\Client Side\Templates\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseUdpClient.h">
+      <Filter>Header Files\Client Side\Templates\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBasePacketProcessor.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseServerObject.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epPacket.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epPacketContainer.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epServerConf.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epServerObjectList.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epServerObjectRemover.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epServerInterfaces.h">
+      <Filter>Header Files\Server Side</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epAsyncTcpServer.h">
+      <Filter>Header Files\Server Side\Asynchronous\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epAsyncTcpSocket.h">
+      <Filter>Header Files\Server Side\Asynchronous\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epAsyncUdpServer.h">
+      <Filter>Header Files\Server Side\Asynchronous\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epAsyncUdpSocket.h">
+      <Filter>Header Files\Server Side\Asynchronous\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epServerPacketProcessor.h">
+      <Filter>Header Files\Server Side\Asynchronous</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epIocpServerJob.h">
+      <Filter>Header Files\Server Side\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epIocpServerProcessor.h">
+      <Filter>Header Files\Server Side\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epIocpTcpServer.h">
+      <Filter>Header Files\Server Side\IOCP\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epIocpTcpSocket.h">
+      <Filter>Header Files\Server Side\IOCP\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epIocpUdpServer.h">
+      <Filter>Header Files\Server Side\IOCP\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epIocpUdpSocket.h">
+      <Filter>Header Files\Server Side\IOCP\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epProxyServerInterfaces.h">
+      <Filter>Header Files\Server Side\Proxy</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epProxyTcpHandler.h">
+      <Filter>Header Files\Server Side\Proxy\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epProxyTcpServer.h">
+      <Filter>Header Files\Server Side\Proxy\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epProxyUdpHandler.h">
+      <Filter>Header Files\Server Side\Proxy\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epProxyUdpServer.h">
+      <Filter>Header Files\Server Side\Proxy\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseProxyHandler.h">
+      <Filter>Header Files\Server Side\Proxy\Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseProxyServer.h">
+      <Filter>Header Files\Server Side\Proxy\Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epSyncTcpServer.h">
+      <Filter>Header Files\Server Side\Synchronous\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epSyncTcpSocket.h">
+      <Filter>Header Files\Server Side\Synchronous\TCP</Filter>
     </ClInclude>
     <ClInclude Include="Headers\epSyncUdpServer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Server Side\Synchronous\UDP</Filter>
     </ClInclude>
     <ClInclude Include="Headers\epSyncUdpSocket.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Server Side\Synchronous\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseServer.h">
+      <Filter>Header Files\Server Side\Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseSocket.h">
+      <Filter>Header Files\Server Side\Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseTcpServer.h">
+      <Filter>Header Files\Server Side\Templates\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseTcpSocket.h">
+      <Filter>Header Files\Server Side\Templates\TCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseUdpServer.h">
+      <Filter>Header Files\Server Side\Templates\UDP</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\epBaseUdpSocket.h">
+      <Filter>Header Files\Server Side\Templates\UDP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -373,146 +559,146 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Sources\epAsyncTcpClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epAsyncTcpServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epAsyncTcpSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epAsyncUdpClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epAsyncUdpServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epAsyncUdpSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epBaseClient.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Sources\epClientInterface.cpp">
+      <Filter>Source Files\Client Side</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epBasePacketProcessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epBaseProxyHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epBaseProxyServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epBaseServer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epBaseServerObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epBaseSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epBaseTcpClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epBaseTcpServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epBaseTcpSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epBaseUdpClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epBaseUdpServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epBaseUdpSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epClientInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epClientPacketProcessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epIocpClientJob.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epIocpClientProcessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epIocpServerJob.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epIocpServerProcessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epIocpTcpClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epIocpTcpServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epIocpTcpSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epIocpUdpClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epIocpUdpServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epIocpUdpSocket.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epPacket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epProxyServerInterfaces.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epProxyTcpHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epProxyTcpServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epProxyUdpHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epProxyUdpServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epServerInterface.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epServerObjectList.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epServerObjectRemover.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epServerPacketProcessor.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epSyncTcpClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epSyncTcpServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\epSyncTcpSocket.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Client Side\Synchronous\TCP</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epSyncUdpClient.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Client Side\Synchronous\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epAsyncTcpClient.cpp">
+      <Filter>Source Files\Client Side\Asynchronous\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epAsyncUdpClient.cpp">
+      <Filter>Source Files\Client Side\Asynchronous\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epClientPacketProcessor.cpp">
+      <Filter>Source Files\Client Side\Asynchronous</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epIocpClientJob.cpp">
+      <Filter>Source Files\Client Side\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epIocpClientProcessor.cpp">
+      <Filter>Source Files\Client Side\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epIocpTcpClient.cpp">
+      <Filter>Source Files\Client Side\IOCP\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epIocpUdpClient.cpp">
+      <Filter>Source Files\Client Side\IOCP\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseClient.cpp">
+      <Filter>Source Files\Client Side\Templates</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseTcpClient.cpp">
+      <Filter>Source Files\Client Side\Templates\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseUdpClient.cpp">
+      <Filter>Source Files\Client Side\Templates\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epServerInterface.cpp">
+      <Filter>Source Files\Server Side</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epAsyncTcpServer.cpp">
+      <Filter>Source Files\Server Side\Asynchronous\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epAsyncTcpSocket.cpp">
+      <Filter>Source Files\Server Side\Asynchronous\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epAsyncUdpServer.cpp">
+      <Filter>Source Files\Server Side\Asynchronous\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epAsyncUdpSocket.cpp">
+      <Filter>Source Files\Server Side\Asynchronous\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epServerPacketProcessor.cpp">
+      <Filter>Source Files\Server Side\Asynchronous</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epIocpServerJob.cpp">
+      <Filter>Source Files\Server Side\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epIocpServerProcessor.cpp">
+      <Filter>Source Files\Server Side\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epIocpTcpServer.cpp">
+      <Filter>Source Files\Server Side\IOCP\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epIocpTcpSocket.cpp">
+      <Filter>Source Files\Server Side\IOCP\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epIocpUdpServer.cpp">
+      <Filter>Source Files\Server Side\IOCP\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epIocpUdpSocket.cpp">
+      <Filter>Source Files\Server Side\IOCP\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epProxyServerInterfaces.cpp">
+      <Filter>Source Files\Server Side\Proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epProxyTcpServer.cpp">
+      <Filter>Source Files\Server Side\Proxy\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epProxyTcpHandler.cpp">
+      <Filter>Source Files\Server Side\Proxy\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epProxyUdpHandler.cpp">
+      <Filter>Source Files\Server Side\Proxy\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epProxyUdpServer.cpp">
+      <Filter>Source Files\Server Side\Proxy\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseProxyHandler.cpp">
+      <Filter>Source Files\Server Side\Proxy\Templates</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseProxyServer.cpp">
+      <Filter>Source Files\Server Side\Proxy\Templates</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epSyncTcpServer.cpp">
+      <Filter>Source Files\Server Side\Synchronous\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epSyncTcpSocket.cpp">
+      <Filter>Source Files\Server Side\Synchronous\TCP</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epSyncUdpServer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Server Side\Synchronous\UDP</Filter>
     </ClCompile>
     <ClCompile Include="Sources\epSyncUdpSocket.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Server Side\Synchronous\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseServer.cpp">
+      <Filter>Source Files\Server Side\Templates</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseSocket.cpp">
+      <Filter>Source Files\Server Side\Templates</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseTcpServer.cpp">
+      <Filter>Source Files\Server Side\Templates\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseTcpSocket.cpp">
+      <Filter>Source Files\Server Side\Templates\TCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseUdpServer.cpp">
+      <Filter>Source Files\Server Side\Templates\UDP</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\epBaseUdpSocket.cpp">
+      <Filter>Source Files\Server Side\Templates\UDP</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
