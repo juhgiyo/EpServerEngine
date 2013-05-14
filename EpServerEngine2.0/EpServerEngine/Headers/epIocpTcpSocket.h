@@ -80,7 +80,7 @@ namespace epse
 		/*!
 		Send the packet to the server
 		@param[in] packet the packet to be sent
-		@param[in] complentionEvent the event to set when send is completed
+		@param[in] completionEvent the event to set when send is completed
 		@param[in] callBackObj the object to callback when send is completed
 		@param[in] priority the priority of the send job
 		@remark if the completionEvent and callBackObj are set as NULL, it is ignored.
@@ -90,7 +90,7 @@ namespace epse
 
 		/*!
 		Receive the packet from the client
-		@param[in] complentionEvent the event to set when receive is completed
+		@param[in] completionEvent the event to set when receive is completed
 		@param[in] callBackObj the object to callback when receive is completed
 		@param[in] priority the priority of the receive job
 		@remark if the completionEvent and callBackObj are set as NULL, it is ignored.
@@ -105,6 +105,7 @@ namespace epse
 		Send the packet to the server
 		@param[in] packet the packet to be sent
 		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
+		@param[in] sendStatus the status of Send
 		@return sent byte size
 		@remark return -1 if error occurred
 		*/

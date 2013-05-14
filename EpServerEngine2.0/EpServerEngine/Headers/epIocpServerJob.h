@@ -59,7 +59,10 @@ namespace epse{
 
 		Initializes the Job
 		@param[in] socket the client socket to do the job
+		@param[in] jobType the type of the job
 		@param[in] packet the packet to do job
+		@param[in] completionEvent the event for IO completion
+		@param[in] callBackObj the callback object for IO completion
 		@param[in] priority the priority of the job
 		@param[in] lockPolicyType The lock policy
 		*/

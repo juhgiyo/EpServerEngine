@@ -68,6 +68,7 @@ namespace epse{
 		Received the packet from the client.
 		@param[in] socket the client socket which received the packet
 		@param[in] receivedPacket the received packet
+		@param[in] status the status of Receive
 		@remark for Asynchronous Server Use Only!
 		*/
 		void OnReceived(SocketInterface *socket,const Packet *receivedPacket,ReceiveStatus status);
@@ -83,6 +84,7 @@ namespace epse{
 		Received the packet from the server.
 		@param[in] client the client which received the packet
 		@param[in] receivedPacket the received packet
+		@param[in] status the status of Receive
 		@remark for Asynchronous Client Use Only!
 		*/
 		void OnReceived(ClientInterface *client,const Packet*receivedPacket,ReceiveStatus status);

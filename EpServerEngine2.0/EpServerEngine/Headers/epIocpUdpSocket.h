@@ -80,15 +80,18 @@ namespace epse
 		/*!
 		Send the packet to the server
 		@param[in] packet the packet to be sent
-		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
+		@param[in] completionEvent the event for IO completion
+		@param[in] callBackObj the callback object for IO completion
+		@param[in] priority the priority of the send
 		*/
 		void Send(Packet &packet,EventEx *completionEvent=NULL,ServerCallbackInterface *callBackObj=NULL,Priority priority=PRIORITY_NORMAL);
 
 
 		/*!
 		Receive the packet from the client
-		@param[in] waitTimeInMilliSec wait time for receiving the packet in millisecond
-		@param[out] retStatus the pointer to ReceiveStatus enumerator to get receive status.
+		@param[in] completionEvent the event for IO completion
+		@param[in] callBackObj the callback object for IO completion
+		@param[in] priority the priority of the receive
 		@return received packet
 		@remark the caller must call ReleaseObj() for Packet to avoid the memory leak.
 		*/
@@ -102,6 +105,7 @@ namespace epse
 		Send the packet to the server
 		@param[in] packet the packet to be sent
 		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
+		@param[in] sendStatus the status of Send
 		@return sent byte size
 		@remark return -1 if error occurred
 		*/

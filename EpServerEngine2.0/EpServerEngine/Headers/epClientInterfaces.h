@@ -176,6 +176,7 @@ namespace epse{
 		Send the packet to the client
 		@param[in] packet the packet to be sent
 		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
+		@param[in] sendStatus the status of send.
 		@return sent byte size
 		@remark return -1 if error occurred
 		*/
@@ -250,6 +251,7 @@ namespace epse{
 		Received the packet from the server.
 		@param[in] client the client which received the packet
 		@param[in] receivedPacket the received packet
+		@param[in] status the status of receive
 		@remark for Asynchronous Client Use Only!
 		*/
 		virtual void OnReceived(ClientInterface *client,const Packet*receivedPacket,ReceiveStatus status)=0;

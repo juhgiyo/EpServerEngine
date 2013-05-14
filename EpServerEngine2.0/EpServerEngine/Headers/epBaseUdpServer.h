@@ -120,6 +120,7 @@ namespace epse{
 		@param[in] packet the packet to be sent
 		@param[in] clientSockAddr the client socket address, which the packet will be delivered
 		@param[in] waitTimeInMilliSec wait time for sending the packet in millisecond
+		@param[in] sendStatus the status of Send
 		@return sent byte size
 		@remark return -1 if error occurred
 		*/
