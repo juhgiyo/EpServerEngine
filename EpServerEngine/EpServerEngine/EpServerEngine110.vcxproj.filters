@@ -359,6 +359,24 @@
     <ClInclude Include="EpLibraryHeaders\epBinaryFile.h">
       <Filter>EpLibraryHeaders</Filter>
     </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcClient.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcClientInterfaces.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcConf.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcPipe.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcServer.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcServerInterfaces.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LICENSE">

@@ -893,6 +893,30 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EpLibraryHeaders\epIpcClient.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EpLibraryHeaders\epIpcClientInterfaces.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EpLibraryHeaders\epIpcConf.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EpLibraryHeaders\epIpcPipe.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EpLibraryHeaders\epIpcServer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EpLibraryHeaders\epIpcServerInterfaces.h"
+				>
+			</File>
+			<File
 				RelativePath=".\EpLibraryHeaders\epJobScheduleQueue.h"
 				>
 			</File>

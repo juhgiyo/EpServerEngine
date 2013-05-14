@@ -369,6 +369,12 @@
     <ClInclude Include="EpLibraryHeaders\epFolderHelper.h" />
     <ClInclude Include="EpLibraryHeaders\epInsertionSort.h" />
     <ClInclude Include="EpLibraryHeaders\epInterlockedEx.h" />
+    <ClInclude Include="EpLibraryHeaders\epIpcClient.h" />
+    <ClInclude Include="EpLibraryHeaders\epIpcClientInterfaces.h" />
+    <ClInclude Include="EpLibraryHeaders\epIpcConf.h" />
+    <ClInclude Include="EpLibraryHeaders\epIpcPipe.h" />
+    <ClInclude Include="EpLibraryHeaders\epIpcServer.h" />
+    <ClInclude Include="EpLibraryHeaders\epIpcServerInterfaces.h" />
     <ClInclude Include="EpLibraryHeaders\epJobScheduleQueue.h" />
     <ClInclude Include="EpLibraryHeaders\epKAryHeap.h" />
     <ClInclude Include="EpLibraryHeaders\epl.h" />

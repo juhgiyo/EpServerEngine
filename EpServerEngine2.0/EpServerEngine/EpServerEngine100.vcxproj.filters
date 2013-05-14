@@ -557,6 +557,24 @@
     <ClInclude Include="Headers\epBaseUdpSocket.h">
       <Filter>Header Files\Server Side\Templates\UDP</Filter>
     </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcClient.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcClientInterfaces.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcConf.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcPipe.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcServer.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epIpcServerInterfaces.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\epBasePacketProcessor.cpp">
