@@ -408,6 +408,7 @@
     <ClInclude Include="EpLibraryHeaders\epThreadSafeQueue.h" />
     <ClInclude Include="EpLibraryHeaders\epTinyObject.h" />
     <ClInclude Include="EpLibraryHeaders\epWinProcessHelper.h" />
+    <ClInclude Include="EpLibraryHeaders\epWinResizer.h" />
     <ClInclude Include="EpLibraryHeaders\epWorkerThreadDelegate.h" />
     <ClInclude Include="EpLibraryHeaders\epWorkerThreadFactory.h" />
     <ClInclude Include="EpLibraryHeaders\epWorkerThreadInfinite.h" />

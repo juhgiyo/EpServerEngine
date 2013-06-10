@@ -1497,6 +1497,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EpLibraryHeaders\epWinResizer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\EpLibraryHeaders\epWorkerThreadDelegate.h"
 				>
 			</File>

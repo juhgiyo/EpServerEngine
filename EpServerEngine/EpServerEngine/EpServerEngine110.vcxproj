@@ -404,6 +404,7 @@
     <ClInclude Include="EpLibraryHeaders\epIpcServerInterfaces.h" />
     <ClInclude Include="EpLibraryHeaders\epLib.h" />
     <ClInclude Include="EpLibraryHeaders\epLogWriter.h" />
+    <ClInclude Include="EpLibraryHeaders\epWinResizer.h" />
     <ClInclude Include="Headers\epBaseClientManual.h" />
     <ClInclude Include="Headers\epBaseClientUDPManual.h" />
     <ClInclude Include="Headers\epBasePacketParser.h" />
