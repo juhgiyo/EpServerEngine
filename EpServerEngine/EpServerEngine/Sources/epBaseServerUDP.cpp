@@ -167,6 +167,11 @@ void  BaseServerUDP::SetPort(const TCHAR *  port)
 
 void  BaseServerUDP::setPort(const TCHAR *  port)
 {
+	if(port==NULL)
+	{
+		m_port=DEFAULT_PORT;
+		return;
+	}
 	unsigned int strLength=epl::System::TcsLen(port);
 	if(strLength==0)
 		m_port=DEFAULT_PORT;

@@ -163,6 +163,11 @@ void  BaseClientManual::SetPort(const TCHAR *port)
 
 void BaseClientManual::setHostName(const TCHAR * hostName)
 {
+	if(hostName==NULL)
+	{
+		m_hostName=DEFAULT_HOSTNAME;
+		return;
+	}
 	unsigned int strLength=epl::System::TcsLen(hostName);
 	if(strLength==0)
 		m_hostName=DEFAULT_HOSTNAME;
@@ -178,6 +183,11 @@ void BaseClientManual::setHostName(const TCHAR * hostName)
 
 void BaseClientManual::setPort(const TCHAR *port)
 {
+	if(port==NULL)
+	{
+		m_port=DEFAULT_PORT;
+		return;
+	}
 	unsigned int strLength=epl::System::TcsLen(port);
 	if(strLength==0)
 		m_port=DEFAULT_PORT;
