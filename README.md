@@ -71,6 +71,12 @@ USAGE
 To find the usage examples, please see the [wiki page](https://github.com/juhgiyo/EpServerEngine/wiki)
 
 
+WARNING
+-------
+
+Warning: This framework is not free from the 10K problem, since it is creating one thread per connection. (There are many frameworks out there which use IOCP to avoid the 10K problem.) This may be sufficient for small network where performance is not very important( which was most of my case).  
+
+
 REFERENCE
 ---------
 * [EpLibrary 2.0](https://github.com/juhgiyo/EpLibrary)
