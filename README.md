@@ -74,7 +74,7 @@ To find the usage examples, please see the [wiki page](https://github.com/juhgiy
 WARNING
 -------
 
-Warning: This framework is not free from the 10K problem, since it is creating one thread per connection. (There are many frameworks out there which use IOCP to avoid the 10K problem.) This may be sufficient for small network where performance is not very important( which was most of my case).  
+Warning: This framework is not free from the 10K problem, since it is creating one thread per connection. (There are many frameworks out there which use IOCP to avoid the 10K problem.) This may be sufficient for small network where performance is NOT very important( which was most of my case).  
 
 
 REFERENCE
