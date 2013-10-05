@@ -104,7 +104,7 @@ namespace epse{
 		
 		/*!
 		Get the IP of client
-		@param socketAddr the socket address info
+		@param[in] socketAddr the socket address info
 		@return the IP of client in string
 		*/
 		static epl::EpTString GetIP(sockaddr socketAddr);
