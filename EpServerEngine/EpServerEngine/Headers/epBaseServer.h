@@ -49,17 +49,6 @@ An Interface for Base Server.
 #include "epServerObjectList.h"
 #include "epParserList.h"
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <vector>
-
-// Need to link with Ws2_32.lib
-#pragma comment (lib, "Ws2_32.lib")
-
-
-
 
 using namespace std;
 
@@ -203,11 +192,12 @@ namespace epse{
 	protected:
 		/*!
 		Return the new server worker.
+		@param[in] sockAddrInfo the socket address info
 		@remark Sub-class should implement this to create new worker.
 		@remark Server will automatically release this worker.
 		@return the new server worker
 		*/
-		virtual BaseServerWorker* createNewWorker()=0;
+		virtual BaseServerWorker* createNewWorker(sockaddr sockAddrInfo)=0;
 
 	private:
 		/*!
@@ -266,6 +256,10 @@ namespace epse{
 		SOCKET m_listenSocket;
 		/// internal use variable
 		struct addrinfo *m_result;
+		// Socket info
+		sockaddr m_socketInfo;
+		// Socket info size
+		int m_sockAddrSize;
 
 		/// general lock 
 		epl::BaseLock *m_baseServerLock;

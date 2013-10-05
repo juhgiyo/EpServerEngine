@@ -258,6 +258,50 @@ BaseServer *BaseServerWorker::GetOwner() const
 	return m_owner;
 }
 
+epl::EpTString BaseServerWorker::GetIP() const
+{
+	sockaddr socketAddr;
+	int socketAddrSize=sizeof(sockaddr);
+	char ip[INET6_ADDRSTRLEN] = {0};
+	if(getpeername(m_clientSocket,&socketAddr,&socketAddrSize)!=SOCKET_ERROR)
+	{
+#if  (_WIN32_WINNT >=WINDOWS_VISTA)
+		sockaddr_in *sin ;
+		sockaddr_in6 *sin6 ;
+		switch (socketAddr.sa_family)
+		{
+		case AF_INET:
+			  // use of reinterpret_cast preferred to C style cast
+			  sin = reinterpret_cast<sockaddr_in*>(&socketAddr);
+			  InetNtop(AF_INET, &sin->sin_addr, ip, INET6_ADDRSTRLEN);
+			  break;
+		case AF_INET6:
+			  sin6 = reinterpret_cast<sockaddr_in6*>(&socketAddr);
+			  // inet_ntoa should be considered deprecated
+			  InetNtop(AF_INET6, &sin6->sin6_addr, ip, INET6_ADDRSTRLEN);
+			  break;
+		  default:
+			  break;
+		}
+#else
+		sockaddr_in *sin ;
+		char * ipPtr=NULL;
+		sin = reinterpret_cast<sockaddr_in*>(&socketAddr);
+		ipPtr=inet_ntoa(sin->sin_addr);
+		memcpy(ip,ipPtr,strlen(ipPtr));
+#endif 
+	}
+	epl::EpString ipString=ip; 
+	if(!ipString.length())
+		return _T("");
+#if defined(_UNICODE) || defined(UNICODE)
+	epl::EpTString retString=epl::System::MultiByteToWideChar(ipString.c_str());
+	return retString;
+#else //defined(_UNICODE) || defined(UNICODE)
+	return ipString;
+#endif //defined(_UNICODE) || defined(UNICODE)
+}
+
 void BaseServerWorker::KillConnection()
 {
 	epl::LockObj lock(m_baseWorkerLock);

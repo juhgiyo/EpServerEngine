@@ -50,17 +50,6 @@ An Interface for Base UDP Server.
 #include "epServerObjectList.h"
 #include "epParserList.h"
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <vector>
-
-// Need to link with Ws2_32.lib
-#pragma comment (lib, "Ws2_32.lib")
-
-
-
 
 using namespace std;
 
@@ -212,11 +201,12 @@ namespace epse{
 	protected:
 		/*!
 		Return the new server worker.
+		@param[in] sockAddrInfo the socket address info
 		@remark Sub-class should implement this to create new worker.
 		@remark Server will automatically release this worker.
 		@return the new server worker
 		*/
-		virtual BaseServerWorkerUDP* createNewWorker()=0;
+		virtual BaseServerWorkerUDP* createNewWorker(sockaddr sockAddrInfo)=0;
 
 	private:
 		/*!

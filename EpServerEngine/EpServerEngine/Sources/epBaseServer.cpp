@@ -58,6 +58,8 @@ BaseServer::BaseServer(const TCHAR *  port,SyncPolicy syncPolicy, unsigned int m
 	setSyncPolicy(syncPolicy);
 	m_maxConnectionCount=maximumConnectionCount;
 	m_parserList=NULL;
+	memset(&m_socketInfo,0,sizeof(sockaddr));
+	m_sockAddrSize=sizeof(sockaddr);
 }
 
 BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
@@ -89,6 +91,8 @@ BaseServer::BaseServer(const BaseServer& b):BaseServerObject(b)
 	m_parserList=b.m_parserList;
 	if(m_parserList)
 		m_parserList->RetainObj();	
+	memset(&m_socketInfo,0,sizeof(sockaddr));
+	m_sockAddrSize=sizeof(sockaddr);
 }
 BaseServer::~BaseServer()
 {
@@ -130,6 +134,8 @@ BaseServer & BaseServer::operator=(const BaseServer&b)
 		m_parserList=b.m_parserList;
 		if(m_parserList)
 			m_parserList->RetainObj();
+		memset(&m_socketInfo,0,sizeof(sockaddr));
+		m_sockAddrSize=sizeof(sockaddr);
 	}
 	return *this;
 }
@@ -241,14 +247,16 @@ void BaseServer::execute()
 
 	while(1)
 	{
-		clientSocket=accept(m_listenSocket, NULL, NULL);
+		memset(&m_socketInfo,0,sizeof(sockaddr));
+		m_sockAddrSize=sizeof(sockaddr);
+		clientSocket=accept(m_listenSocket,&m_socketInfo,&m_sockAddrSize);
 		if(clientSocket == INVALID_SOCKET || m_listenSocket== INVALID_SOCKET)
 		{
 			break;			
 		}
 		else
 		{
-			BaseServerWorker *accWorker=createNewWorker();
+			BaseServerWorker *accWorker=createNewWorker(m_socketInfo);
 			accWorker->setSyncPolicy(m_syncPolicy);
 			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 				accWorker->setParserList(m_parserList);

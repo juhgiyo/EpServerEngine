@@ -41,6 +41,15 @@ An Interface for Base Server Object.
 #include "epServerEngine.h"
 #include "epServerConf.h"
 
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <vector>
+
+// Need to link with Ws2_32.lib
+#pragma comment (lib, "Ws2_32.lib")
+
 namespace epse{
 
 	/*! 
@@ -93,8 +102,12 @@ namespace epse{
 		*/
 		unsigned int GetWaitTime();
 		
-
-
+		/*!
+		Get the IP of client
+		@param socketAddr the socket address info
+		@return the IP of client in string
+		*/
+		static epl::EpTString GetIP(sockaddr socketAddr);
 		
 	private:
 		friend class ServerObjectList;
