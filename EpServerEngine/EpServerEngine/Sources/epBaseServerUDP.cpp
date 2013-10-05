@@ -357,8 +357,12 @@ void BaseServerUDP::execute()
 				}
 			}
 			/// Create Worker Thread
-			Packet *passPacket=EP_NEW Packet(packetData,recvLength);
 			BaseServerWorkerUDP *accWorker=createNewWorker(clientSockAddr);
+			if(!accWorker)
+			{
+				continue;
+			}
+			Packet *passPacket=EP_NEW Packet(packetData,recvLength);
 			accWorker->setSyncPolicy(m_syncPolicy);
 			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 				accWorker->setParserList(m_parserList);

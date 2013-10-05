@@ -257,6 +257,11 @@ void BaseServer::execute()
 		else
 		{
 			BaseServerWorker *accWorker=createNewWorker(m_socketInfo);
+			if(!accWorker)
+			{
+				closesocket(clientSocket);
+				continue;
+			}
 			accWorker->setSyncPolicy(m_syncPolicy);
 			if(m_syncPolicy==SYNC_POLICY_SYNCHRONOUS)
 				accWorker->setParserList(m_parserList);

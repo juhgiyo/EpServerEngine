@@ -204,6 +204,7 @@ namespace epse{
 		@param[in] sockAddrInfo the socket address info
 		@remark Sub-class should implement this to create new worker.
 		@remark Server will automatically release this worker.
+		@remark returning NULL will close the client connection.
 		@return the new server worker
 		*/
 		virtual BaseServerWorkerUDP* createNewWorker(sockaddr sockAddrInfo)=0;

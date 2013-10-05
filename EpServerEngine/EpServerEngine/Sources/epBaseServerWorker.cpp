@@ -418,6 +418,11 @@ void BaseServerWorker::execute()
 				passUnit.m_packet=recvPacket;
 				passUnit.m_owner=this;
 				BasePacketParser *parser =createNewPacketParser();
+				if(!parser)
+				{
+					recvPacket->ReleaseObj();
+					continue;
+				}
 				parser->setSyncPolicy(m_syncPolicy);
 				parser->setPacketPassUnit(passUnit);
 				m_parserList->Push(parser);

@@ -406,6 +406,11 @@ void BaseServerWorkerUDP::execute()
 		passUnit.m_owner=this;
 		passUnit.m_packet=packet;
 		BasePacketParser *parser =createNewPacketParser();
+		if(!parser)
+		{
+			packet->ReleaseObj();
+			continue;
+		}
 		parser->setSyncPolicy(m_syncPolicy);
 		parser->setPacketPassUnit(passUnit);
 		m_parserList->Push(parser);

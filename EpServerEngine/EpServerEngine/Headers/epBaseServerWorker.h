@@ -167,6 +167,7 @@ namespace epse
 		Return the new packet parser
 		@remark Sub-class should implement this to create new parser.
 		@remark Client will automatically release this parser.
+		@remark returning NULL will ignore the packet.
 		@return the new packet parser
 		*/
 		virtual BasePacketParser* createNewPacketParser()=0;
