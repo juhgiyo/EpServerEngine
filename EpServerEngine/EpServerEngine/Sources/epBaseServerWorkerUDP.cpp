@@ -260,6 +260,10 @@ epl::EpTString BaseServerWorkerUDP::GetIP() const
 	epl::EpTString retString=ip;
 	return retString;
 }
+sockaddr BaseServerWorkerUDP::GetSockAddr() const
+{
+	return m_clientSocket;
+}
 
 unsigned int BaseServerWorkerUDP::GetMaxPacketByteSize() const
 {

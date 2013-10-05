@@ -273,6 +273,17 @@ epl::EpTString BaseServerWorker::GetIP() const
 	return retString;
 }
 
+sockaddr BaseServerWorker::GetSockAddr() const
+{
+	sockaddr socketAddr={0};
+	int socketAddrSize=sizeof(sockaddr);
+	if(getpeername(m_clientSocket,&socketAddr,&socketAddrSize)!=SOCKET_ERROR)
+	{
+		return socketAddr;
+	}
+	return socketAddr;
+}
+
 void BaseServerWorker::KillConnection()
 {
 	epl::LockObj lock(m_baseWorkerLock);

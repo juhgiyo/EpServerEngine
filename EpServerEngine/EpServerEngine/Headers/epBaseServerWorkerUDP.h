@@ -160,6 +160,12 @@ namespace epse
 		*/
 		epl::EpTString GetIP() const;
 
+		/*!
+		Get the sockaddr of client
+		@return the sockaddr of client
+		*/
+		sockaddr GetSockAddr() const;
+
 	protected:
 		/*!
 		Return the new packet parser
