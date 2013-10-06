@@ -62,6 +62,6 @@ ProxyTcpServer & ProxyTcpServer::operator=(const ProxyTcpServer&b)
 void ProxyTcpServer::OnNewConnection(SocketInterface *socket)
 {
 	epl::LockObj lock(m_baseProxyServerLock);
-	ProxyTcpHandler *newHandler=EP_NEW ProxyTcpHandler(m_callBack,m_callBack->GetForwardServerInfo(socket->GetSockAddress()),socket);
+	ProxyTcpHandler *newHandler=EP_NEW ProxyTcpHandler(m_callBack,m_callBack->GetForwardServerInfo(socket->GetSockAddr()),socket);
 	m_proxyHandlerList.push_back(newHandler);
 }

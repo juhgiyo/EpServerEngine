@@ -108,7 +108,7 @@ epl::EpTString BaseSocket::GetIP() const
 	return retString;
 }
 
-sockaddr BaseSocket::GetSockAddress() const
+sockaddr BaseSocket::GetSockAddr() const
 {
 	return m_sockAddr;
 }

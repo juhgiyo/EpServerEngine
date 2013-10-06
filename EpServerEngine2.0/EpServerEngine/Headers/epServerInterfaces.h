@@ -235,7 +235,7 @@ namespace epse{
 		Get the sockaddr of this socket object.
 		@return the sockaddr of this socket object.
 		*/
-		virtual sockaddr GetSockAddress() const=0;
+		virtual sockaddr GetSockAddr() const=0;
 
 		/*!
 		Get the IP of client

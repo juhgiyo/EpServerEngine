@@ -80,7 +80,7 @@ void BaseProxyHandler::OnDisconnect(SocketInterface *socket)
 	if(m_forwardClient)
 		m_forwardClient->Disconnect();
 	epl::LockObj lock(m_baseProxyHandlerLock);
-	m_callBack->OnDisconnect(socket->GetSockAddress());
+	m_callBack->OnDisconnect(socket->GetSockAddr());
 }
 
 void BaseProxyHandler::OnReceived(ClientInterface *client,const Packet*receivedPacket,ReceiveStatus status)
@@ -116,11 +116,11 @@ epl::EpTString BaseProxyHandler::GetIP() const
 	return _T("");
 }
 
-sockaddr BaseProxyHandler::GetSockAddress() const
+sockaddr BaseProxyHandler::GetSockAddr() const
 {
 	if(m_client)
 	{
-		return m_client->GetSockAddress();
+		return m_client->GetSockAddr();
 	}
 	return sockaddr();
 }

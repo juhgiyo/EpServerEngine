@@ -189,9 +189,9 @@ int BaseUdpServer::send(const Packet &packet,const sockaddr &clientSockAddr, uns
 bool BaseUdpServer::socketCompare(sockaddr const & clientSocket, const BaseServerObject*obj )
 {
 	SocketInterface *workerObj=(SocketInterface*)const_cast<BaseServerObject*>(obj);
-	if(clientSocket.sa_family==workerObj->GetSockAddress().sa_family)
+	if(clientSocket.sa_family==workerObj->GetSockAddr().sa_family)
 	{
-		if(System::Memcmp((void*)clientSocket.sa_data,(void*)workerObj->GetSockAddress().sa_data,sizeof(clientSocket.sa_data))==0)
+		if(System::Memcmp((void*)clientSocket.sa_data,(void*)workerObj->GetSockAddr().sa_data,sizeof(clientSocket.sa_data))==0)
 			return true;
 	}
 	return false;

@@ -58,6 +58,6 @@ ProxyUdpServer & ProxyUdpServer::operator=(const ProxyUdpServer&b)
 void ProxyUdpServer::OnNewConnection(SocketInterface *socket)
 {
 	epl::LockObj lock(m_baseProxyServerLock);
-	ProxyUdpHandler *newHandler=EP_NEW ProxyUdpHandler(m_callBack,m_callBack->GetForwardServerInfo(socket->GetSockAddress()),socket);
+	ProxyUdpHandler *newHandler=EP_NEW ProxyUdpHandler(m_callBack,m_callBack->GetForwardServerInfo(socket->GetSockAddr()),socket);
 	m_proxyHandlerList.push_back(newHandler);
 }

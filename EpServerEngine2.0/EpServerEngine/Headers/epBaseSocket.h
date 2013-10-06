@@ -110,7 +110,7 @@ namespace epse
 		Get the sockaddr of this socket object.
 		@return the sockaddr of this socket object.
 		*/
-		sockaddr GetSockAddress() const;
+		sockaddr GetSockAddr() const;
 
 		/*!
 		Get the IP of client

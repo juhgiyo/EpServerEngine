@@ -124,7 +124,7 @@ namespace epse{
 		Get the sockaddr of client
 		@return the sockaddr of client
 		*/
-		sockaddr GetSockAddress() const;
+		sockaddr GetSockAddr() const;
 
 	protected:
 		/// client socket
