@@ -238,12 +238,17 @@ namespace epse{
 		virtual sockaddr GetSockAddress() const=0;
 
 		/*!
+		Get the IP of client
+		@return the IP of client in string
+		*/
+		virtual epl::EpTString GetIP() const=0;
+
+		/*!
 		Get the owner object of this socket object.
 		@return the pointer to the owner object.
 		*/
 		virtual BaseServerObject *GetOwner()=0;
 		
-
 		/*!
 		Set the wait time for the thread termination
 		@param[in] milliSec the time for waiting in millisecond

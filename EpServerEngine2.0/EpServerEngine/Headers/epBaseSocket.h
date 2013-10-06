@@ -112,6 +112,19 @@ namespace epse
 		*/
 		sockaddr GetSockAddress() const;
 
+		/*!
+		Get the IP of client
+		@return the IP of client in string
+		*/
+		virtual epl::EpTString GetIP() const;
+
+		/*!
+		Get the IP of client
+		@param[in] socketAddr the socket address info
+		@return the IP of client in string
+		*/
+		static epl::EpTString GetIP(sockaddr socketAddr);
+
 		
 		/*!
 		Get the owner object of this socket object.

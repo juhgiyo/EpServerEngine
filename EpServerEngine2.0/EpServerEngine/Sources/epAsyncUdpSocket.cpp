@@ -169,6 +169,11 @@ void AsyncUdpSocket::execute()
 			passUnit.m_owner=this;
 			passUnit.m_packet=packet;
 			ServerPacketProcessor *parser =EP_NEW ServerPacketProcessor(m_callBackObj,m_waitTime,m_lockPolicy);
+			if(!parser)
+			{
+				packet->ReleaseObj();
+				continue;
+			}
 			parser->setPacketPassUnit(passUnit);
 			m_processorList.Push(parser);
 			parser->Start();

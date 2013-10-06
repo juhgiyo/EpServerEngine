@@ -91,17 +91,37 @@ bool BaseSocket::IsConnectionAlive() const
 	return (GetStatus()!=Thread::THREAD_STATUS_TERMINATED);
 }
 
-sockaddr BaseSocket::GetSockAddress() const
-{
-	return m_sockAddr;
-}
 
 BaseServerObject * BaseSocket::GetOwner()
 {
 	return m_owner;
 }
 
+epl::EpTString BaseSocket::GetIP() const
+{
+	sockaddr socketAddr=m_sockAddr;
+	TCHAR ip[INET6_ADDRSTRLEN] = {0};
+	unsigned long ipSize=INET6_ADDRSTRLEN;
+	WSAPROTOCOL_INFO protocolInfo;
+	WSAAddressToString(&socketAddr,sizeof(sockaddr),&protocolInfo,ip,&ipSize);
+	epl::EpTString retString=ip;
+	return retString;
+}
 
+sockaddr BaseSocket::GetSockAddress() const
+{
+	return m_sockAddr;
+}
+
+epl::EpTString BaseSocket::GetIP(sockaddr socketAddr)
+{
+	TCHAR ip[INET6_ADDRSTRLEN] = {0};
+	unsigned long ipSize=INET6_ADDRSTRLEN;
+	WSAPROTOCOL_INFO protocolInfo;
+	WSAAddressToString(&socketAddr,sizeof(sockaddr),&protocolInfo,ip,&ipSize);
+	epl::EpTString retString=ip;
+	return retString;
+}
 
 void BaseSocket::SetCallbackObject(ServerCallbackInterface *callBackObj)
 {

@@ -106,3 +106,21 @@ ProxyServerCallbackInterface *BaseProxyHandler::GetCallbackObject()
 	epl::LockObj lock(m_baseProxyHandlerLock);
 	return m_callBack;
 }
+
+epl::EpTString BaseProxyHandler::GetIP() const
+{
+	if(m_client)
+	{
+		return m_client->GetIP();
+	}
+	return _T("");
+}
+
+sockaddr BaseProxyHandler::GetSockAddress() const
+{
+	if(m_client)
+	{
+		return m_client->GetSockAddress();
+	}
+	return sockaddr();
+}

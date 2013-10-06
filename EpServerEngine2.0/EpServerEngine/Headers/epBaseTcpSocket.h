@@ -84,7 +84,7 @@ namespace epse
 		*/
 		virtual void KillConnection()=0;
 		
-	
+
 	protected:	
 		friend class SyncTcpServer;
 		friend class AsyncTcpServer;

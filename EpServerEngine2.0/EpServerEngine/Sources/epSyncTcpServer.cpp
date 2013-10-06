@@ -74,6 +74,11 @@ void SyncTcpServer::execute()
 				continue;
 			}
 			SyncTcpSocket *accWorker=EP_NEW SyncTcpSocket(m_callBackObj,m_waitTime,m_lockPolicy);
+			if(!accWorker)
+			{
+				closesocket(clientSocket);
+				continue;
+			}
 			accWorker->setClientSocket(clientSocket);
 			accWorker->setOwner(this);
 			accWorker->setSockAddr(sockAddr);

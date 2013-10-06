@@ -95,8 +95,12 @@ void SyncUdpServer::execute()
 				continue;
 			}
 			/// Create Worker Thread
-			Packet *passPacket=EP_NEW Packet(packetData,recvLength);
 			SyncUdpSocket *accWorker=EP_NEW SyncUdpSocket(m_callBackObj,m_waitTime,m_lockPolicy);
+			if(!accWorker)
+			{
+				continue;
+			}
+			Packet *passPacket=EP_NEW Packet(packetData,recvLength);
 			accWorker->setSockAddr(clientSockAddr);
 			accWorker->setOwner(this);
 			accWorker->setMaxPacketByteSize(m_maxPacketSize);

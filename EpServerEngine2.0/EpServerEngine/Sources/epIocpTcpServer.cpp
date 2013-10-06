@@ -213,6 +213,11 @@ void IocpTcpServer::execute()
 				continue;
 			}
 			IocpTcpSocket *accWorker=EP_NEW IocpTcpSocket(m_callBackObj,m_waitTime,m_lockPolicy);
+			if(!accWorker)
+			{
+				closesocket(clientSocket);
+				continue;
+			}
 			accWorker->setClientSocket(clientSocket);
 			accWorker->setSockAddr(sockAddr);
 

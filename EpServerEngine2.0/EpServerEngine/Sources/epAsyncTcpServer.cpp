@@ -96,6 +96,11 @@ void AsyncTcpServer::execute()
 				continue;
 			}
 			AsyncTcpSocket *accWorker=EP_NEW AsyncTcpSocket(m_callBackObj,m_isAsynchronousReceive,m_waitTime,PROCESSOR_LIMIT_INFINITE,m_lockPolicy);
+			if(!accWorker)
+			{
+				closesocket(clientSocket);
+				continue;
+			}
 			accWorker->setClientSocket(clientSocket);
 			accWorker->setOwner(this);
 			accWorker->setSockAddr(sockAddr);

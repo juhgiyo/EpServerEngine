@@ -96,6 +96,7 @@ namespace epse
 		*/
 		unsigned int GetMaxPacketByteSize() const;
 
+
 	protected:	
 		friend class BaseServerUDP;
 

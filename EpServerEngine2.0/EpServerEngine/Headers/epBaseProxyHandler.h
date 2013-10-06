@@ -114,6 +114,18 @@ namespace epse{
 		*/
 		ProxyServerCallbackInterface *GetCallbackObject();
 
+		/*!
+		Get the IP of client
+		@return the IP of client in string
+		*/
+		epl::EpTString GetIP() const;
+
+		/*!
+		Get the sockaddr of client
+		@return the sockaddr of client
+		*/
+		sockaddr GetSockAddress() const;
+
 	protected:
 		/// client socket
 		SocketInterface *m_client;
