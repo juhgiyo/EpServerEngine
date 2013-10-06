@@ -153,8 +153,7 @@ epl::EpTString BaseServerObject::GetIP(sockaddr socketAddr)
 {
 	TCHAR ip[INET6_ADDRSTRLEN] = {0};
 	unsigned long ipSize=INET6_ADDRSTRLEN;
-	WSAPROTOCOL_INFO protocolInfo;
-	WSAAddressToString(&socketAddr,sizeof(sockaddr),&protocolInfo,ip,&ipSize);
+	WSAAddressToString(&socketAddr,sizeof(sockaddr),NULL,ip,&ipSize);
 	epl::EpTString retString=ip;
 	return retString;
 }

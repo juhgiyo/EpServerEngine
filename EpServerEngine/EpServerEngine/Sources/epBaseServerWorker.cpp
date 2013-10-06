@@ -266,8 +266,7 @@ epl::EpTString BaseServerWorker::GetIP() const
 	unsigned long ipSize=INET6_ADDRSTRLEN;
 	if(getpeername(m_clientSocket,&socketAddr,&socketAddrSize)!=SOCKET_ERROR)
 	{
-		WSAPROTOCOL_INFO protocolInfo;
-		WSAAddressToString(&socketAddr,sizeof(sockaddr),&protocolInfo,ip,&ipSize);
+		WSAAddressToString(&socketAddr,sizeof(sockaddr),NULL,ip,&ipSize);
 	}
 	epl::EpTString retString=ip;
 	return retString;
