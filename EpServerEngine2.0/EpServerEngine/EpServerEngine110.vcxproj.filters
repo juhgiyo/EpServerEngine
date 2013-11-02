@@ -573,6 +573,9 @@
     <ClInclude Include="EpLibraryHeaders\epWinResizer.h">
       <Filter>EpLibraryHeaders</Filter>
     </ClInclude>
+    <ClInclude Include="EpLibraryHeaders\epCoroutine.h">
+      <Filter>EpLibraryHeaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LICENSE">

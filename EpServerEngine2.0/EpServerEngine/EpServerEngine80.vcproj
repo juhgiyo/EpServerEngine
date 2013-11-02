@@ -1285,6 +1285,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EpLibraryHeaders\epCoroutine.h"
+				>
+			</File>
+			<File
 				RelativePath=".\EpLibraryHeaders\epCriticalSectionEx.h"
 				>
 			</File>

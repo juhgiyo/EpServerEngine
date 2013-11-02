@@ -355,6 +355,7 @@
     <ClInclude Include="EpLibraryHeaders\epBinarySearch.h" />
     <ClInclude Include="EpLibraryHeaders\epCmdLineOptions.h" />
     <ClInclude Include="EpLibraryHeaders\epConsoleHelper.h" />
+    <ClInclude Include="EpLibraryHeaders\epCoroutine.h" />
     <ClInclude Include="EpLibraryHeaders\epCriticalSectionEx.h" />
     <ClInclude Include="EpLibraryHeaders\epCStringEx.h" />
     <ClInclude Include="EpLibraryHeaders\epDateTimeHelper.h" />
