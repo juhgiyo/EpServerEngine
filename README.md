@@ -1,3 +1,4 @@
+<a href='https://pledgie.com/campaigns/27763'><img alt='Click here to lend your support to: EpServerEngine and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/27763.png?skin_name=chrome' border='0' ></a>
 EpServerEngine
 =======================
 #### Visual C++ WinSock Server/Client Engine ####
@@ -81,6 +82,10 @@ REFERENCE
 ---------
 * [EpLibrary 2.0](https://github.com/juhgiyo/EpLibrary)
 
+DONATION
+---------
+
+<a href='https://pledgie.com/campaigns/27763'><img alt='Click here to lend your support to: EpServerEngine and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/27763.png?skin_name=chrome' border='0' ></a>
 
 LICENSE
 -------
