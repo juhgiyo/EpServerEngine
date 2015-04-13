@@ -79,6 +79,7 @@ An Interface for EpLibrary Pre-compiled header
 #include "epXMLite.h"
 #include "epTextFile.h"
 #include "epLogWriter.h"
+#include "epLogWorker.h"
 
 //IPC
 #include "epIpcClient.h"
@@ -101,6 +102,7 @@ An Interface for EpLibrary Pre-compiled header
 #include "epSingletonHolder.h"
 #include "epSmartObject.h"
 #include "epThreadSafeClass.h"
+#include "epCrypt.h"
 
 //GUI
 #include "epTaskbarNotifier.h"
