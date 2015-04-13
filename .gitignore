@@ -1,0 +1,8 @@
+*.ncb
+*.suo
+*.user
+*.htm
+\intermediate
+\bin
+*.opensdf
+*.sdf
