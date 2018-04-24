@@ -52,7 +52,7 @@ What is in the EpServerEngine?
 DOCUMENTATION
 -------------
 
-For detailed documentation, please download the full document [EpServerEngine Documentation.chm](https://s3.amazonaws.com/elasticbeanstalk-us-east-1-052504677345/Downloads/EpServerEngine/EpServerEngine+Documentation.chm).
+For detailed documentation, please download the full document [EpServerEngine Documentation.chm](https://github.com/juhgiyo/EpServerEngine/releases/download/1.0.0/EpServerEngine.Documentation.chm).
 
 If the documentation file is not visible after finishing download,
 * Solution 1.
